@@ -7,6 +7,9 @@ run your own lines, keep a submission history); answers and submissions stay on 
 
 ## Repository and deployed source
 
+GitHub repository: [qiaosungithub/LLM-interview-web](https://github.com/qiaosungithub/LLM-interview-web)
+(branch `main`).
+
 This directory is the source of the currently running site:
 `/kmh-nfs-ssd-us-mount/code/qiao/work/interview_prep`.
 On 2026-11-20 the Cloudflare tunnel address was
@@ -26,7 +29,7 @@ Answers, submissions, grading, the access key, logs, local Python installations,
 virtual environments, `node_modules/` and `tools/out/` are excluded. They remain
 on this machine; a Git clone is not a backup of personal answers. Keep separate
 backups of `answers/` and `reviews/`. Never force-add `.access_key` or include a
-key-bearing URL in a commit. The repository is local; no remote is configured.
+key-bearing URL in a commit.
 
 ## Set up a fresh checkout
 
