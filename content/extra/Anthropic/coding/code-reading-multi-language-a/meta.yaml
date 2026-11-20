@@ -1,14 +1,17 @@
 title: "Code reading in several languages (A): C, JavaScript, SQL"
 title_zh: "读代码：三段代码，三种语言（A 卷：C / JavaScript / SQL）"
 summary_zh: "不写代码，只读代码：一段 C、一段 JavaScript、一段 SQL，各约 30 行。讲清楚每段想做什么、实际输出什么、哪里有错、怎么改、想问作者什么。"
+summary: "No writing code, only reading it: one C snippet, one JavaScript snippet and one SQL snippet, about 30 lines each. Explain what each one is trying to do, what it actually outputs, where the bugs are, how to fix them, and what you would ask the author."
 category: coding
 kind_zh: "读代码 · 多种语言"
+kind: "Code reading · Multiple languages"
 roles: [SWE, MLE, RE]
 topics: [code-reading, c, javascript, sql, integer-types, undefined-behavior, async-ordering, null-semantics]
 difficulty: medium
 frequency: low
 stage: [hm-screen]
 format_zh: "3 段代码 / 30 分钟"
+format: "3 snippets / 30 minutes"
 order: 64
 added: true
 origin: "证据只有一份第三方材料（interviewing.io 的 Anthropic 面试指南）：它说用人经理电话有时会让候选人读几种不同语言的代码示例，说出代码在做什么并找出问题；材料没有给出任何具体代码。这一页的三段代码和全部问题都是我们补写的，真实面试不一定问这些。"

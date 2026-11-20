@@ -1,14 +1,17 @@
 title: "Spectra and convergence rates: PCA by SVD, power iteration, gradient descent"
 title_zh: "谱与收敛速度：PCA、幂迭代和梯度下降"
 summary_zh: "给一份协方差谱已知的数据：用 SVD 做 PCA 并和特征分解对照；写幂迭代，用特征值之比预测误差直线的斜率；用 PyTorch 对最小二乘做梯度下降，在对数坐标上画出每个特征方向各自的衰减，再用条件数算出要走多少步。每张图都要先说出形状再画。"
+summary: "Given data with a known covariance spectrum: do PCA by SVD and check it against the eigendecomposition; write power iteration and use the ratio of eigenvalues to predict the slope of the straight-line error curve; run gradient descent on least squares in PyTorch, plot the decay along each eigendirection on a log scale, and use the condition number to work out how many steps it takes. For every plot, state its shape before drawing it."
 category: coding
 kind_zh: "编程 · PyTorch、线性代数与画图"
+kind: "Coding · PyTorch, linear algebra and plotting"
 roles: [RS, RE]
 topics: [pytorch, linear-algebra, pca, svd, power-iteration, gradient-descent, condition-number, plotting]
 difficulty: medium
 frequency: low
 stage: [phone-screen]
 format_zh: "3 个部分 / 60 分钟"
+format: "3 parts / 60 minutes"
 order: 62
 added: true
 origin: "Anthropic 面试流程汇总里研究岗位那一段说，第一轮技术面是从几种形式里选一种，其中一种是“ML research fundamentals”，即用 PyTorch 写代码、带一点线性代数和画图，没有记录任何具体题目；这道题是我们按这句描述补写的，真实面试不一定问这些内容。"

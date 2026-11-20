@@ -1,14 +1,17 @@
 title: "Design a System to Detect Harmful Outputs"
 title_zh: "设计有害输出检测系统"
 summary_zh: "给一个大语言模型的 API 和聊天产品设计有害输出的检测与处置：检查放在请求路径的哪里、流式输出怎么拦、级联分类器在极低基准率下的召回与审核量怎么算，以及评估、申诉、跨请求滥用检测和隐私留存。"
+summary: "Design detection and handling of harmful outputs for an LLM API and chat product: where the checks go in the request path, how to intercept streamed output, how to compute recall and review volume for a classifier cascade at a very low base rate, plus evaluation, appeals, cross-request abuse detection, and privacy and retention."
 category: system-design
 kind_zh: "系统设计"
+kind: "System design"
 roles: [SWE, MLE, Infra Eng]
 topics: [content-moderation, classifier-cascade, base-rate, streaming-guardrails, human-review, abuse-detection, evaluation-drift, privacy-retention]
 difficulty: hard
 frequency: low
 stage: [onsite]
 format_zh: "系统设计 / 55 分钟"
+format: "System design / 55 minutes"
 order: 60
 added: true
 origin: "第三方面试指南（Landed 整理的 Anthropic 面试指南，自称汇总自 Glassdoor、Blind、Reddit 和候选人博客）在系统设计题单里列了一句“Design a system to detect harmful outputs”，这一条注明的出处是另一个面试准备网站；指南后文只附了一行简短的答题要点（越狱检测器、内容政策分类器、持续红队评估、人工复核被标记的内容等），没有题目细节。这类指南之间可能互相引用同一来源。题目里的流量、基准率、分类器指标等数字和整份解答都是我们补写的练习假设，不是真实面试原题，也不是 Anthropic 的真实数据。"

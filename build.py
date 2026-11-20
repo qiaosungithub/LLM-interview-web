@@ -602,7 +602,13 @@ def main() -> int:
                                                               rewrite_links(text, c, "", lang))
         for name in ("rules", "selection"):
             p = site_cfg / f"{name}.{c['key']}.zh.md"
-            if p.exists():
+            p_en = site_cfg / f"{name}.{c['key']}.md"
+            if p.exists() and p_en.exists():
+                # both languages: published as <key>.<name>.zh / .en, which the front end picks by language
+                for lang, src in (("zh", p), ("en", p_en)):
+                    pages[f"{c['key']}.{name}.{lang}"] = frags.add(f"page|{c['key']}|{name}|{lang}",
+                                                                  src.read_text(encoding="utf-8"))
+            elif p.exists():
                 pages[f"{c['key']}.{name}"] = frags.add(f"page|{c['key']}|{name}", p.read_text(encoding="utf-8"))
     cards_path = site_cfg / "companies.yaml"
     company_cfg = (yaml.safe_load(cards_path.read_text(encoding="utf-8")) or {}) if cards_path.exists() else {}
@@ -611,6 +617,8 @@ def main() -> int:
             warn(f"companies.yaml: unknown company {ckey}")
         for i, card in enumerate(cfg.get("cards") or []):
             card["html"] = frags.add(f"card|{ckey}|{i}", card.pop("text"))
+            if card.get("text_en"):
+                card["html_en"] = frags.add(f"card|{ckey}|{i}|en", card.pop("text_en"))
     for p in sorted(site_cfg.glob("*.zh.md")) if site_cfg.is_dir() else []:
         name = p.name[:-len(".zh.md")]
         if "." not in name:
@@ -644,7 +652,10 @@ def main() -> int:
         "built": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
         "companies": [{"key": c["key"], "name": c["name"], "repo": c["repo"],
                        "tagline": company_cfg.get(c["key"], {}).get("tagline", ""),
-                       "cards": [{"title": k["title"], "html": html[k["html"]]}
+                       "tagline_en": company_cfg.get(c["key"], {}).get("tagline_en", ""),
+                       "cards": [{"title": k["title"], "html": html[k["html"]],
+                                  "title_en": k.get("title_en", ""),
+                                  "html_en": html[k["html_en"]] if k.get("html_en") else ""}
                                  for k in company_cfg.get(c["key"], {}).get("cards") or []]} for c in COMPANIES],
         "categories": CATEGORIES, "stageLabels": STAGE_ZH, "pages": sorted(pages),
         "items": entries, "problems": problems,

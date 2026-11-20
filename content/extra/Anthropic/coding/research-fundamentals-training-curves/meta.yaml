@@ -1,14 +1,17 @@
 title: "Training curves: a minimal PyTorch loop, three planted bugs, and the stability threshold"
 title_zh: "训练曲线：最小训练循环、三处 bug 和学习率阈值"
 summary_zh: "先用 PyTorch 写一个最小的训练循环，画训练和验证曲线，并解释训练曲线为什么一直高于验证曲线（dropout 的精确恒等式）；再读同事的训练脚本，根据曲线和几行测量找出三处 bug；最后对线性模型手推梯度、用有限差分核对，再用 Hessian 的最大特征值预测学习率的稳定阈值，画出阈值上下三条损失曲线。"
+summary: "First write a minimal training loop in PyTorch, plot the training and validation curves, and explain why the training curve stays above the validation curve (an exact dropout identity); then read a colleague's training script and find three bugs from the curves and a few lines of measurement; finally derive the gradient of a linear model by hand, check it with finite differences, use the Hessian's largest eigenvalue to predict the learning-rate stability threshold, and plot three loss curves around that threshold."
 category: coding
 kind_zh: "编程 · PyTorch、线性代数与画图"
+kind: "Coding · PyTorch, linear algebra and plotting"
 roles: [RS, RE]
 topics: [pytorch, training-loop, debugging, dropout, finite-differences, learning-rate, hessian, plotting]
 difficulty: medium
 frequency: low
 stage: [phone-screen]
 format_zh: "3 个部分 / 60 分钟"
+format: "3 parts / 60 min"
 order: 63
 added: true
 origin: "Anthropic 面试流程汇总里研究岗位那一段说，第一轮技术面是从几种形式里选一种，其中一种是“ML research fundamentals”，即用 PyTorch 写代码、带一点线性代数和画图，没有记录任何具体题目；这道题是我们按这句描述补写的，真实面试不一定问这些内容。"

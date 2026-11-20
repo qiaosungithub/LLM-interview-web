@@ -1,14 +1,17 @@
 title: "Debug a vectorised Isolation Forest implementation"
 title_zh: "调试向量化的 Isolation Forest 实现"
 summary_zh: "一份用 NumPy 向量化实现的孤立森林里藏了 6 个 bug，修好 iforest.py 让给定的测试全部通过，再推导 c(n) 的来历。"
+summary: "An Isolation Forest implemented in vectorised NumPy hides 6 bugs. Fix iforest.py so that all the given tests pass, then derive where c(n) comes from."
 category: coding
 kind_zh: "编程 · NumPy 调试"
+kind: "Coding · NumPy debugging"
 roles: [RS, RE, Intern]
 topics: [numpy, vectorization, debugging, isolation-forest, anomaly-detection, ensembles]
 difficulty: hard
 frequency: rare
 stage: [oa]
 format_zh: "2 个部分 / 60 分钟"
+format: "2 parts / 60 minutes"
 order: 61
 added: true
 origin: "证据里没有人报告过 Isolation Forest 题；几家彼此不独立的商业备考网站（它们对能否上网搜索说法不一）报告的是 Fellows 在线测评的 Extra-Trees 调试题，本页是我们给那道题配的同类练习，算法、代码、bug 和测试全部是补写的。"

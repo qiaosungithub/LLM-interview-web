@@ -1,14 +1,17 @@
 title: "Design a Banking App"
 title_zh: "设计一个银行 App"
 summary_zh: "设计银行 App 的后端：复式记账的不可变账本，用幂等键让转账只生效一次，用哪种隔离级别和机制分别防住丢失更新与写偏斜，跨分片转账选两阶段提交还是 saga，冻结与入账，读到自己的写，以及对账、审计和留存。"
+summary: "Design the backend of a banking app: an immutable double-entry ledger, idempotency keys so a transfer takes effect only once, which isolation level and mechanism prevent lost updates and write skew respectively, two-phase commit or a saga for cross-shard transfers, holds and captures, read-your-writes, and reconciliation, audit and retention."
 category: system-design
 kind_zh: "系统设计"
+kind: "System design"
 roles: [SWE, Infra Eng]
 topics: [ledger, double-entry, idempotency, isolation-levels, write-skew, two-phase-commit, sagas, reconciliation]
 difficulty: hard
 frequency: low
 stage: [onsite]
 format_zh: "系统设计 / 60 分钟"
+format: "System design / 60 min"
 order: 62
 added: true
 origin: "第三方面试指南 interviewing.io 的 Anthropic 页面在系统设计题里只列了一句“Design a banking app”，没有细节；另一份第三方指南（Landed 整理，自称汇总自 Glassdoor、Blind、Reddit 和候选人博客）在编程题里列了“为银行 App 实现有多种交易类型的核心业务逻辑”，站内对应 OA 银行系统题。这些指南可能互相引用同一来源。题目里的用户数、流量、延迟和留存期限等数字以及整份解答都是我们补写的练习假设，不是真实面试原题，也不描述任何公司的真实系统。"

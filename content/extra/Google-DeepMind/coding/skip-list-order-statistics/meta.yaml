@@ -1,14 +1,17 @@
 title: "Skip List: a Sorted Multiset with Order Statistics"
 title_zh: "跳表：有序多重集合与按名次查询"
 summary_zh: "用跳表（skip list）从零实现一个允许重复键的有序集合：插入、查找、删除、范围查询，再给每个指针加上跨度，支持“第 k 小”和“比它小的有几个”。每个操作要求期望 O(log n)，追问集中在它和排序数组、平衡树之间的取舍。"
+summary: "Implement, from scratch, a sorted set that allows duplicate keys using a skip list: insert, lookup, delete and range queries, then add a span to every pointer to support \"the k-th smallest\" and \"how many keys are smaller than this one\". Every operation must be expected O(log n); the follow-ups focus on the trade-offs against sorted arrays and balanced trees."
 category: coding
 kind_zh: "编程 · 随机化数据结构"
+kind: "Coding · Randomized data structures"
 roles: [SWE, MLE, RE, RS]
 topics: [skip-list, sorted-multiset, order-statistics, randomized-data-structure, linked-list, time-memory-trade-offs]
 difficulty: hard
 frequency: low
 stage: [onsite]
 format_zh: "3 个部分 / 45 分钟"
+format: "3 parts / 45 minutes"
 order: 63
 added: true
 origin: "Google DeepMind 面试流程汇总的编程轮一段里，有一份反馈提到考过“比较冷门的数据结构和树相关问题”（obscure data structure and trees questions），没有记录任何具体题目；这道跳表题是按“冷门数据结构”这个题型补写的，真实面试不一定考过它。"

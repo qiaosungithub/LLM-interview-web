@@ -1,13 +1,16 @@
 title: "Hiring-Manager Round: Evaluating a Multi-Task Model Across Domains, and Improving a Model Without New Data"
 title_zh: "用人经理面：跨领域评估多任务模型，不加数据怎么改进模型"
 summary_zh: "用人经理轮的两道开放题，各带三个追问：怎么跨领域评估一个多任务系统（先问评估为哪个决定服务，分领域指标与加权、总平均掩盖退步和辛普森悖论、小样本的误差与配对比较、多重比较、留出领域与防背题、退步门槛），以及拿不到新数据时怎么改进模型（先问约束，再按收益和成本排序：错误分析与管线 bug、用好现有数据、训练配方、迁移、自训练与蒸馏、集成、校准，以及怎么判断一个改动是真的有用）。"
+summary: "Two open-ended questions from the hiring-manager round, each with three follow-ups: how to evaluate a multi-task system across domains (first ask which decision the evaluation serves; per-domain metrics and weighting; overall averages that hide regressions, and Simpson's paradox; error bars and paired comparisons on small samples; multiple comparisons; held-out domains and guarding against memorization; regression gates), and how to improve a model when you can't get new data (first ask about the constraints, then order by benefit and cost: error analysis and pipeline bugs, making good use of existing data, the training recipe, transfer, self-training and distillation, ensembling, calibration, and how to tell whether a change really helped)."
 category: discussion
 kind_zh: "口头讨论 · 机器学习判断题"
+kind: "Spoken discussion · ML judgment"
 roles: [SWE, MLE, RE]
 topics: [ml-evaluation, multi-task, aggregation, simpsons-paradox, statistical-significance, contamination, error-analysis, regularisation, ensembling, experiment-design]
 frequency: low
 stage: [hm-screen]
 format_zh: "2 题共 8 问 / 每题约 10 分钟"
+format: "2 questions, 8 parts in total / about 10 min each"
 order: 60
 added: true
 origin: "Google DeepMind 流程页记录了一场 Gemini 应用团队的机器学习软件工程师面试（走 Google 的招聘渠道），用人经理轮问了“怎么跨领域评估一个多任务系统”和“没有更多数据时怎么改进模型”，只有这一份报告、只有这两句；Q1 和 Q5 是这两题，其余 6 个追问、所有数字和参考答案都是补写的。"

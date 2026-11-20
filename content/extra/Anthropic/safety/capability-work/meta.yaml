@@ -1,13 +1,16 @@
 title: "Doing Capabilities Work at a Safety-Focused Lab"
 title_zh: "做能力研究的人在这里该怎么做：六个情景"
 summary_zh: "不在安全团队、做模型训练和能力研究的人，哪些要求是公开文件里写明的，哪些只是合理推断；然后是六个入职后会遇到的情景题和两个开放题。"
+summary: "For people outside the safety team who do model training and capabilities research: which requirements are stated in public documents and which are only reasonable inferences, followed by six scenarios you will run into after joining and two open questions."
 category: safety
 kind_zh: "复习笔记 · 情景自测"
+kind: "Study notes · scenario self-test"
 roles: [RS, RE, MLE]
 topics: [capability-evaluations, reporting, publication, reward-hacking, access-control]
 frequency: medium
 stage: [onsite]
 format_zh: "8 个问题 / 约 40 分钟"
+format: "8 questions / about 40 min"
 order: 6
 added: true
 origin: "根据你保存的对话记录《Anthropic AI Safety 深度剖析》（2026-11-16 导出）里“非安全岗位的研发人员该怎么做”一节整理；情景题是新写的，参考答案是建议而不是公司规定。"

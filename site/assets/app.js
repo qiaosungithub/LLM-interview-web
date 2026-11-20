@@ -47,7 +47,7 @@ const S = {
   byId: new Map(),
   state: { answers: {}, status: {}, reviews: {}, judge: {}, root: "" },
   offline: false,
-  lang: store.get("lang", "zh"),
+  lang: store.get("lang", "en"),
   nav: 0,                 // incremented on every navigation, so a slow view can tell it has been superseded
   view: "",               // which page is on screen (lets a section link scroll instead of re-rendering)
   hash: "",
@@ -423,7 +423,8 @@ function viewCompany(ckey, section) {
 
   const started = all.filter((it) => progress(it).started).length;
   const finished = all.filter((it) => progress(it).finished).length;
-  const cards = c.cards.length ? `<div class="rules">${c.cards.map((k) => `<div class="card"><h3>${esc(k.title)}</h3>${k.html}</div>`).join("")}</div>` : "";
+  const en = S.lang === "en";
+  const cards = c.cards.length ? `<div class="rules">${c.cards.map((k) => `<div class="card"><h3>${esc((en && k.title_en) || k.title)}</h3>${(en && k.html_en) || k.html}</div>`).join("")}</div>` : "";
 
   app.innerHTML = `<div class="page">
     <nav class="side">
@@ -432,7 +433,7 @@ function viewCompany(ckey, section) {
     </nav>
     <div>
       <div class="hero">
-        <div><h1>${esc(c.name)}</h1><p>${esc(c.tagline || `共 ${all.length} 道题`)}</p></div>
+        <div><h1>${esc(c.name)}</h1><p>${esc((en && c.tagline_en) || c.tagline || `共 ${all.length} 道题`)}</p></div>
         <div class="progress">已动笔 ${started} / ${all.length} · 已完成 ${finished}<div class="bar"><i style="width:${all.length ? (100 * started) / all.length : 0}%"></i></div></div>
       </div>
       ${cards}

@@ -1,14 +1,17 @@
 title: "Keyframe Placement: Minimum Cost Under Gap Limits, and Counting Optimal Plans"
 title_zh: "关键帧放置：间隔受限的最小代价与最优方案计数"
 summary_zh: "在一段视频里选关键帧：首尾必选、相邻关键帧的间隔不超过 G，求最小费用；再加上“两个长间隔不能相邻”，状态要多带一位；最后在同一份代码上数出最优方案的个数（对 1e9+7 取模）。"
+summary: "Choose keyframes in a video: the first and last frames are mandatory and consecutive keyframes may be at most G apart; find the minimum cost. Then add \"no two long gaps in a row\", which needs one more bit of state. Finally, on the same code, count the optimal plans (modulo 1e9+7)."
 category: coding
 kind_zh: "编程 · 动态规划"
+kind: "Coding · Dynamic programming"
 roles: [SWE, MLE, RE]
 topics: [dynamic-programming, state-design, counting-modulo-prime, sliding-window-minimum, monotonic-deque]
 difficulty: medium
 frequency: low
 stage: [onsite]
 format_zh: "3 个部分 / 45 分钟"
+format: "3 parts / 45 minutes"
 order: 60
 added: true
 origin: "Google DeepMind 面试流程汇总里，有一份反馈说软件工程和 Gemini 应用岗位的编程轮是 LeetCode 中等难度、考“dynamic programming and backtracking”，另一段提到过“标准题之后接一道建立在候选人自己代码上的组合数学题”；两处都没有记录具体题目，这道关键帧动态规划题是按这个题型补写的，真实面试不一定考过它。"

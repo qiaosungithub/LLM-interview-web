@@ -1,14 +1,17 @@
 title: "Hash Map from Scratch"
 title_zh: "从零实现哈希表"
 summary_zh: "不用 dict 和 set，用开放寻址加线性探测实现一个哈希表：插入、查找和扩容，正确的删除，遍历，最后支持调用方自己提供哈希函数和相等判断。每一步都要说清代价是期望、最坏还是均摊。"
+summary: "Without dict or set, implement a hash map with open addressing and linear probing: insertion, lookup and growth, correct deletion, iteration, and finally support for caller-supplied hash and equality functions. At every step, say whether each cost is expected, worst case, or amortized."
 category: coding
 kind_zh: "编程 · 从零实现数据结构"
+kind: "Coding · data structure from scratch"
 roles: [SWE, MLE, RE]
 topics: [hash-table, open-addressing, linear-probing, tombstones, amortized-analysis, iteration]
 difficulty: medium
 frequency: low
 stage: [phone-screen, onsite]
 format_zh: "4 个部分 / 60 分钟"
+format: "4 parts / 60 min"
 order: 67
 added: true
 origin: "依据只有一句话：第三方面试指南 interviewing.io 的 Anthropic 页面说，编程轮偏好 first-principles、build-from-scratch，候选人用标准库把题解干净之后，可能被要求从零实现数据结构，并要为复杂度辩护、处理边界情况。它没有点名任何具体的数据结构，也没有给题目。选哈希表、四个部分的分法、所有规则、例子和验证代码都是我们补写的。"

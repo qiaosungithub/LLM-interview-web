@@ -1,14 +1,17 @@
 title: "Debug a vectorised Extra-Trees implementation"
 title_zh: "调试向量化的 Extra-Trees 实现"
 summary_zh: "一份用 NumPy 向量化实现的极端随机树分类器里藏了 6 个 bug，修好 trees.py 让给定的测试全部通过，不许改测试和 docstring，也不许改成循环。"
+summary: "An Extremely Randomized Trees classifier implemented with vectorized NumPy hides 6 bugs. Fix trees.py so that all the given tests pass, without changing the tests or the docstrings and without rewriting the code as loops."
 category: coding
 kind_zh: "编程 · NumPy 调试"
+kind: "Coding · NumPy debugging"
 roles: [RS, RE, Intern]
 topics: [numpy, vectorization, debugging, decision-trees, extra-trees, ensembles]
 difficulty: hard
 frequency: low
 stage: [oa]
 format_zh: "2 个部分 / 60 分钟（原题只有第 1 部分）"
+format: "2 parts / 60 minutes (the original has only Part 1)"
 order: 60
 added: true
 origin: "InterviewDB（Reddit 帖）、csoahelp、VOprep、FastPrep 几家商业备考网站都说 Anthropic Fellows 的在线测评里有一道题，要修好一份有若干 bug 的 Extra-Trees 实现：Reddit 帖和 csoahelp 说是第二轮测评，csoahelp 的标题写着 60 分钟；csoahelp 和 VOprep 贴出的题面基本相同，要求修好 trees.py、让 test_trees.py 全部通过（csoahelp 的题面还说不要把向量化的 NumPy 代码改成循环）；FastPrep 只有一行题名和简介。csoahelp 和 VOprep 留的联系方式相同，不是独立来源；各家对能否上网搜索说法也不一致（Reddit 帖说只能查文档，csoahelp 和 VOprep 说可以搜索）；真题代码没有公开，本页的代码、bug、测试和第 2 部分都是补写的。"

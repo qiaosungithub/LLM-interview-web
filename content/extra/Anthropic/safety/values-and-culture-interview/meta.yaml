@@ -1,13 +1,16 @@
 title: "The Seven Values and How to Use Them in the Culture Round"
 title_zh: "七条公司价值观，以及怎样把这些复习内容用到文化面里"
 summary_zh: "官网上的七条价值观逐条过一遍，然后是文化面里最常见的几种追问：少数派看法、对公司最大的怀疑、最难做到的价值观、你的研究和安全的关系。八个问题，前三个是回忆，后五个要写出你自己的答案。"
+summary: "A walk through the seven values on the company website, one by one, followed by the most common follow-ups in the culture round: a minority view you hold, your biggest doubt about the company, the hardest value to live up to, and how your research relates to safety. Eight questions: the first three are recall, the last five ask you to write your own answers."
 category: safety
 kind_zh: "复习笔记 · 自测"
+kind: "Review notes · Self-test"
 roles: [All]
 topics: [company-values, culture-interview, critical-views, research-and-safety]
 frequency: very-high
 stage: [onsite]
 format_zh: "8 个问题 / 约 45 分钟"
+format: "8 questions / about 45 min"
 order: 7
 added: true
 origin: "根据你保存的对话记录《Anthropic AI Safety 深度剖析》（2026-11-16 导出）里“公司价值观和面试建议”一节整理；七条价值观的原文于 2026-11-17 对照官网核对；其中两道题出自收集到的第三方面经汇总。"

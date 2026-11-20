@@ -1,13 +1,16 @@
 title: "Network Debugging Role Play B: Small Files Download, Large Files Hang"
 title_zh: "网络排障角色扮演 B：小文件能下，大文件卡住"
 summary_zh: "面试官扮演值班同事，你主导排查：两个机房之间换成隧道以后，健康检查一直正常，跨机房下载大文件却卡住、一个字节都收不到。7 步从读 curl 输出、为什么 ping 和 mtr 都正常、带 DF 位的 ping 二分出路径 MTU、逐行读服务器端 tcpdump（重传和退避、没有 ICMP、pmtu 仍是 1500），到在路由器上找到被防火墙吞掉的“需要分片”报文、当下怎么止血（MSS 钳制、tcp_mtu_probing、按路由设 MTU 的取舍）、怎么根治和验证，以及怎么更早发现。"
+summary: "The interviewer plays an on-call colleague and you lead the investigation: after the link between two data centers is switched to a tunnel, health checks stay green, but large cross-DC downloads hang without receiving a single byte. Seven steps: reading the curl output; why ping and mtr both look fine; binary-searching the path MTU with DF-bit pings; reading a server-side tcpdump line by line (retransmissions and backoff, no ICMP, pmtu still 1500); finding the \"fragmentation needed\" messages swallowed by a firewall from the router; mitigating right away (the trade-offs of MSS clamping, tcp_mtu_probing and per-route MTU); fixing and verifying the root cause; and catching it sooner."
 category: discussion
 kind_zh: "角色扮演 · 排查网络故障"
+kind: "Role play · Network troubleshooting"
 roles: [SWE, Infra Eng]
 topics: [network-debugging, mtu, path-mtu-discovery, icmp, mss-clamping, tcpdump, tunnels, incident-response]
 frequency: low
 stage: [onsite]
 format_zh: "7 步 / 约 45 分钟（时长是练习设定，证据没有记录）"
+format: "7 steps / about 45 min (timing is a practice setting; the evidence did not record it)"
 order: 62
 added: true
 origin: "证据只有流程页里的两句话：性能和基础设施岗位的专项轮里有一场“网络排障角色扮演”（network-debugging role play），一位性能工程候选人的候选人门户也把它列在现场面里；没有任何报告记录过具体场景、时长或评分方式。这里的场景、数字和命令输出全部是补写的：输出格式对照本机的 tcpdump、ping、mtr、curl、ss 核对过，数值不是实测；内核行为对照 Linux 源码和 ip-sysctl 文档核对（2026-11-18）。"

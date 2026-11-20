@@ -1,14 +1,17 @@
 title: "Indexed Priority Queue from Scratch"
 title_zh: "从零实现堆和带索引的优先队列"
 summary_zh: "不用 heapq，先写一个二叉堆，再扩展成能按键修改优先级、按键删除的带索引优先队列，最后用它写 Dijkstra，并和“懒删除”的写法比较堆的大小和复杂度。"
+summary: "Without heapq, write a binary heap, extend it into an indexed priority queue that can change priorities and remove by key, then use it to write Dijkstra, and compare heap size and complexity with the lazy-deletion approach."
 category: coding
 kind_zh: "编程 · 从零实现数据结构"
+kind: "Coding · Data structures from scratch"
 roles: [SWE, MLE, RE]
 topics: [binary-heap, indexed-priority-queue, decrease-key, dijkstra, lazy-deletion, complexity-analysis]
 difficulty: medium
 frequency: low
 stage: [phone-screen, onsite]
 format_zh: "3 个部分 / 60 分钟"
+format: "3 parts / 60 minutes"
 order: 68
 added: true
 origin: "依据只有一句话：第三方面试指南 interviewing.io 的 Anthropic 页面说，编程轮偏好 first-principles、build-from-scratch，候选人用标准库把题解干净之后，可能被要求从零实现数据结构，并要为复杂度辩护、处理边界情况。它没有点名任何具体的数据结构，也没有给题目。选堆和带索引的优先队列、三个部分的分法、Dijkstra 的应用、所有例子和验证代码都是我们补写的。"

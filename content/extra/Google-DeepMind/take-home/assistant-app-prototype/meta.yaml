@@ -1,14 +1,17 @@
 title: "Take-home: a working assistant app prototype in a few hours (streaming, one tool, failure handling)"
 title_zh: "几小时做一个能跑的助手应用原型：流式对话、一个工具、失败处理"
 summary_zh: "几小时内交一个能跑的聊天助手后端：会话状态、SSE 流式输出、一个计算器工具，处理模型超时和格式错误的工具调用，配上可靠的测试和 README；模型放在接口后面，评审不用 key 就能跑。"
+summary: "Hand in a working chat assistant backend within a few hours: conversation state, SSE streaming, a calculator tool, handling of model timeouts and malformed tool calls, plus reliable tests and a README; the model sits behind an interface so the reviewer can run everything without a key."
 category: take-home
 kind_zh: "take-home · 小型应用原型"
+kind: "Take-home · small app prototype"
 roles: [SWE, MLE]
 topics: [llm-app, streaming, server-sent-events, tool-calling, error-handling, testing, api-design]
 difficulty: medium
 frequency: rare
 stage: [take-home]
 format_zh: "4 个部分 / 假设 4 小时 / 交代码仓库和 README"
+format: "4 parts / 4 hours assumed / hand in a code repository and README"
 order: 61
 added: true
 origin: "证据只有一句：一个公开代码仓库的描述是“为 DeepMind 面试演示做的 Gemini app 原型”，由此推测至少有一次面试要求做一个小的可运行应用；我们只见到这句描述，题目原文、时长和评分方式都没有记录。本页的需求、接口、时长和评分要点全部是我们补写的，真实题目很可能不同。"

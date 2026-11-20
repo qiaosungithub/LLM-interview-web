@@ -1,14 +1,17 @@
 title: "Streaming Detokenizer That Stalls on Long Replies"
 title_zh: "流式解码在长回复里越来越卡"
 summary_zh: "给你一段输出正确、但回复越长每个 token 越慢的流式解码（token id 转文本）代码和一个复现脚本：先说清怎样定位时间花在哪里，再在每次返回值都不变的前提下让每个 token 的工作量与回复长度无关，最后加上停止串支持且不重新引入平方开销。"
+summary: "You are given streaming decoding code (token ids to text) whose output is correct but which gets slower per token the longer the reply is, plus a repro script: first explain how to find where the time goes, then make the work per token independent of the reply length while keeping every return value the same, and finally add stop-string support without reintroducing the quadratic cost."
 category: coding
 kind_zh: "编程 · 性能调试"
+kind: "Coding · performance debugging"
 roles: [SWE, RE, MLE]
 topics: [performance-debugging, profiling, streaming, detokenization, utf-8, quadratic-behavior, stop-sequences]
 difficulty: medium
 frequency: rare
 stage: [onsite]
 format_zh: "3 个部分 / 60 分钟"
+format: "3 parts / 60 minutes"
 order: 75
 added: true
 origin: "只有一份匿名 Reddit 面经（r/InterviewCoderHQ 上自称拿到 L4 offer 的帖子，可信度较低）在现场编程轮列了一行“Debug a performance bottleneck in a streaming tokenization system”，没有任何细节；这里把它放到解码一侧，代码、场景和工单数字都是我们补写的，真实面试不一定是这道题。"

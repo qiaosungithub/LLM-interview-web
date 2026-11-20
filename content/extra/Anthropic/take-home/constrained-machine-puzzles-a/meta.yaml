@@ -1,14 +1,17 @@
 title: "Constrained-Machine Puzzles (A): A Guarded Accumulator Machine"
 title_zh: "Take-home：受限指令集谜题（一）带条件前缀的累加器机"
 summary_zh: "一台只有两个寄存器、一个标志位、10 条指令、程序首尾成环的小机器，配一份只判断对错和条数的检查器。5 道独立小题，按总指令数计分：要自己写跟踪器，把状态藏进标志位和条件前缀，再用穷举搜索证明解已经最短。"
+summary: "A tiny machine with just two registers, one flag and 10 instructions, whose program wraps around into a ring, plus a checker that reports only validity and instruction count. Five independent puzzles scored by total instruction count: write your own tracer, hide state in the flag and the guards, and use exhaustive search to prove your solutions are already the shortest."
 category: take-home
 kind_zh: "Take-home · 受限指令集谜题"
+kind: "Take-home · Constrained instruction-set puzzles"
 roles: [Perf Eng]
 topics: [constrained-instruction-set, instruction-count-golf, zachtronics-style-puzzles, debugging-tooling, superoptimization, exhaustive-search]
 difficulty: hard
 frequency: medium
 stage: [take-home]
 format_zh: "5 道独立小题 / 2 小时 / 可用 AI 助手"
+format: "5 independent puzzles / 2 hours / AI assistant allowed"
 order: 60
 added: true
 origin: "证据是 Anthropic 官网的一篇工程文章（2026 年 1 月，作者是性能优化团队的负责人之一，讲怎样设计不怕 AI 的技术考核）：现在的性能 take-home 是一组在很小、限制很多的指令集上做的谜题，以最少指令数为目标，灵感来自 Zachtronics 游戏（比如 Shenzhen I/O：每块芯片约 10 条指令、一两个寄存器，常把状态编进指令指针或分支标志）；不提供可视化和调试工具，起始代码只检查答案是否有效，自己做调试工具是考察的一部分；由多个独立小题组成。真实的谜题和指令集没有公开，这一页的机器、5 道题、计分细节和参考解答都是我们自己设计的；2 小时时限沿用旧版 take-home 的说法；新版的时限原文没有明说，只提到设计时担心新题难到人在两小时内做不完。"

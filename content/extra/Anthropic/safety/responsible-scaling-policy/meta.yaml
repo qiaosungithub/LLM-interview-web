@@ -1,13 +1,16 @@
 title: "The Responsible Scaling Policy"
 title_zh: "负责任扩展政策（RSP）：机制、第 3 版改了什么、争议在哪"
 summary_zh: "RSP 的“达到某种能力就必须配上某种防护”机制、安全等级（ASL）、第 3 版的四块结构，以及 2026 年最大的争议：删掉暂停承诺。六个自测问题，其中两个是面试里会被追问的开放题。"
+summary: "The RSP's \"reach a given capability and you must have the matching safeguards\" mechanism, the AI Safety Levels (ASL), the four-part structure of version 3, and the biggest controversy of 2026: removing the pause commitment. Six self-test questions, two of them open-ended questions you will be pressed on in interviews."
 category: safety
 kind_zh: "复习笔记 · 自测"
+kind: "Review notes · Self-test"
 roles: [All]
 topics: [rsp, asl, risk-reports, frontier-safety-roadmap, pause-commitment]
 frequency: very-high
 stage: [onsite]
 format_zh: "6 个问题 / 约 30 分钟"
+format: "6 questions / about 30 minutes"
 order: 2
 added: true
 origin: "根据你保存的对话记录《Anthropic AI Safety 深度剖析》（2026-11-16 导出）整理；事实于 2026-11-17 对照官方页面和 GovAI 的分析核对。"

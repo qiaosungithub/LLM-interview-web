@@ -1,14 +1,17 @@
 title: "Official original: Anthropic's performance-engineering take-home (open-sourced older version)"
 title_zh: "官方原题：性能优化 Take-home（已开源的旧版）"
 summary_zh: "Anthropic 公开的性能工程 take-home 原题：在一台模拟的 VLIW + SIMD 机器上，把批量“树遍历加哈希”的内核从 147734 个周期往下压。附我们分 9 个阶段实测的优化路线（最后到 1040 个周期）。"
+summary: "The original performance-engineering take-home that Anthropic made public: on a simulated VLIW + SIMD machine, push a batched \"tree traversal plus hash\" kernel down from 147734 cycles. Includes the optimization path we measured in 9 stages (ending at 1040 cycles)."
 category: take-home
 kind_zh: "Take-home · 性能优化（官方原题）"
+kind: "Take-home · Performance optimization (official original)"
 roles: [Perf Eng]
 topics: [performance-optimization, vliw, simd, vectorization, instruction-scheduling, simulator]
 difficulty: hard
 frequency: low
 stage: [take-home]
 format_zh: "当年限时 4 小时，后改为 2 小时；公开版不限时；允许用 AI"
+format: "Originally 4 hours, later cut to 2 hours; the public version is untimed; AI allowed"
 order: 1
 added: false
 origin: "Anthropic 开源的原版性能工程 take-home（https://github.com/anthropics/original_performance_takehome ，背景见 2026-01-21 的官方工程博客）。它已经不再用于限时招聘，现在的作业换成了另一类题。题面按代码和 Readme 整理；分阶段的优化路线、参考解答和其中的周期数是这次写的，周期数都实际跑过。"

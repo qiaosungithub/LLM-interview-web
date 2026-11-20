@@ -1,14 +1,17 @@
 title: "Streaming Tokenizer That Slows Down on Long Documents"
 title_zh: "流式分词器在长文档上越跑越慢"
 summary_zh: "给你一段输出正确、但文档越长每个 token 越慢的流式最长匹配分词代码和一个复现脚本：先说清怎样定位时间花在哪里，再在不改变任何输出的前提下把总工作量降到线性，最后让它在两个线程间安全使用并限制积压。"
+summary: "You are given streaming greedy longest-match tokenizer code whose output is correct but which gets slower per token the longer the document is, plus a repro script: first explain how to find where the time goes, then bring the total work down to linear without changing any output, and finally make it safe to use from two threads with a bounded backlog."
 category: coding
 kind_zh: "编程 · 性能调试"
+kind: "Coding · performance debugging"
 roles: [SWE, RE, MLE]
 topics: [performance-debugging, profiling, streaming, tokenization, quadratic-behavior, producer-consumer, backpressure]
 difficulty: medium
 frequency: rare
 stage: [onsite]
 format_zh: "3 个部分 / 60 分钟"
+format: "3 parts / 60 minutes"
 order: 74
 added: true
 origin: "只有一份匿名 Reddit 面经（r/InterviewCoderHQ 上自称拿到 L4 offer 的帖子，可信度较低）在现场编程轮列了一行“Debug a performance bottleneck in a streaming tokenization system”，没有任何细节；这里的代码、场景和工单数字都是我们按这一行补写的，真实面试不一定是这道题。"

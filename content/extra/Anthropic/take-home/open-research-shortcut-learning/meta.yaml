@@ -1,14 +1,17 @@
 title: "72-Hour Open Research Take-Home: When Does a Small Vision Model Learn a Shortcut, and Can the Data Predict It?"
 title_zh: "72 小时开放研究：小视觉模型什么时候走捷径，能不能从数据事先预测"
 summary_zh: "约 72 小时的开放研究 take-home（适合计算机视觉背景）：小视觉模型什么时候学一个虚假的捷径特征，而不是本该学的特征？能不能从数据的性质事先预测？参考解答示范怎样收窄问题、安排三天，并给出一个 CPU 上就能跑完的核心实验：用代码生成的横竖条图片加一个角落标记，36 个小 CNN；只用数据算出的贝叶斯最优观察者能大体预测“谁更依赖捷径”的排序，却低估了依赖的程度，学习曲线显示差距和核心特征学得更慢有关。"
+summary: "A roughly 72-hour open research take-home (suited to a computer-vision background): when does a small vision model learn a spurious shortcut feature instead of the feature it should learn, and can this be predicted in advance from properties of the data? The reference solution shows how to narrow the question and plan the three days, and gives a core experiment that runs to completion on a CPU: code-generated images of horizontal and vertical bars plus a corner marker, and 36 small CNNs. A Bayes-optimal observer computed from the data alone roughly predicts the ranking of which models rely more on the shortcut, but underestimates how much they rely on it; learning curves tie the gap to the core feature being learned more slowly."
 category: take-home
 kind_zh: "研究 Take-home · 开放课题（约 72 小时）"
+kind: "Research take-home · Open-ended project (about 72 hours)"
 roles: [RS, RE]
 topics: [shortcut-learning, spurious-correlation, computer-vision, ideal-observer, learning-dynamics, research-scoping, experimental-design]
 difficulty: hard
 frequency: low
 stage: [take-home]
 format_zh: "4 个部分 / 约 72 小时 / 书面报告 + 代码 + 评审通话"
+format: "4 parts / about 72 hours / written report + code + review call"
 order: 65
 added: true
 origin: "Anthropic 面试流程汇总里的候选人反馈只说：研究岗的流程里有 4 小时的探索性 ML take-home，有些团队还有 72 小时的研究 take-home，内容因团队而异；没有记下任何具体题目；这道捷径学习的开放题（按计算机视觉背景选题）、评审要求和参考解答都是我们补写的。"

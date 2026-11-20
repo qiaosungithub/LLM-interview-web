@@ -1,13 +1,16 @@
 title: "Research Brainstorm: Is the Chain-of-Thought the Real Reason, and Why a High Benchmark Score Does Not Feel Better"
 title_zh: "研究头脑风暴：思维链是不是真实理由，基准分数高为什么不好用"
 summary_zh: "15 分钟、两道开放题的研究头脑风暴练习，每题带三个追问。第一题：只能用 API，怎么检验模型写出来的推理（思维链）是不是它得出答案的真实原因（暗示注入实验、对照组、截断结果怎么解读、为什么做安全的人在意）。第二题：公开基准分数很高，用户却说不好用，可能是什么原因，怎么用最便宜的实验区分数据污染和题目变难。每问都写了强回答该覆盖什么、常见的丢分点。"
+summary: "A 15-minute research-brainstorm exercise with two open questions, each with three follow-ups. Question 1: with API access only, how do you test whether the reasoning a model writes out (its chain-of-thought) is the real reason it reached its answer (hint-injection experiments, control groups, how to read truncation results, why safety researchers care). Question 2: a public benchmark score is very high but users say the model is not better in practice; what could explain it, and what is the cheapest experiment that separates data contamination from the rewritten questions being harder. Each question spells out what a strong answer should cover and the common ways to lose points."
 category: discussion
 kind_zh: "研究讨论 · 开放题"
+kind: "Research discussion · Open-ended"
 roles: [RS, RE, Intern]
 topics: [research-brainstorm, chain-of-thought, faithfulness, black-box-evaluation, benchmark-contamination, experiment-design, statistical-significance, evaluation-metrics]
 frequency: low
 stage: [onsite]
 format_zh: "2 题共 8 问 / 15 分钟（两题平均每题不到 7.5 分钟）"
+format: "2 questions, 8 parts / 15 minutes (under 7.5 minutes per question on average)"
 order: 60
 added: true
 origin: "唯一的证据是一篇候选人博客（faillearnrepeat.net，2025 年 2 月，申请的是研究 Fellowship）：虚拟现场面里有一场 15 分钟的研究头脑风暴，对方是对齐方向的负责人，简短介绍后问了两个开放题，作者说不需要 LLM 的内部知识，只要把模型当黑盒观察过的经验和一点创意，具体题目和评分方式都没有记录；这里的两道题、六个追问、所有数字和参考答案都是补写的，引用的论文结论于 2026-11-18 对照 arXiv 摘要核对。"

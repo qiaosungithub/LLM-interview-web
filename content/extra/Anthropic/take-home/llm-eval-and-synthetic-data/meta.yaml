@@ -1,14 +1,17 @@
 title: "Evaluating LLMs on a Toy Task, Then Testing LLM-Generated Data"
 title_zh: "小任务上评估 LLM，再用 LLM 造数据：生成的数据到底有没有用"
 summary_zh: "5 小时研究型 take-home：在括号配平这个小任务上评估两个模型，再让模型生成带标签的例子，先检查数据质量，再判断它们当作少样本示例是否真的有帮助。题里埋了几个做评估时常见的坑。本页用一个模拟 API 代替真实模型。"
+summary: "A 5-hour research take-home: evaluate two models on the toy task of bracket balancing, then have a model generate labeled examples, check the data quality first, and judge whether they actually help as few-shot examples. Several common evaluation pitfalls are built into the problem. This page uses a simulated API in place of real models."
 category: take-home
 kind_zh: "研究 Take-home · LLM 评估与合成数据"
+kind: "Research take-home · LLM evaluation and synthetic data"
 roles: [RS, RE, Intern]
 topics: [llm-evaluation, synthetic-data, data-leakage, label-noise, few-shot-prompting, confidence-intervals]
 difficulty: hard
 frequency: low
 stage: [take-home]
 format_zh: "4 个部分 / 5 小时 / notebook + 10 分钟讲解"
+format: "4 parts / 5 hours / notebook + 10-minute presentation"
 order: 63
 added: true
 origin: "证据有两条，都没有给出具体题目：一条 Glassdoor 反馈只能看到标题，说 Research Engineer/Scientist 的技术面试是评估 LLM 在一个简单小任务上的表现，并用 LLM 为这个任务生成额外数据（没说是不是 take-home）；一位 2025 年 Research Fellowship 候选人的博客说，5 小时 take-home 是一个 Jupyter Notebook，给 Anthropic API 的 key，最后在通话里讲解方案。这一页的小任务、模拟 API、埋下的陷阱和参考解答都是我们补写的，真实题目不一定是这样。"

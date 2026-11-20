@@ -1,14 +1,17 @@
 title: "Design API Rate Limiting"
 title_zh: "设计 API 限流"
 summary_zh: "给一个公开大模型 API 设计按组织的限流：请求数、输入 token、输出 token 三个令牌桶怎么在 200 个网关之间原子地检查和扣减，最大客户的热点分片怎么办，输出 token 事先不知道时怎么记账，以及限流存储故障和多区域时的取舍。"
+summary: "Design per-organization rate limiting for a public LLM API: how three token buckets (requests, input tokens, output tokens) are checked and deducted atomically across 200 gateways, what to do about the hot shard of the largest customer, how to account for output tokens that aren't known in advance, and the trade-offs when the rate-limit store fails and across multiple regions."
 category: system-design
 kind_zh: "系统设计"
+kind: "System design"
 roles: [SWE, Infra Eng]
 topics: [rate-limiting, token-bucket, redis, lua, atomicity, distributed-counting, llm-api, multi-region]
 difficulty: hard
 frequency: low
 stage: [onsite]
 format_zh: "系统设计 / 60 分钟"
+format: "System design / 60 min"
 order: 63
 added: true
 origin: "第三方面试指南（Landed 整理，自称汇总自 Glassdoor、Blind、Reddit 和候选人博客）在 Anthropic 的系统设计题里只列了一句“Design API rate-limiting”，没有细节；这些指南可能互相引用同一来源。题目里三个限额维度和 429 加 retry-after 的对外行为参考了公开的 Claude API 文档；流量、规模、延迟等数字和整份解答都是我们补写的练习假设，不是真实面试原题，也不描述任何公司的内部系统。"

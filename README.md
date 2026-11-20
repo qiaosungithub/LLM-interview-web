@@ -84,13 +84,20 @@ export PATH=$HOME/.local/bin:$PATH    # node, used to pre-render maths and code 
 .venv/bin/python build.py             # --check validates without writing
 ```
 
+## Languages
+
+Every problem page exists in Chinese and English; the site opens in English (the header button switches, and
+the choice is remembered per browser). On question-and-answer pages (behavioral, quiz, discussion, safety) the
+saved answers are keyed by question number, so the two languages must keep identical question numbering and
+grouping; `build.py --check` reports any mismatch. The site's own interface labels are still Chinese.
+
 ## Layout
 
 | Path | What it is |
 | --- | --- |
 | `content/schuture/<Company>/<category>/<slug>/` | The collected problem notes (`README.zh.md` is what the site shows, `README.md` is the English original, `meta.yaml`, `audit.json`). Audited and corrected in place; the untouched originals are in `../anthropic_interviews_2026-11-10/Schuture-interview-notes-2026-10-05/`. |
-| `content/extra/<Company>/<category>/<slug>/` | Problems written for this site: question types the reports describe without a concrete problem, the official Anthropic performance take-home, and the Anthropic safety-philosophy review. |
-| `content/site/` | Per-company pages (`rules.*`: AI rules and interview environment; `selection.*`: what was kept, added, left out), the audit page intro, AI-allowed labels (`ai_overrides.yaml`), home-page cards. |
+| `content/extra/<Company>/<category>/<slug>/` | Problems written for this site: question types the reports describe without a concrete problem, the official Anthropic performance take-home, and the Anthropic safety-philosophy review. Written in Chinese (`README.zh.md`); each also has an English translation (`README.md`, plus `summary`/`kind`/`format` in `meta.yaml`) with the same question numbering. |
+| `content/site/` | Per-company pages (`rules.*`: AI rules and interview environment; `selection.*`: what was kept, added, left out; `.zh.md` Chinese, `.md` English), the audit page intro, AI-allowed labels (`ai_overrides.yaml`), home-page cards (`companies.yaml`, with `*_en` fields). |
 | `materials/` | Third-party code the pages refer to (the official take-home repository and a staged solution). |
 | `site/` | Build output plus the front end (`site/assets/`). |
 | `answers/` | The user's saved answers and judge submissions (`<id>/submissions.jsonl`, `<id>/submissions/<n>.py`). **User data: never edit or delete.** |
