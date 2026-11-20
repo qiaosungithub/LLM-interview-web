@@ -3,7 +3,8 @@
 A local study site: one page per interview problem, grouped by company and by round type, with the reference
 answer hidden until asked for, an editor that saves answers as plain files, and a record of what was checked
 and changed on every page. Code problems also have an online judge (run the examples, submit against every test,
-run your own lines, keep a submission history); answers and submissions stay on this machine.
+run your own lines, keep a submission history). Answers and submissions are saved on this machine and shared
+through Git snapshots of `answers/`.
 
 ## Repository and deployed source
 
@@ -25,11 +26,24 @@ front-end assets and generated content are retained so a checkout contains the
 currently deployable pages. After a content change, rebuild and commit the
 corresponding `site/data/` changes together with the source.
 
-Answers, submissions, grading, the access key, logs, local Python installations,
-virtual environments, `node_modules/` and `tools/out/` are excluded. They remain
-on this machine; a Git clone is not a backup of personal answers. Keep separate
-backups of `answers/` and `reviews/`. Never force-add `.access_key` or include a
-key-bearing URL in a commit.
+The user's saved answers, progress (`answers/state.json`), submitted code and
+judge results under `answers/` are versioned for sharing. These are the user's
+attempts, including unfinished or incorrect work; reference solutions remain
+under `content/`. Browser saves update local files; sharing later changes still
+requires a Git commit and push:
+
+```bash
+git add answers/
+git commit -m "Update saved interview answers"
+git push origin main
+```
+
+Automatic draft history (`answers/.history/`), assistant grading (`reviews/`),
+the access key, logs, local Python installations, virtual environments,
+`node_modules/` and `tools/out/` remain excluded. Keep separate backups of local
+draft history and grading. Preserve uncommitted answers before pulling changes
+from another machine. Never force-add `.access_key` or include a key-bearing URL
+in a commit.
 
 ## Set up a fresh checkout
 
@@ -100,7 +114,7 @@ grouping; `build.py --check` reports any mismatch. The site's own interface labe
 | `content/site/` | Per-company pages (`rules.*`: AI rules and interview environment; `selection.*`: what was kept, added, left out; `.zh.md` Chinese, `.md` English), the audit page intro, AI-allowed labels (`ai_overrides.yaml`), home-page cards (`companies.yaml`, with `*_en` fields). |
 | `materials/` | Third-party code the pages refer to (the official take-home repository and a staged solution). |
 | `site/` | Build output plus the front end (`site/assets/`). |
-| `answers/` | The user's saved answers and judge submissions (`<id>/submissions.jsonl`, `<id>/submissions/<n>.py`). **User data: never edit or delete.** |
+| `answers/` | Shared Git snapshots of the user's saved answers, progress and judge submissions (`<id>/submissions.jsonl`, `<id>/submissions/<n>.py` and `.json`). Automatic `.history/` drafts stay local. **User data: never edit or delete.** |
 | `reviews/` | Grading written by an assistant on request; shown in each problem's "批改" tab. |
 | `tools/` | `run_page.py` runs every `python` block of a page; `page_ns.py` loads a page's code for experiments; `judge/` is the judge (below); `judge_check.py` checks every problem's tests; the briefs below. |
 | `.access_key`, `logs/` | The tunnel access key (secret, mode 600) and the server and tunnel logs. |

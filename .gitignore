@@ -1,5 +1,5 @@
-# Private workspace data and access credentials
-/answers/
+# Local draft history, grading and access credentials
+/answers/.history/
 /reviews/
 /.access_key
 /.access_key.*
