@@ -1,0 +1,37 @@
+{
+  "id": "Anthropic/coding/longest-match-tokenizer",
+  "verdict": "fixed",
+  "summary_zh": "题目、例子和三个参考实现都没问题（和按题意另写的暴力解在约 5.8 万组输入上结果一致）。只改了 Part 1 讲解里的一句复杂度：原文说最坏情况是 O(n²) 时间，但 Part 2 自己强调每次查找要切片加哈希、代价与长度成正比，按同样的算法 Part 1 应该是 O(n²) 次查找、O(n³) 时间；已改成这个说法，前后两部分不再矛盾。",
+  "issues": [
+    {
+      "where": "参考解答 Part 1（复杂度）",
+      "problem_zh": "原文写“最坏情况下为 O(n²) 时间”，这是把每次字典查找当成 O(1) 算的。但紧接着的 Part 2 明确说每次查找要先切出并哈希一段子串、代价是 O(ℓ)，并据此得出 O(n·L²)；把 L 换成 n 就是 Part 1 的做法，应为 O(n³)，两处说法对不上。实测一段完全匹配不上的文本，长度每翻一倍耗时变为 5 到 6 倍（n=4000 时约 4.4 秒），切片的总字符数正好是 n(n+1)(n+2)/6。",
+      "action": "fixed",
+      "change_zh": "把这句改成：最坏情况下要做 O(n²) 次字典查找；每次查找还要切出并哈希最长 n 个字符的子串，所以总时间是 O(n³)，Part 2 会再讲这份开销。代码没有改。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有覆盖 Part 1 最坏情况下的工作量。",
+      "action": "fixed",
+      "change_zh": "新增一个小检查：对一段 60 个字符、完全匹配不上的文本统计 Part 1 的查找次数和切片字符总数，分别是 60·61/2 = 1830 次和 60·61·62/6 = 37820 个字符（后者随 n 三次方增长）。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "statement examples recomputed by hand and against the reference ([3,0,5,0], [3,0,0,5] -> [3,0,5], trie examples)",
+    "independent brute force written from the statement (startswith over all keys, take the longest): tokenize, tokenize_merged and TrieTokenizer agree on every text over {a,b,c} up to length 7 for 7 adversarial vocabs (prefix chains with a non-key middle node, colliding ids, id 0, empty vocab) = 45,920 cases, plus 12,000 random cases with longer keys, unicode, duplicate ids, different unk_id values and one tokenizer reused across texts",
+    "greedy-is-not-minimal counterexample ('aaaaaa' -> [1,3,3] vs [2,2]) and the coin-change analogy (1,3,4 for 6)",
+    "counted lookups and sliced characters with a dict subclass: Part 1 on unmatched text n(n+1)/2 lookups and n(n+1)(n+2)/6 characters; Part 2 ~n*L lookups and ~n*L^2/2 characters (matches the O(n*L^2) claim)",
+    "timed Part 1 on unmatched text: 0.13s / 0.73s / 4.4s for n = 1000 / 2000 / 4000 (x5-6 per doubling, i.e. worse than quadratic)",
+    "timed bounded loop vs trie walk on page-style data for L from 1 to 80: trie 1.5x-16x faster, so the follow-up's 'trie already wins once tokens are longer than a character or two' holds here; on an adversarial input where both do their worst-case work the two are about equal up to L=16 and the trie pulls ahead beyond (x1.6 at 64, x2.9 at 1024)",
+    "the page's reuse-vs-rebuild timing check: rebuilt/reused ratio 18x on a cold first run, ~87x warmed up (threshold in the page is 8x)",
+    "read the English page against the Chinese one; code blocks identical in both"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. The reference code was not changed, so the added check passes on the old page too; it pins down the corrected claim (characters handled grow as n^3), which the old sentence (O(n^2) time) did not match."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

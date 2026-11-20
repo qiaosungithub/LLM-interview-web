@@ -1,0 +1,40 @@
+{
+  "id": "Anthropic/take-home/performance-kernel-optimization",
+  "verdict": "fixed",
+  "summary_zh": "页面内部没有错：机器、代码、每一步的周期数都重新跑过。但它是一道自己设计的同类练习，和 Anthropic 公开的官方原题在任务、机器和计分上都不一样，容易被当成原题来准备。已在题目开头加了说明，并另外补了官方原题那一页。",
+  "issues": [
+    {
+      "where": "题目 机器 / 待优化的内核（与官方原题对照）",
+      "problem_zh": "这一页本身没有错，但它是一道自己设计的同类练习，和 Anthropic 公开的官方原题（original_performance_takehome）在任务和机器上都不一样，不能当成原题来准备。官方的任务是“批量树遍历 + 哈希”：256 个输入在一棵高度 10 的完全二叉树（2047 个节点）上走 16 轮，每轮 val = hash(val ^ 当前节点值)（6 段 32 位整数运算），再按 val 的奇偶走左孩子或右孩子，越界就回到根；只检查最后内存里的 256 个 val。本页的任务是浮点数的 Σ(a·x_i + b)·y_i，读的是连续内存。官方的机器是 VLIW SIMD 模拟器：每个周期最多 12 条标量 alu、6 条向量 valu、2 条 load、2 条 store、1 条 flow；VLEN = 8；没有 8+8 个寄存器，而是一块 1536 个字的 scratch 空间当寄存器用；数据是 32 位整数（结果对 2^32 取模），不是浮点；有 select / vselect 和各种跳转（本页说“机器没有分支指令”）；没有加载延迟，也不会阻塞，每个指令束固定算 1 个周期（同一周期内先读后写这一点和本页一样）。vload 只能读连续的 8 个字，而每个输入要读的树节点地址各不相同，这是官方题最主要的难点，本页的内核没有这个问题；反过来，本页 Step 2 到 Step 4 围绕的“4 周期加载延迟”在官方机器上并不存在。",
+      "action": "fixed",
+      "change_zh": "页面自己的机器、代码和数字是自洽的（都跑过），所以正文没有动；在题目开头加了一段醒目的说明：这不是官方原题，并链接到新补的官方原题那一页，建议先做官方原题。"
+    },
+    {
+      "where": "题目 交付物与评分",
+      "problem_zh": "评分方式和官方不同。本页按“加速比”评分，并要求附一页说明；官方按一个固定测试（forest_height=10、rounds=16、batch_size=256）跑出的绝对周期数评分，起始代码是 147734 个周期（我实际跑出来就是这个数），tests/submission_tests.py 里的门槛依次是 <18532、<2164、<1790、<1579、<1548、<1487、<1363（相当于约 8 倍到 108 倍），并且不允许改 tests/ 目录。本页参考解答的 38 倍是在自造机器上的数字，和这些门槛不可比。另外，本页写“你有 2 小时。全程可以使用 AI 助手”：官方 README 说最初是 4 小时版（从接近最慢的基线开始），后来改成 2 小时版（起始代码已经是 18532 个周期），公开版不限时；README 只提到“如果用 AI agent，要让它别改 tests/”，没有说限时版是否允许用 AI，所以“全程可用 AI”这一句从官方材料里无法确认。",
+      "action": "fixed",
+      "change_zh": "评分方式没有改，开头新加的说明已经指出计分方式和官方不同。“可以用 AI”这一点后来查到了依据：Anthropic 的工程博客明确说这份 take-home 允许使用 AI 工具（见“AI 规则与面试环境”页）。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages): all quoted cycle counts (1223, 838, 68, 44, 32), speedups, closed forms 19n+7, 13n+6, 7c+12, 4c+12, 2c+16 and the lower-bound table are asserted and pass",
+    "re-derived issue cycles with an independent implementation of the stall rule: Step 2 stalls exactly 2 cycles per chunk (loads at 9, 10, first vmadd at 13); Step 3 and Step 4 stall only during setup (2 cycles waiting for a's load)",
+    "unit utilisation at n=1024: Step 4 uses 258 of 272 load slots and 260 of 272 vector slots (both saturated in steady state); Step 3 uses half, as the page says",
+    "Step 4 tail cost: cycles(8k+r) - cycles(8k) = 13r + 3 for k = 0..5, r = 1..7, results correct; n = 0..8 all correct",
+    "lower bound 2*(n//VLEN): follows from 2 vector loads per chunk and a load unit of width 1 (every x and y word must be loaded, 8 words per load)",
+    "follow-ups: with LOAD_LATENCY = 8 the 2-deep pipeline drops to 4 cycles per chunk (52/84/148 cycles at n = 64/128/256), and full rate would need 8 in-flight load destinations, more than the registers left; moving the zero broadcast earlier saves 1 cycle (a more aggressive setup that also starts the first vloads early gives 2c+10)",
+    "machine description vs simulator: unit widths, latencies, read-before-write within a bundle, duplicate-write and over-width rejection, the 6-cycle worked trace",
+    "official assignment (read-only): read Readme.md, problem.py, perf_takehome.py, tests/submission_tests.py in full; tests/frozen_problem.py is byte-identical to problem.py; ran the official starter kernel on the official simulator (python -I -B, sources exec'd from text, nothing written to that folder): 147734 cycles, one non-debug bundle = one cycle, no latency",
+    "Chinese vs English: python fences identical; prose, tables and numbers agree"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass (9 blocks, 0.2 s each). No edits. Own probes: tools/out/scratch/b08/perf_probe1.py and official_baseline.py."
+  },
+  "env_evidence": [
+    "你有 2 小时。全程可以使用 AI 助手——Claude、ChatGPT、Copilot 或其他任何工具。",
+    "提交 `build_optimised`，并附一份不超过一页的简短说明，对每一处改动都写清楚：改动前后在某个测试规模下测得的周期数；当时认为瓶颈在哪个发射单元、依据是什么；以及内核向量化之后，最终的周期数与根据机器自身单元吞吐量推出的下界相比如何。"
+  ],
+  "confidence": "high"
+}

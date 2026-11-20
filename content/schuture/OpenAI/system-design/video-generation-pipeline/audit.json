@@ -1,0 +1,29 @@
+{
+  "id": "OpenAI/system-design/video-generation-pipeline",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md and README.md in full and compared them paragraph by paragraph (same numbers, code block identical, mermaid edges identical)",
+    "ran page (1 block, both languages pass)",
+    "recomputed every estimate in my own script (tools/out/scratch/b21/t4_video.py): 2 and 16 requests/s, 27.5 GPU-seconds per output second, W = 165 GPU-seconds, 330 and 2,640 concurrent jobs, 3,168 -> 3,200 workers, 19.4 jobs/s, 82.5% utilization, floor 1,800 GPUs = 10.9 jobs/s, deficit 5.1 jobs/s, 6,109 jobs over the 1,200 s dip, 1,155 displaced jobs worth 578 average jobs, backlog 6,687, surplus 3.39 jobs/s, drain 1,970 s = 32.8 min, 2.275 MB per output second, 13.65 MB per job, 2.36 TB/day; an hour at peak is 57,600 requests, a third of the day, and dip plus drain (53 min) fits inside it",
+    "recomputed the checkpoint figures: T* = sqrt(2*3*900) = 73.5 s, loss 8.2% at 75 s (first order), 0.6 and 0.4 points more at 50 s and 100 s, worst-case redo 78 s <= 90 s",
+    "ran my own event-driven simulation of checkpointing under Poisson worker losses: measured loss 8.6% at 75 s (page says under 9%), larger at 20 s and 300 s, minimum flat between 50 s and 100 s",
+    "checked the lease / fencing-token argument (conditional UPDATE on token and status, token-prefixed object keys, lease = three heartbeat intervals, cancel learned at next heartbeat) and the 6:3:1 weighted round-robin share (free gets at least 1/10)",
+    "checked the mermaid diagram against the request walk-through"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

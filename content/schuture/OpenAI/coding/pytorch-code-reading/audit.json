@@ -1,0 +1,49 @@
+{
+  "id": "OpenAI/coding/pytorch-code-reading",
+  "verdict": "fixed",
+  "summary_zh": "参考解答里有两句解释是错的，已改正：(1) Part 3 说向量化版本的中间张量只占 O(PC)，但代码里取出的 M[idx_a] 形状是 (P, C, C)，占 O(PC²)，在本题规模下（15,968 个浮点数）反而比它要取代的 einsum 网格（8,000 个）大；(2) Part 2 把最后两个可靠度估计值挨得近归因于“标注次数少”，实际上每个标注者的标注数差不多（182–214 条），真正原因是 25 轮还没收敛，训练到 50 轮就是 0.34 和 0.15。代码本身和其余数字都没问题。",
+  "issues": [
+    {
+      "where": "参考解答 Part 3 的说明",
+      "problem_zh": "原文：“中间张量占用 O(PC)，而不是 Part 1 问题 6 里的 O(NAC)”。但同一段前一句刚说 M[idx_a] 的形状是 (P, C, C)，也就是 O(PC²)。实测 M[idx_a] 有 998×4×4 = 15,968 个浮点数，而 einsum 得到的 (N, A, C) 网格只有 8,000 个——在本题数据上向量化版本的中间内存反而更大。这页的考点正是形状和复杂度，这句话会让人背错。",
+      "action": "fixed",
+      "change_zh": "改为：中间张量不再随 N·A 增长，但最大的 M[idx_a] 占 O(PC²) 而不是 O(PC)，只有 P·C 小于 N·A 时才比 O(NAC) 小，这里是 15,968 对 8,000；并补了一句怎样真正降到 O(PC)：只取每个矩阵里用得到的那一列 (p[idx_i] * M[idx_a, :, lab]).sum(1)。参考代码没有改。"
+    },
+    {
+      "where": "参考解答 追问 第 1 条",
+      "problem_zh": "原文说先算完整网格再筛选“内存又回到了 O(NAC)”，暗示 Part 3 的写法一定更省，和上一条同一个问题。",
+      "action": "fixed",
+      "change_zh": "改为“内存是 O(NAC)，随 N·A 而不是 P 增长”。"
+    },
+    {
+      "where": "参考解答 Part 2 末尾",
+      "problem_zh": "原文把估计值 0.31 和 0.26 挨得近解释为“一个标注次数本来就少、上报又接近均匀分布的标注者，能提供的证据本就不多”。实际上五个标注者的标注数是 214、207、205、182、190，并不少；用同样的设置训练到 50 轮，估计值就是 [0.97, 0.82, 0.63, 0.34, 0.15]（seed 1–3 也一样收敛到真实值附近）。差距小是因为 25 轮没训练够：对角元初始值是 0.71，标注者 4 要降到 0.15，离得最远。",
+      "action": "fixed",
+      "change_zh": "把这句解释换成真实原因：25 轮还没收敛，训练到 50 轮估计值约为 [0.97, 0.82, 0.63, 0.34, 0.15]，并注明标注者 3 在这份数据里的实际准确率是 0.33。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有覆盖上面两处说法。",
+      "action": "fixed",
+      "change_zh": "加了两条检查：一条用同样的初始化训练 50 轮，断言标注者 4 的估计值降到 0.15 附近；一条断言 M[idx_a] 有 15,968 个元素、网格有 8,000 个，并验证“只取一列”的写法算出的损失相同。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit (about 16 s)",
+    "reproduced the statement run: P = 998, N*A = 2000, every sample has 2 or 3 labels, crowd.reliability() = [0.94, 0.82, 0.58, 0.31, 0.26], least_reliable = 4",
+    "Part 1 answers: shapes (400, 4), (400, 4), (5, 4, 4); multiply-add counts 134,400 and 15,968; inspected the autograd nodes (AddmmBackward keeps its input, ReluBackward and SoftmaxBackward keep only their result), which matches answer 4",
+    "timed one training step here: net forward 0.1 ms, nll_loop 52 ms, backward 96 ms (page says 0.4 / 34 / 67 ms; same conclusion, machine-dependent numbers left as they are)",
+    "Part 3: nll_vectorized equals nll_loop and an einsum-grid version in value; no-grad timing 38 ms vs 0.16 ms (page says about 21 ms vs well under 1 ms)",
+    "measured intermediate sizes: M[idx_a] is (998, 4, 4) = 15,968 floats, p[idx_i] 3,992, einsum grid 8,000; checked that (p[idx_i] * M[idx_a, :, lab]).sum(1) gives the same loss",
+    "trained for 15 to 800 epochs on seeds 0-3 (vectorized loss) and with the page's own run(seed=0, epochs=50): the estimates converge to the raw annotator accuracies by about epoch 50; labels per annotator are 182-214 at seed 0",
+    "re-derived the Bonus answers (self-attention time and memory, conv2d, bmm) and read the remaining follow-ups",
+    "compared code blocks between README.md and README.zh.md (identical)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. No reference code changed. Two checks were added for the two corrected claims; both state facts that contradict the old wording (15,968 > 8,000 floats; annotator 4's estimate reaches about 0.15 after 50 epochs)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

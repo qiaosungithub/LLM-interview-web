@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 75       # seconds for the whole run: covers an answer that times out on every case
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "Part 2 的「大致均匀」按每个分片拥有的键数在公平份额 1/N 的 0.4 到 2 倍之间来判；「与进程无关」用另一个 PYTHONHASHSEED 不同的 Python 进程重做同样的调用来检查。"

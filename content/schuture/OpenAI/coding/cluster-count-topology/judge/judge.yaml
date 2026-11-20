@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 69       # seconds for the whole run: covers an answer that times out on every case
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "Part 3 的四条规则用手动投递的消息逐条检查，只看每条消息的发送方和接收方，不看消息内容（格式由你决定）。"

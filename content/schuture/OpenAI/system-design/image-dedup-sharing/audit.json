@@ -1,0 +1,34 @@
+{
+  "id": "OpenAI/system-design/image-dedup-sharing",
+  "verdict": "fixed",
+  "summary_zh": "估算数字和设计本身都没问题；只有架构图和正文对不上：正文说客户端把字节直接传到暂存区、下载时拿着签名 URL 去找 CDN，图上却画成都经过 API。已在图上补/改了两条边。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 架构图",
+      "problem_zh": "正文写的是“客户端把字节直接 PUT 到 staging”“读取 API 返回一个经由 CDN 的 URL，客户端再去取”，但图上没有 客户端→暂存区 这条边，并且把下载画成 读取 API→CDN，看图会以为上传字节经过上传 API、读取 API 挡在 CDN 前面。",
+      "action": "fixed",
+      "change_zh": "图上新增一条 客户端→暂存区，把 读取 API→CDN 改成 客户端→CDN；其余不动，中英文两份图同步修改。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "recomputed every capacity number in an independent script: 1.14 TiB/day raw, 820.3 GiB/day new, 292.4 TiB/year, 4.6 and 23 upload QPS, 46.3 view QPS, 11.44 TiB/day served, 0.92 TiB/day origin egress, 93 and 373 Mbps, 352 GiB/day duplicate share",
+    "checked that the 92% CDN hit rate is consistent with the statement's latency targets (median is a hit, p95 is a miss)",
+    "walked the claim/write/commit/delete/tombstone steps in the prose against the interleaving model in the runnable block, including the revive-in-place and new-generation cases and a stale-read (ABA) tombstone",
+    "checked the mermaid diagram against the walk-through",
+    "compared README.zh.md with README.md paragraph by paragraph; python block identical in both"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "The only edit is two edges in the mermaid diagram, which no code can check, so no check was added."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

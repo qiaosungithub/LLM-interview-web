@@ -1,0 +1,49 @@
+{
+  "id": "Anthropic/system-design/inference-api-batching",
+  "verdict": "fixed",
+  "summary_zh": "容量估算、KV cache 内存算术和各组仿真数字全部核对无误。改了两句说过头或对不上的话：“固定时钟刷新只要到达率为正队列就无限增长”其实只在每个副本每秒十来个请求以上才成立（页面自己的仿真在 5 个/秒时很稳定）；中文版说离线池“只比自己的下限多一个副本”，实际配置 4 个、下限 3.125 个，相差不到一个。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 深入话题 (a)（固定时钟刷新那一条）",
+      "problem_zh": "原文说只要 max_wait 比 100 ms 的执行时间短，“只要到达率为正，待处理队列就会无限增长”。用页面自己的仿真（去掉副本感知、max_wait = 20 ms）实测：每个副本 2、5、8 个请求/秒时等待时间稳定在 1 秒以内，跑 900 秒也不增长；要到大约 12.5 个/秒以上队列才会无限增长（25 个/秒时最大等待随运行时长线性上涨）。结论对 400/秒的真实负载没有影响，但“任何正到达率”这个说法本身是错的。",
+      "action": "relaxed",
+      "change_zh": "中英文都改为“只要每个副本的到达率超过每秒十来个请求（按 20 ms 的 max_wait 算，远低于这里每个副本承载的 400/秒），待处理队列就会无限增长”。"
+    },
+    {
+      "where": "参考解答 需求与规模（峰值机群规模，仅中文版）",
+      "problem_zh": "中文写“离线池单独来看，已经只比自己的下限多一个副本”。离线池配置 4 个副本，下限是 2,000/640 = 3.125 个（向上取整也是 4 个），差距不到一个副本；英文版写的是“within one replica of its own floor”，是对的。",
+      "action": "fixed",
+      "change_zh": "中文改为“与自己的下限（3.125 个副本）相差已经不到一个副本”。英文版这一句没有改动。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只验证了固定时钟在 400/秒下不稳定，没有覆盖“任何正到达率”这个说法。",
+      "action": "fixed",
+      "change_zh": "新增一条断言：固定时钟策略在 5 个请求/秒下跑 300 秒，最大等待小于 1 秒。按原来的说法（任何正到达率都无限增长）这条断言不该成立。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "题干是原题库（GPT 版网站从 schuture 题库导入）留下来的：一大段长句，把规模参数、范围说明、五个深入话题的要求全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻，更难读。上次重做时只核对了数字，没有改写题干。",
+      "action": "fixed",
+      "change_zh": "按正常面试题重写题干：先一句话说要设计什么，再分“已有条件 / 峰值流量 / 要交付什么 / 面试官会追问的话题 (a)–(e) / 不考的范围”几块列清楚。所有数字和条件不变（64、100 ms、512、10,000/s、80/20、300/200 token、p95 500 ms、多模型多版本、tenant_id 与限流等级、8 卡池追问），参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "recomputed every capacity number independently in a script: 640/s per replica, floor 16, 10,240 vs 9,600, rho 97.7%, real-time 16.7 -> 20 replicas at 400/s (62.5%), offline 3.125 -> 4 replicas at 500/s (78.1%), fleet 24 = 1.5x floor, queue cap 2,560, 10x chunked-streaming cost, 475 ms budget and 274 ms margin",
+    "recomputed KV-cache arithmetic: 12.58B params, 25.2 GB weights, 163,840 bytes/token (0.82 MB with full MHA), 49.8 GB free, 81.9 MB per 500-token sequence, 608 sequences = 9.5x batch cap, 24.6 MB per 150-token prefix, 40 prefixes per GB",
+    "printed all simulation outputs and compared with prose: floor-risk p99 292 ms / max 391 ms, real-time fill 62.5% p50 150 / p95 195 / p99 199 / max 201 ms, offline fill 99.99% p50 162 / p95 226 / p99 243 ms, fixed-clock max wait 17.5 s vs 0.2 s for the chosen policy, 8-GPU pool idle-drain 8.44% and 6.42%",
+    "swept utilization 5%-97.7% and max_wait 5-400 ms to test 'fill tracks utilization for any max_wait under 100 ms' and '150 ms mean / ~200 ms p99 below about 85% utilization' (both hold)",
+    "swept the fixed-clock policy over 2-50 requests/s, 3 seeds and 3 durations: bounded up to 10/s, critical at 12.5/s, growing linearly with run length at 25/s",
+    "aging 100 -> 300 ms raises p99 by 26% (small model) and 37% (large model); the page says 'roughly a quarter' for both - left alone as a rough figure",
+    "checked the mermaid diagram against the walk-through prose, and facts about GQA, paged attention, power-of-two-choices, token bucket, SSE",
+    "compared Chinese and English text paragraph by paragraph; python block identical in both files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. Added slow_clock (fixed clock at 5 requests/s, max wait 0.51 s < 1.0)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

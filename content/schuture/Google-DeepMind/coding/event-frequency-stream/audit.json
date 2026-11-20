@@ -1,0 +1,48 @@
+{
+  "id": "Google-DeepMind/coding/event-frequency-stream",
+  "verdict": "fixed",
+  "summary_zh": "三个部分的结果都对，但题目要求的“每次 add 均摊 O(1)”参考解答其实没做到：桶用的是普通 dict，而普通 dict 在删过键之后读第一个或最后一个键要跳过留下的空位，表越大越慢（实测 k 或 n 放大 40 倍，单次 add 慢 10 倍以上）。已把桶换成 OrderedDict（只改 6 行），并改了讲解里相应的几句话。",
+  "issues": [
+    {
+      "where": "题目 Part 2 的复杂度要求 / 参考解答 Part 2、Part 3 的代码",
+      "problem_zh": "题目要求每次操作均摊 O(1)、与 n 和不同消息数无关，讲解也说“读 dict 的最后一个键是 O(1)，不需要扫描”。但 CPython 的普通 dict 删除键后只留下空位，next(reversed(d)) 和 next(iter(d)) 要先跳过这一端的空位。实测：SpaceSaving 填满 k 条消息后再来 k 条全新的消息（每次都淘汰最小桶的第一个键），k 从 1 万到 8 万时单次 add 从 3.7 微秒涨到 24 微秒；WindowTopMessage 在最大桶从末尾被接连删空的输入上，从 2.6 微秒涨到 53 微秒。都是随规模线性增长，不是 O(1)。",
+      "action": "fixed",
+      "change_zh": "两个类里的桶从 dict 换成 collections.OrderedDict（内部是双向链表，读头尾真正 O(1)），一共改 6 行，其余逻辑不动。改完后同样的测试里单次 add 基本不随规模变化（1.1→1.3 微秒，1.9→2.4 微秒）。"
+    },
+    {
+      "where": "参考解答 Part 2、Part 3 的讲解",
+      "problem_zh": "讲解里有三处说桶是“dict”、读它最后一个键“直接从插入顺序末尾读出、不是扫描”，这对普通 dict 不成立；Part 3 还把淘汰说成“从最小桶里任取一个元素”，和题目“淘汰停留最久的那个”的规则对不上。",
+      "action": "fixed",
+      "change_zh": "这几句改成 OrderedDict，并加了一句说明为什么不能用普通 dict（删键留空位，读头尾要跳过空位）；“任取一个元素”改成“取出最早放进去的那个键”。"
+    },
+    {
+      "where": "追问（按时间开窗口）",
+      "problem_zh": "原文说改成按时间淘汰后“仍是每个事件均摊 O(1)，只是不再是每次 add 调用均摊 O(1)”。后半句不对：每个事件只会被淘汰一次，所以按 add 调用算仍然是均摊 O(1)，变的只是单次调用的最坏情况。",
+      "action": "fixed",
+      "change_zh": "改成：仍然是每次 add 均摊 O(1)（每个事件只会被淘汰一次），只是单独某一次 add 可能要做不止常数次操作。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只验证结果，没有验证“单次 add 的开销与 n、k 无关”。",
+      "action": "fixed",
+      "change_zh": "新增一组计时检查：规模放大 40 倍后单次 add 的 CPU 时间不得超过原来的 4 倍（SpaceSaving 和 WindowTopMessage 各一条）。桶用普通 dict 时比值是 11–15 倍，检查失败；换成 OrderedDict 后是 1.2 倍左右，检查通过。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "Part 1: own brute force on 5000 random small event lists (ties, single message, repeated timestamps) + empty-list ValueError",
+    "Part 2: own brute force from the statement's change-numbering rule on 3000 random runs (n = 1..7, 1..5 distinct messages), plus the n = 3 trace",
+    "Part 3: own literal simulation (min counter, longest-held tie-break, m + 1 seeding) compared state-by-state at every prefix on 4300 random and skewed streams (k = 1..8); both guarantees (heavy-hitter coverage, f <= c <= f + N/k) and top(m) ordering asserted at every prefix; k = 3 trace",
+    "timed per-add cost versus k and n on streams that keep deleting the first / last key of one bucket: linear growth with plain dict buckets, flat with OrderedDict",
+    "confirmed the new check fails on a scratch copy with plain-dict buckets (ratios 11-15x) and passes on the edited page (ratios 1.15-1.3x, threshold 4x, measured with process_time, best of three)",
+    "follow-ups: Misra-Gries with k-1 counters (c <= f, f - c <= N/k, heavy hitters monitored) on 3000 random streams; Count-Min w = ceil(e/eps), d = ceil(ln(1/delta)) violation rate 0.029 <= delta = 0.05",
+    "compared Chinese and English text section by section; code blocks identical in both files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass (about 1 s each; the new timing check adds roughly 0.8 s). The check compares CPU time (time.process_time) at two sizes, so it does not depend on machine speed or on other users' load."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

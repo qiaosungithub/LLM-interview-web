@@ -1,0 +1,64 @@
+{
+  "id": "Anthropic/take-home/open-research-shortcut-learning",
+  "verdict": "fixed",
+  "summary_zh": "题目适合做 72 小时 take-home；最优观察者的公式和冲突准确率独立重算过，三张表和正文里的数字都和代码输出一致。主要问题是 Part 3 把“排序”说得太满：等级相关 0.88 主要来自每个旋钮各自的单调性，唯一一组两个旋钮反向变化的比较，CNN 在 5 个种子里有 3 次和最优观察者排反；“上限”也是这个实验里观察到的规律，不是一般结论。已把正文、结论、小标题、一句话总结和 meta 摘要都改成“大体排对”，并补了一条只在 SEED = 0 下运行的检查；另外删掉了一处文献没写的“学习速度”。",
+  "issues": [
+    {
+      "where": "参考解答 Part 3 “排序”一段（以及小标题）",
+      "problem_zh": "原文说斯皮尔曼相关 0.88 意味着只用数据算的量“能把谁更依赖捷径排对”。9 个格子里，ρ 或 σ 单独变大时两边都下降，相关系数主要来自这一点；唯一不平凡的比较是 σ = 0.5、ρ = 0.97 对 σ = 0.85、ρ = 0.8：最优观察者是 0.868 对 0.413，CNN 却是 0.158 对 0.197，排反了。SEED = 0、1、3 都排反，SEED = 2 只以 0.008 排对，SEED = 4 排对。事先写下的预测是“排序一致”，正文没有说这条只部分兑现。",
+      "action": "fixed",
+      "change_zh": "小标题“排序准，大小不准”改为“排序大体准，大小不准”；“能把……排对”改为“能把……大体排对，但事先写下的‘排序一致’没有完全兑现”，并补两句说明 0.88 主要来自各旋钮自己的方向、点名这组反例和“SEED = 0 到 4 里有 3 次是反的”。验证代码的 if SEED == 0 块里加了一条检查这组比较确实是反的；代码注释 “gets the order right” 改为 “gets the order roughly right”。"
+    },
+    {
+      "where": "参考解答 Part 3 “大小”一段",
+      "problem_zh": "原文“所以只用数据的预测给出的是一个上限：模型依赖捷径的程度，至少有数据所支持的那么多”读起来像一般规律。它在这里成立（每个 CNN 都不比最优观察者高），但这是实验观察；一个没学会标记的模型完全可以在冲突图上比贝叶斯最优观察者做得好。",
+      "action": "fixed",
+      "change_zh": "改为“所以在这个实验里，只用数据的预测相当于一个上限（这是观察到的规律，不是定理）”。"
+    },
+    {
+      "where": "结论第 2 条、面试结束前的一句话总结、meta.yaml 的 summary_zh",
+      "problem_zh": "三处重复了“能把依赖程度排对”“排序可预测”“能预测……的排序”的说法，和上面同样过满。",
+      "action": "fixed",
+      "change_zh": "结论改为“能把依赖程度大体排对（等级相关 0.88；两个旋钮反向变化时会排错），但在这里只起到上限的作用”；一句话总结改为“排序大体可预测”；meta 摘要改为“能大体预测……的排序”。"
+    },
+    {
+      "where": "参考解答 Part 4 学习曲线后的说明",
+      "problem_zh": "原文说 ρ 越大核心特征学得越慢、“这个顺序在换种子以后不变”。SEED = 4 上顺序仍然成立，但 ρ = 0.8 和 0.9 到 0.75 的步数是 238 对 239，几乎打平。",
+      "action": "fixed",
+      "change_zh": "句末补了“（个别种子上 ρ = 0.8 和 0.9 几乎打平）”。"
+    },
+    {
+      "where": "延伸阅读 Hermann 和 Lampinen（2020）",
+      "problem_zh": "原文说这篇是“关于特征可解码性和学习速度的工作”。论文讲的是冗余特征里模型偏向更容易（更可线性解码）的那个、并压制另一个；摘要里没有学习速度的结论，我也没有在正文里核实到。",
+      "action": "fixed",
+      "change_zh": "改为“关于特征难易（可解码性）的工作”。"
+    },
+    {
+      "where": "验证代码（多种子的定性检查）",
+      "problem_zh": "页面说所有定性检查在 SEED = 0、1、2 都通过，作者的日志属实；我另跑的 SEED = 3 也全部通过。SEED = 4 上只有一条没过：σ = 0.5 时核心 AUC 从 ρ = 0.5 到 0.97 只降了 0.046，检查要求超过 0.05。正文“核心 AUC 也随 ρ 增大而下降”在 SEED = 4 上仍然成立（0.992、0.990、0.980、0.946）。",
+      "action": "flag",
+      "change_zh": "没有改。正文说的种子范围内都对，只是这条检查的容差偏紧，换更多种子可能偶尔不过。"
+    }
+  ],
+  "checked": [
+    "ran page plain and with --hash-seeds before and after the edits (PASS, about 70 s each, 36 CNNs)",
+    "own script, no code shared with the page: rebuilt the 72 vertical / 80 horizontal bar templates, wrote the likelihood p(x|y) as a mixture over templates and the marker as a mixture over agree/disagree, and computed the log-likelihood ratio from scratch; core and conflict accuracies on fresh samples agree with the page's Bayes table within Monte Carlo error at every (sigma, rho)",
+    "re-derived the marker LLR logaddexp(log rho + u, log(1-rho) - u) - logaddexp(log(1-rho) + u, log rho - u) with u = A * sum(patch) / sigma^2 and the 1 / (4 rho (1 - rho)) = 8.6 estimate",
+    "ran trimmed copies of the page at SEED = 3 and 4 with soft asserts and extra prints (Spearman, the cross-knob pair, max CNN minus Bayes, steps to AUC 0.75); read the author's SEED 1 and 2 logs. Spearman(Bayes, CNN) is 0.88 to 0.95 across seeds 0-4; no CNN beats the Bayes observer by more than 0.01 at any seed",
+    "checked every number in the three tables and the prose against the printed output at SEED = 0 (0.88, 0.179, 0.107, 0.868 vs 0.158, 0.894, 11.6x, 0.701 -> 0.894)",
+    "checked related work: Shah et al. 2020 on simplicity bias, and the mentions of Waterbirds (background shortcut) and group DRO (mitigation), are fair; Hermann and Lampinen 2020 softened as above",
+    "no assertion depends on wall-clock time (training and evaluation times are only printed)",
+    "checked meta.yaml: origin matches the process notes (research loops: 4-hour exploratory ML take-home, some teams a 72-hour research take-home, content varies by team) and says the problem was written by us; no paths; frequency low",
+    "judged the task as a 72-hour take-home: the open question is narrowed in the reference answer, CPU only, synthetic data, deliverables and grading criteria stated"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "PASS before and after, plain and PYTHONHASHSEED=0/1. Added one assert inside the existing if SEED == 0 block: the Bayes observer ranks (0.5, 0.97) above (0.85, 0.8) while the CNNs rank it below, which is what the new text says. At SEED = 4 one tight core-AUC margin check fails narrowly (see flag)."
+  },
+  "env_evidence": [
+    "从拿到题目起，约 72 小时内交卷。只用 CPU，不提供 GPU。",
+    "不能用 AI 编程助手，除非邀请信另有说明。"
+  ],
+  "confidence": "high"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "Anthropic/coding/concurrent-web-crawler",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "题目 Part 3 第一句",
+      "problem_zh": "题面只暗示 crawl_async 要并行抓取，但页面自己的检查断言了同时在途数 > 1。",
+      "action": "fixed",
+      "change_zh": "第一句写明：crawl_async 要像 Part 2 一样让 get_urls 调用重叠进行（而不是一次只抓取一个页面），并保证同时在途的调用最多 concurrency 个。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages), three times in a row to see whether the timing assertions are stable",
+    "followed the Part 1 trace by hand against the statement's rules; the example output is asserted by the page for all three implementations",
+    "compared crawl against an independent reachability computation on 1500 random graphs (mixed-case hosts, ports, userinfo, https, subdomains, fragments incl. empty and double '#', duplicate links, self-links, failing pages incl. a failing start page, start URL carrying a fragment), with exactly-once fetch counts",
+    "crawl_concurrent and crawl_async on 500 of those graphs each with limits 1, 2, 5, 16 (2000 runs each): same result, every URL fetched exactly once, peak in-flight calls never above the limit, no thread left alive afterwards",
+    "300-page complete graph with zero latency and 32 workers (maximum contention on the visited check), 5 trials each: no URL fetched twice",
+    "5000-page chain: crawl_async finishes without recursion problems",
+    "verified explanation claims: urlparse lower-cases hostname and ignores port/scheme, Queue's unfinished counter (put +1, task_done -1), asyncio.gather propagates the first exception immediately",
+    "compared Chinese prose with English paragraph by paragraph; python blocks identical in both files",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass; nothing was changed."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

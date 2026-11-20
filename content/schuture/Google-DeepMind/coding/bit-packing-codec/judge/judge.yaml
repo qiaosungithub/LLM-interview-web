@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 45       # 38 cases x 1 s CPU, plus margin
+case_cpu: 1       # CPU seconds per case
+note: "for_size 是否“只用公式”只能部分检查：测试只确认它没有调用 encode_for、pack 或 encode_uvarints。"

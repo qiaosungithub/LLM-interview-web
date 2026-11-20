@@ -1,0 +1,24 @@
+{
+  "id": "OpenAI/coding/rl-training-debug",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages); the given file, the fixed file and the checks are byte-identical in both languages",
+    "diffed the given file against the fixed file: exactly the four claimed lines differ (plus comments)",
+    "ran the given file standalone at every stage of the table (no fix, 1, 1+2, 1+2+3, all four): each stage fails at exactly the test the table names, with the same assertion messages; the fully fixed file prints reward +1.640, value loss 0.077, mean adv +0.010 and 'all tests passed'",
+    "each bug alone (other three fixed) still fails its own test (1, 2, 3; bug 4 alone = stage 1+2+3 fails test 4)",
+    "fixed file over 12 seeds: all five tests pass every time; bug-4-only over 8 seeds: test 4 fails every time and mean advantage is within 0.05 of minus the entropy, as the derivation says",
+    "compute_returns vs brute-force reward-to-go on 300 random reward/done tensors; forward-loop numbers [-0.02, -0.0394, 1.0, 0.95] and correct [0.9015, 0.95, 1.0, -0.02] recomputed by hand",
+    "env_step vs a hand-written transition table for all 24x4 state-action pairs; exhaustive DP gives 1.640 as the best 20-step total, -0.400 as the floor",
+    "autograd: dL/dV = (log pi + V - G)/N with the un-detached advantage and (V - G)/N with detach; score-function identity and baseline-invariance checked against the exact gradient on a 4-armed bandit (200k samples); flipped sign gives the exact opposite direction",
+    "compared Chinese and English text"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "The per-run numbers quoted for the partially fixed stages depend on the CPU's SIMD path (checked with ATEN_CPU_CAPABILITY): on this host stage 1+2+3 reports 'baseline is off by -0.630' (page: -0.545) and iteration 119 shows adv -0.761 / entropy 0.721 / value loss 0.863 (page: -0.586 / 0.612 / 0.528); stage 1+2 peaks at -0.193 (page: -0.209). Same qualitative behaviour, same failing test, so left unchanged. The deterministic numbers (test 2: -1.671 -> -15.674, test 3 lists, fully fixed run) reproduce exactly."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "OpenAI/system-design/crossword-solver",
+  "verdict": "fixed",
+  "summary_zh": "估算数字、求解器代码和协议模型都核对过，没有问题。只改了追问里的一句话：原文读起来像是“预算耗尽后服务也可以报告不存在填法”，和题目强调的“放弃”与“已证明无解”是两种结果相矛盾，已改正。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "追问 第 1 条",
+      "problem_zh": "原句是“所以穷举搜索仍然要跑完，或者预算耗尽，服务才能报告‘不存在填法’”。按字面理解，预算（300 秒）耗尽之后服务也能报告“不存在填法”，这和题目以及参考解答里反复强调的相反：预算耗尽只能报告“放弃”（timeout），只有整棵搜索树走完才能报告“不存在填法”（unsat）。",
+      "action": "fixed",
+      "change_zh": "改成“所以穷举搜索仍然要跑完，服务才能报告‘不存在填法’；预算先耗尽的话，结果仍然只是‘放弃’。”英文版同步修改。其余内容没有改动。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md and README.md in full and compared them; code blocks are identical in both files",
+    "ran page before and after the edit (3 blocks, about 9.5 s, both languages pass)",
+    "recomputed every scale number independently (tools/out/scratch/b19/t6_crossword.py): 300^100 = 10^247.7, 76,923 words per length bucket, 7 MB raw + 22.75 MB bitmaps, 0.231 / 1.157 requests per second, 4,167 requests in the peak hour, 43.5 s mean solve time, 10.1 / 50.3 concurrent puzzles, 403 busy workers -> 512 pool (79%), 38.4M node expansions at the cap, 806 claims/s + 806 reports/s + 58 heartbeats/s = 1,669 writes/s, 265 writes/s for one 64-worker puzzle, 1,203 machine words per bucket bitmap, one AND measured at 0.6 microseconds",
+    "compared the page's solve() (all four MRV/FC combinations) against my own brute force on 1,350 random boards: 2x2, 3x3 and 4x4 with 2- to 4-letter alphabets, 733 satisfiable and 617 unsatisfiable, all agree; every returned filling re-validated cell by cell including the no-repeated-word rule",
+    "reproduced the node-count claim: 12.6x on the first dictionary, 8.9x to 19.4x over the eight dictionaries (page says 9x to 19x); MRV alone and MRV + forward checking give identical node counts there and on 300 further random 4x4 dictionaries, so 'forward checking removes calls, not nodes' holds in general",
+    "instrumented the protocol model (tools/out/scratch/b19/t6b_protocol.py): it is not vacuous (reaches the unsat verdict when there is no filling and the solved verdict otherwise), holds for L = 1..5 leaves with up to 3 faults, and both negative controls (no fencing, non-atomic split) are caught at L = 2, 3, 4",
+    "checked the mermaid diagram against the walk-through, the 52-bitmap-operation figure for arc consistency, and the counting argument for unsat (tasks_created vs tasks_finalized)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "the edit is prose only (a design statement about timeout vs unsat that the runnable blocks do not model), so no check was added"
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

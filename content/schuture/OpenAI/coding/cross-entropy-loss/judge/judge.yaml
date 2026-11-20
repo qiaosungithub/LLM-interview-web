@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 60       # 27 cases at 2 s add up to 54 s; the reference answer needs well under 1 s in total
+case_cpu: 2       # CPU seconds per case
+note: 只评测四个函数（Part 1–3 和 Part 4 (c) 的 cross_entropy_grad）；Part 4 (a)(b) 的推导和下界说明是书面部分，不评测。所有输入都是 float64，结果按 float64 的舍入误差比较。

@@ -1,0 +1,35 @@
+{
+  "id": "Anthropic/system-design/harmful-output-detection",
+  "verdict": "fixed",
+  "summary_zh": "题目和解答里的数字、引用的 Anthropic 公开资料都核对过，没有发现错误，正文没改。只改了出处说明：原来说那份指南对这道题“没有任何细节”，其实它后文附了一行简短的答题要点，而且这一条注明的出处是另一个面试准备网站。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "出处说明（origin）",
+      "problem_zh": "原来写指南“只列了一句……没有任何细节”。实际上那份指南在后文给了一行“好答案”的要点（单独训练的越狱检测器、内容政策分类器、持续的对抗性红队评估、人工复核被标记内容、熔断），而且这道题在题单里注明的出处是另一个面试准备网站，不是 Glassdoor 等候选人原帖。",
+      "action": "fixed",
+      "change_zh": "改成：题单里列了这一句，这一条注明的出处是另一个面试准备网站；指南后文只附了一行简短的答题要点，没有题目细节。其余说明（数字和解答都是补写的练习假设，不是真实面试原题）保持不变。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md in full",
+    "ran run_page.py before and after the edit, plain and with --hash-seeds (seeds 0 and 1): all pass; no wall-clock upper-bound asserts in the page",
+    "recomputed every number independently with fractions/closed forms in a scratch script: traffic and base rates, single-classifier strawman, two-stage cascade precision/recall/false blocks, S0 path, review hours and headcount, appeals and shadow sampling budget, GPU counts and per-request cost, storage, evaluation sample sizes and standard deviations, weak-language load, FPR needed for 90% precision, Poisson account rule; all match the page",
+    "re-derived the streaming gate (first-token delay, mean delay, worst-case leak for k=5/10/1 with h=0 and k=5 with h=11, d=12) with a token-level release rule written separately from the page's gate(); all match",
+    "checked the design advice (cascade placement, hold-back buffer trade-off, review sampling, account-level aggregation) for soundness; no problems",
+    "web-checked the Anthropic API refusal stop reason and the Constitutional Classifiers figures quoted on the page against Anthropic's public docs/posts: confirmed",
+    "checked origin against the Landed guide and its reference list; frequency low is consistent with a single thin source"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "One python block; passes plain and with hash seeds 0/1 (about 5 s). README.zh.md unchanged; only meta.yaml origin edited."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

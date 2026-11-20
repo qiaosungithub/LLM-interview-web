@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 66       # seconds for the whole run: 23 cases at 2 s and one at 15 s, plus 5
+case_cpu: 2       # CPU seconds per case
+note: Part 1 的测试里没有三张同花色的手牌，所以写完 Part 2 的同花之后 Part 1 的测试照样能过。

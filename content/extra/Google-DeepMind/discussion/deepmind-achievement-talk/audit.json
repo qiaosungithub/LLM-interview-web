@@ -1,0 +1,39 @@
+{
+  "id": "Google-DeepMind/discussion/deepmind-achievement-talk",
+  "verdict": "fixed",
+  "summary_zh": "流程页只说这位候选人“准备并讲了”一次关于 DeepMind 近期成果的报告，没说是当面讲，也没说是在哪一轮。删掉了题目和简介里的“当面”，并把阶段标签从现场面改成 take-home（流程页把这条放在 take-home 一节）。Genie 4 和 AlphaProof Code 两次练习里的数字、日期和英文引文都和官方原文对上了，没有改动。",
+  "issues": [
+    {
+      "where": "题目第一段 / meta 简介",
+      "problem_zh": "写成候选人“要准备并当面讲一项 DeepMind 近期的成果”。流程页原话只有“prepared and presented a talk on a recent DeepMind achievement”，没有说是当面讲。",
+      "action": "fixed",
+      "change_zh": "改成“要准备并讲一项 DeepMind 近期的成果”，简介同样删掉“当面”。"
+    },
+    {
+      "where": "meta stage",
+      "problem_zh": "阶段标成 onsite（现场面）。流程页把这条报告放在 take-home 一节，没有说这次报告是在哪一轮讲的。",
+      "action": "fixed",
+      "change_zh": "改成 take-home，和流程页的归类一致。"
+    }
+  ],
+  "checked": [
+    "ran page normally and with --hash-seeds, before and after the edits (no code blocks); meta.yaml still parses",
+    "origin, frequency (rare) and the README's first paragraph compared with the take-home paragraph of the process page (Chinese and English): one strategy-and-operations candidate prepared and presented a talk, single report; origin says questions, timing and both exercises were written for the site",
+    "downloaded all nine cited official sources and compared every 【官方】 sentence, number, date and English quote against the text",
+    "Genie 4 announcement: 2026-10-27, Hadsell / Rivas / Qi, the four capability sections, Gemini Omni and other Gemini models, Gemini 3.8 Flash as guiding agent, tester industries, 'an early, experimental model', the drift and open-problem list, Gemini 4 Argon + Apptronik Apollo playing checkers in simulation, AGI line, release path, 'a new standard of realism', 'the most dramatic leap', 'zero-to-one', 'identifying gaps', SynthID / safeguards, archival-photo example; no metrics and no paper; modified 2026-11-05",
+    "Genie model page: 'Results for illustrative purposes. Sequences shortened.', 'a few minutes of continuous interaction, rather than extended sessions', no 'limited action space' entry",
+    "Genie 3 announcement: 2025-08-05, 24 fps, 720p, consistent for a few minutes, visual memory up to one minute, 'Limited action space', 'rather than extended hours', NeRF / Gaussian Splatting comparison and 'an emergent capability'; the GameNGen / Genie 2 / Veo table exists only as an image (alt text confirms), as the page says",
+    "Project Genie post (2026-01-29): world-model definition quote, powered by Genie 3, 60-second generation limit, promptable events not yet included; techspert interview (2026-02-25): Fruchter quote 'the model simulates end to end, with no game engine running in the background'; blog.google note: limited group of trusted testers",
+    "AlphaProof Code announcement: 2026-11-10, modified 2026-11-12, 'over three million lines' in the page description vs 'over six million lines of Lean' in the body, the 'first time ... by any method, with or without AI' sentence, Ehren Kret as Signal CTO, three Signal members thanked",
+    "technical report (PDF text) and web version: 6.5M proof lines / nearly 7M in the repository, ~26,000 trusted lines, five people over four weeks, nine authors, proofs entirely by Gemini 4 Carbon agent teams, 40-80 agents for 24-72 h on one machine, clean build several hours, seL4 20 and CompCert 6 person-years, libsignal v0.105.4 one-to-one, PQXDH + Triple Ratchet, four property classes, Table 1 contents, ten symbolic theorems, 39 hooked routines in the PDF vs 37 in the web version and the routine list, keygen unverified, libsignal-cli 'not Signal's own applications', trust-on-first-use path not exercised, replay-based forward-secrecy loss, SPQR healing not proved, 25,000 messages or 2^20 sessions of 2^10 messages, Rust compiler outside the trusted base, the two re-injected Cheval / Jacomme / Richards bugs, MAC-skip mutation, predicate-redefined-to-False example (cited from other work), sorry / native_decide rejected, Gemini 4 Carbon + Claude Opus 5.5 drafting specs, related work (miTLS / Everest, Noise*, LibSignal*, modified WireGuard code, 'To our knowledge'), Fermat ~13M lines in September 2026, future work and open review, abstract quote; every cited section number exists and holds the cited content",
+    "WebFetch spot-check of the AlphaProof Code and Genie 4 announcements re-confirmed dates, authors, the six-million figure, the first-time sentence, Kret's title, the thanked Signal members, Gemini 3.8 Flash, 'an early, experimental model', the absence of any numbers, and the access path",
+    "questions Q1-Q9 and hints read for fit with a strategy-and-operations talk round; 【判断】 lines are clearly marked as opinion"
+  ],
+  "code_run": {
+    "ran": false,
+    "passed": true,
+    "notes": "no python blocks. Not re-done: the page's own statements that a web search on 2026-11-17 found no independent review (already worded as 'this one search found nothing'); the Fermat source [9] was not read (the page says so)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

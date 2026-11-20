@@ -1,0 +1,18 @@
+{
+  "id": "Anthropic/coding/indexed-priority-queue-from-scratch",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page, and with --hash-seeds (PYTHONHASHSEED 0 and 1): all pass",
+    "worked the Part 1 and Part 2 examples by hand (including the array [1, 12, 4, 18, 14, 13, 7] and why sift-down-only removal pops 12 before 7) and confirmed the reference returns them",
+    "my own random operation sequences on IndexedPQ with incomparable object() keys and heavy priority ties, 2,000 runs x 100 ops, against a dict model with brute-force minimum",
+    "compared both Dijkstra versions against my own Floyd-Warshall on 1,500 random graphs with self-loops, parallel edges and zero weights",
+    "checked the comparison bounds (push <= floor(log2 n), pop/update/remove <= 2 floor(log2 n) + 2) and the build-heap sum 2n by reasoning, and the page's counting checks",
+    "verified the (v - u)^2 graph really makes every edge relax (E + 1 pushes) and measured the lazy heap's peak there at 10,097 of E = 11,175; a star graph peaks at exactly E",
+    "checked the origin line against the interviewing.io page (same sentence as the hash-map page)"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "Page passes as written, also under PYTHONHASHSEED 0 and 1. No edits. Minor, not changed: the text says the lazy heap can hold 'E + 1' entries at worst; the true maximum at one time is E (the source is popped before anything else is pushed), which does not change the lesson."},
+  "env_evidence": [],
+  "confidence": "high"
+}

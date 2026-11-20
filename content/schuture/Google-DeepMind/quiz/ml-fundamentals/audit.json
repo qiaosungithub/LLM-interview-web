@@ -1,0 +1,40 @@
+{
+  "id": "Google-DeepMind/quiz/ml-fundamentals",
+  "verdict": "fixed",
+  "summary_zh": "15 道题的答案都核对过，没有问题。只改了解答开头的一句约定说明：原文把 Adam 的矩也说成“未归一化”，其实只有动量的速度项是；Adam 的写法本来就带 (1−β) 权重。",
+  "issues": [
+    {
+      "where": "参考解答开头的约定说明",
+      "problem_zh": "开头说“下面动量和 Adam 的更新规则用的是未归一化的速度/矩项”。这句话对动量成立（v_t = μ·v_{t−1} + g_t 没有 (1−μ) 权重），但 Q6 里 Adam 的 m_t、v_t 带 (1−β₁)、(1−β₂) 权重，本身就是归一化的写法，说成“未归一化”容易让人看糊涂。",
+      "action": "fixed",
+      "change_zh": "已改：把这句里的“和 Adam”“/矩”删掉，现在只说动量用的是未归一化的速度项；Adam 的写法本来就带 (1−β) 权重。中英文两版都改了。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages): pass",
+    "Q1 recomputed the four metrics with scikit-learn on explicit label arrays, and the always-negative baseline",
+    "Q2 area under my own threshold-sweep ROC (with ties) vs the pair probability; duplicating negatives 10x leaves every ROC point unchanged and lowers precision at every threshold with FP>0",
+    "Q3, Q4, Q5 gradients and the logistic Hessian against torch autograd; gradient descent on separable data for 100k steps (norm keeps growing, loss -> 0) vs lambda=1 (norm settles); log-sum-exp shift against scipy",
+    "Q6 E[m_t] closed form in sympy; first step of torch.optim.Adam for gradients from 1e-3 to 1e3",
+    "Q7 torch SGD weight_decay vs manual decoupled decay (identical); torch Adam+weight_decay vs AdamW (differ); searched for a single gamma that reconciles them on 20 steps (none)",
+    "Q8 iterated the exact variance recursion for four step sizes against eta*sigma^2/(2-eta)",
+    "Q9 exact bias^2, variance and noise for the degree-1 fit (prediction is linear in the targets), compared with a 200k-run simulated MSE; bias^2/variance = 5.0",
+    "Q10 ridge by numerical minimisation vs closed form, SVD form and shrink factors; coordinatewise ridge c/(1+lambda) and lasso soft threshold by 1-D minimisation (and that the threshold is lambda/2 without the leading 1/2)",
+    "Q11 expectation symbolically; Q12 formulas against torch BatchNorm1d (train/eval) and LayerNorm, batch-of-one collapse",
+    "Q13 brute-force minimisers vs mean/median, outlier moved to 1e6, Huber gradient against torch huber_loss, Gaussian/Laplace MLE of location vs mean/median",
+    "Q14 optimal discriminator by pointwise numerical maximisation; V(D*) = -log 4 + 2 JSD; both generator-loss gradients against autograd",
+    "Q15 importance-weighting identity by quadrature (target accuracy 0.939 = weighted source; unweighted source 0.776); definitions of covariate/label/concept shift read against the standard ones",
+    "numbering Q1-Q15 lines up one to one in both languages; formulas and numbers compared question by question between English and Chinese, and both texts read in full; code blocks identical in both files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; nothing was changed."
+  },
+  "env_evidence": [
+    "Quiz · oral, with derivations",
+    "15 questions / 60 min",
+    "Two conventions worth pinning down before answering out loud: the momentum and Adam update rules below use an unnormalised velocity/moment term, the common convention in ML courses and frameworks — a textbook that instead weights the momentum term by $(1-\\mu)$ describes the same algorithm up to a rescaling of the effective learning rate."
+  ],
+  "confidence": "high"
+}

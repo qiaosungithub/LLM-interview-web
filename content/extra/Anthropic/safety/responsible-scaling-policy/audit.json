@@ -1,0 +1,43 @@
+{
+  "id": "Anthropic/safety/responsible-scaling-policy",
+  "verdict": "fixed",
+  "summary_zh": "改了四处：未删节风险报告的内部共享范围在 3.4 版已经改了；2025 年 5 月启用 ASL-3 是预防性的，不是确认越线；“新的基线”那句其实是 GovAI 的概括；GovAI 的结论是“细读后变得更正面”，不是“转为正面”。",
+  "issues": [
+    {
+      "where": "笔记·内部的监督安排",
+      "problem_zh": "写的是“未删节的风险报告对有常规权限的员工开放”。这是 3.0 版的规定；RSP 页面写明 2026 年 7 月的 3.4 版已改为“至少与 200 名员工共享”，不再要求对所有常规权限员工开放。",
+      "action": "fixed",
+      "change_zh": "改成：3.0 版要求对所有常规权限员工开放，3.4 版改为至少与 200 名员工共享。"
+    },
+    {
+      "where": "笔记·安全等级；Q1 解答",
+      "problem_zh": "说 ASL-3 是被化学、生物、放射和核武器风险“触发”的，听起来像是模型已经确认越线。启用公告说这是“precautionary and provisional action”，当时还没有确定 Claude Opus 4 是否越过能力线，只是无法明确排除。",
+      "action": "fixed",
+      "change_zh": "“触发”改为“针对”，并补一句：当时是预防性措施，还没确定越线，只是无法排除。Q1 解答同步。"
+    },
+    {
+      "where": "笔记·最大的争议",
+      "problem_zh": "“新的基线是：只有在其他公司也这样做，或者 Anthropic 明显领先时，才采用更严格的措施”紧跟在 TIME 报道后面，读起来像 Anthropic 的原话。其实这是 GovAI 对新政策的概括，而且 GovAI 同时提到新政策承诺跟进对手更有效、成本相近的防护。",
+      "action": "fixed",
+      "change_zh": "改为明确标出是 GovAI 的概括，并补上“对手的防护更有效、成本相近就跟进”这一条。"
+    },
+    {
+      "where": "笔记·GovAI 的评价；Q4 解答",
+      "problem_zh": "写的是 GovAI 的看法“从偏负面转为偏正面”。原文是“initial reaction rather negative……overall view became more positive”，并说是否利大于弊取决于执行。“转为正面”说过头了。文章还注明代表两位作者本人而非机构。",
+      "action": "fixed",
+      "change_zh": "改成“一开始偏负面，细读后变得更正面”；第一次提到时注明文章代表作者本人观点。Q4 解答同步。"
+    }
+  ],
+  "checked": [
+    "verified version dates, the 3.1 pausing sentence, the 3.2 LTBT external-review change and the 3.4 change notes on the RSP page",
+    "verified the v3 announcement (two sets of measures, Roadmap quote, Risk Reports every 3-6 months, ASL-3 May 2025, peers adopted frameworks within months)",
+    "read the ASL-3 activation post (2025-05-22) for the precautionary framing",
+    "re-read the GovAI commentary (Williams and Freund, 2026-03-05) for the structure, reasons, concerns, overall verdict and internal oversight items",
+    "TIME original not opened; Kaplan quote corroborated by several outlets",
+    "checked the RSP-related questions against the Anthropic process page (RSP is explicitly mentioned among recurring HR-screen questions), so frequency very-high is supported",
+    "ran build.py --check"
+  ],
+  "code_run": {"ran": false, "passed": null, "notes": "no runnable code on this page"},
+  "env_evidence": [],
+  "confidence": "high"
+}

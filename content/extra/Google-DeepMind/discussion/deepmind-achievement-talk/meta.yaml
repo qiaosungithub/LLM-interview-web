@@ -1,0 +1,13 @@
+title: "Presenting a Recent DeepMind Achievement: Preparation and Two Worked Exercises"
+title_zh: "讲一项 DeepMind 近期成果：演讲准备与两次练习"
+summary_zh: "流程页记录过一次这样的考法，出现在战略与运营（strategy and operations）岗位：准备并讲一项 DeepMind 近期成果。这一页先练选题、12 分钟结构和追问清单，再用 Genie 4 和 AlphaProof Code 各练一次提纲和两个最难的追问。研究岗被问到“你觉得 DeepMind 近期哪项工作最有意思，为什么”时，同一套准备也用得上。"
+category: discussion
+kind_zh: "演讲准备 · 讲一项近期成果"
+roles: [All]
+topics: [presentation, research-communication, critical-reading, world-models, video-generation, formal-verification]
+frequency: rare
+stage: [take-home]
+format_zh: "3 组共 9 问 / 12 分钟演讲加 10–15 分钟追问（时长是练习设定，原报告没有记录）"
+order: 61
+added: true
+origin: "Google DeepMind 面试流程汇总的 take-home 一节只有一句：一位战略与运营岗位的候选人准备并讲了一次关于 DeepMind 近期成果的报告，而且只有这一份反馈；时长、听众和评分方式都没有记录。这里的 9 个问题、12 分钟的设定和两次练习（Genie 4、AlphaProof Code）全部是补写的，练习里的事实取自 2026-11-17 下载的官方材料。"

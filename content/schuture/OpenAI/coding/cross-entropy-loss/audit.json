@@ -1,0 +1,28 @@
+{
+  "id": "OpenAI/coding/cross-entropy-loss",
+  "verdict": "fixed",
+  "summary_zh": "题目、例子、推导和参考代码都核对无误。只改了一处：Part 1 参考代码最后一行的注释把损失写成了 (z_y - m) - log Σ exp(z_v - m)，少了一个负号（那是 log 概率，不是损失），已补上。",
+  "issues": [
+    {
+      "where": "参考解答 Part 1（代码注释）",
+      "problem_zh": "`nll = log_z - picked` 这一行的注释写的是“this is (z_y - m) - log sum_v exp(z_v - m)”，这个式子等于 log q_y，是 nll 的相反数；随机数据上实测注释里的式子算出来全是负数，正好是 nll 取负。和上面正文里的公式 ℓ = -(z_y - m) + log Σ 也对不上。",
+      "action": "fixed",
+      "change_zh": "注释改为“this is -[(z_y - m) - log sum_v exp(z_v - m)]”，中英文两个文件同步。代码本身没有动，所以没有新增检查。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "recomputed the Part 1/2/3 examples by hand and with an independent loop implementation (0.2152, 0.2152, 0.6452)",
+    "brute-force compare of cross_entropy / cross_entropy_masked / cross_entropy_smoothed / cross_entropy_grad on 4,000 random inputs (float32 and float64, scales up to 1000, T == V shapes, ties, bool and int masks, all-masked, out-of-range targets at masked slots, eps up to 0.999): max relative error 8e-15",
+    "label_smoothing = 0.0 is bit-for-bit equal to cross_entropy_masked on all 4,000 inputs",
+    "gradient against central finite differences on 200 random inputs (worst abs diff 7e-10)",
+    "logits [1000, 0, -1000]: losses 0, 1000, 2000 and smoothed loss 300 as expected",
+    "Part 4(a) identity checked numerically; Part 4(b) closed form for H(p) equals direct entropy and equals the BFGS-minimised loss for four (V, eps) pairs; H(p) = 0.4851 for the example",
+    "PyTorch claims: label_smoothing spreads eps over all V classes, cross_entropy == nll_loss(log_softmax), nan when everything is ignored",
+    "float16 follow-up: exp overflows from z = 11.09, spacing at 12 is 0.0078, smallest positive value 6e-8 (exp actually rounds to 0 below about 3e-8; left as is)",
+    "confirmed the comment's formula is the negative of nll on random data"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass. The only edit is one code comment, so no check was added."},
+  "env_evidence": [],
+  "confidence": "high"
+}

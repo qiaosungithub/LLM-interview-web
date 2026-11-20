@@ -1,0 +1,6 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 70       # 14 cases at 3 s = 42 s, plus loading the answer (20 s), plus slack
+case_cpu: 3       # CPU seconds per case; the reference needs well under 1 s per case
+load_cpu: 20      # tests.py has already imported torch; slack for answers that compute at import time
+memory_gb: 6
+note: 只评测 pca_svd、power_iteration、gd_least_squares 三个函数的返回值；画图和“画之前回答”的书面问题不评测。Part 3 只检查每一步的迭代结果，不检查梯度是否来自 autograd。

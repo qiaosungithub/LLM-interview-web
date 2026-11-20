@@ -1,0 +1,28 @@
+{
+  "id": "OpenAI/system-design/ai-chatbot-frontend",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md and README.md in full; the two say the same thing and their code blocks are identical",
+    "ran page (both languages pass)",
+    "recomputed every number in an independent script (tools/out/scratch/b19/t2_chatbot_frontend.py): 225k conversations/day, 1.8M messages/day, 20.8/s average, 104/s peak (20.8% of the day in the peak hour), 7.5 s stream, 781 concurrent streams, 37-byte SSE frame, 1,480 B/s per stream, 1.16 MB/s = 9.25 Mbit/s, 12,160 chars + 1,920 B overhead = 14 KB, 186 conversations in 5 MiB at 2 B/char, 6,800-token history budget, 3,040 tokens for 8 turns, truncation first at turn 19",
+    "payload-only egress is 9 Mbit/s; with one TLS record plus TCP/IP header per frame it is about 25 Mbit/s - still negligible, so the page's conclusion (size for open connections, not bytes) holds",
+    "checked browser/protocol claims: EventSource is GET-only with no body or custom headers; fetch + ReadableStream reader + TextDecoder({stream:true}) and U+FFFD on split multi-byte characters; requestAnimationFrame paused in background tabs; CommonMark unclosed fence runs to end of document; HttpOnly/Secure/SameSite=Lax semantics, 'site' = registrable domain; double-submit CSRF token and CORS preflight for custom headers; SSE ':' comment lines; sessionStorage being per-tab with a ~5 MB per-origin quota; V8 one-byte vs two-byte strings",
+    "checked the mermaid diagram against the walk-through prose and the API list - consistent"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "single estimate-check block; README.md and README.zh.md both pass"
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

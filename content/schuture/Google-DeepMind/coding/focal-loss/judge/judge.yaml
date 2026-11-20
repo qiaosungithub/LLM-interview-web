@@ -1,0 +1,3 @@
+timeout: 23
+case_cpu: 2
+note: 只评测 Part 2 的 focal_loss_and_grad；Part 1 的推导和 Part 3 的分析不评测。按 float64 精度比较（相对误差 1e-9），|z| 接近 100 时那些极小的损失和梯度也按相对误差比较；溢出警告算错。

@@ -1,0 +1,14 @@
+title: "Online Assessment: Bank System with Instant Transfers, Cashback and Merges"
+title_zh: "在线测评：银行系统（即时转账、返现与合并）"
+summary_zh: "银行系统题的另一套四关：开户、存款与即时转账；按支出总额排行；付款后 24 小时到账的 2% 返现与付款状态；合并账户（未到账的返现转给存下来的账户）并查询过去某一时刻的余额。"
+category: coding
+kind_zh: "在线测评 · 4 关"
+roles: [SWE, MLE, RE]
+topics: [oop-design, ledger, timestamps, lazy-settlement, merge]
+difficulty: medium
+frequency: low
+stage: [oa]
+format_zh: "4 关 / 90 分钟"
+order: 72
+added: true
+origin: "银行系统这类四关在线测评在收集到的面经里多次出现，本站已有另一套关卡。这一套（即时转账、支出排行、付款与 24 小时后的 2% 返现、合并与历史余额）取自两个公开的 CodeSignal 风格练习集：LibreSignal 和 Fellowship Trainer 里的银行四关模拟题，两者都说明自己是练习用的模拟题，都不是经过确认的 Anthropic 原题；网上一份 Anthropic 面试整理清单把“银行账本”列为在线测评题，也只有三行要点（开户、存款和转账；24 小时后到账的返现；余额历史和支出排行），没有题面。题面、例子和参考解答是重写的。来源有几处要自己定：LibreSignal 的第 2 关和第 4 关各有一张例子表数字前后对不上，本页的验证代码里按规则改正；被合并掉的账户能不能查历史余额，两份来源的参考实现各不相同，本页定为“看 time_at 那一刻这个账户在不在”。"

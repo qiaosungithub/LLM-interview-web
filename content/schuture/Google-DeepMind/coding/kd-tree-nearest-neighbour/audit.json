@@ -1,0 +1,38 @@
+{
+  "id": "Google-DeepMind/coding/kd-tree-nearest-neighbour",
+  "verdict": "fixed",
+  "summary_zh": "题目、例子和参考解法都没问题（建树、最近邻、k 近邻、矩形计数与逐点暴力算法完全一致）。只有追问里“近似最近邻”的公式把 (1+ε)² 乘错了边：照原式做反而会访问更多节点、根本不会近似。已改成正确的写法，并加了一条验证。",
+  "issues": [
+    {
+      "where": "参考解答 追问（近似最近邻）",
+      "problem_zh": "原文说把剪枝判断放宽为 (q_a−s)² ≤ (1+ε)²·d_best² 可以换来更激进的剪枝。实际上这个条件比精确搜索的条件更容易满足，另一侧会被访问得更多：实测 4000 个 8 维均匀点、ε=1 时平均访问 3282 个节点，而精确搜索只访问 573 个，并且永远不会漏掉最近点——和这段话要讲的效果正好相反。",
+      "action": "fixed",
+      "change_zh": "改为把“访问另一侧”的条件收紧为 (1+ε)²·(q_a−s)² ≤ d_best²。同样的数据下平均只访问 93 个节点，返回的点到查询点的距离不超过真实最近距离的 1+ε 倍。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原来没有检查近似最近邻这条追问。",
+      "action": "fixed",
+      "change_zh": "新增一段检查：按改正后的条件搜索，结果距离不超过真实最近距离的 1.5 倍（ε=0.5），且访问的节点总数少于精确搜索；把条件换回原来的写法，这条检查会失败。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "rebuilt the tree from the statement's rule with an independent recursive builder and compared the exact structure and height bound on 6000 random inputs (uniform, integer grid, duplicate rows, all-identical points, constant columns, points on one line; d in 1..6, n in 1..60)",
+    "compared nearest / knn against an exact-arithmetic (Fraction) linear scan with the (distance, index) tie rule, and count_in_box against a per-point scan, on 36000 queries including queries at stored points, far queries, degenerate and inverted boxes, boxes with edges on point coordinates, infinite boxes: 0 mismatches",
+    "checked all ValueError cases the statement lists",
+    "verified the worked examples (tree shape, distances, trace with 4 visited nodes, knn, box count)",
+    "counted visited nodes: nearest in 2-D grows like log n (13.7 at n=500 to 21.1 at n=32000); knn about 2k + O(log n); all-identical points visit all n nodes; fraction of tree visited vs d at n=4000 is 49% at d=10, 85% at d=12, 98.5% at d=16 (supports the 'd around 10-20' claim)",
+    "counted nodes visited by count_in_box: visited / n^(1-1/d) stays constant (about 5.5 in 2-D, 2.2 in 3-D) for n from 1000 to 64000; degenerate inputs (all-identical points, 8x8 integer grid) stay sublinear too",
+    "tested the approximate-NN follow-up with both the page's formula and the corrected one, counting visited nodes and the distance ratio",
+    "new check fails with the original formula (run on a scratch copy) and passes with the corrected one",
+    "re-derived the height bound, the far-side lower bound, the ring-search stopping rule and the n^(1-1/d) crossing argument"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change; the added check fails when the original formula is put back."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

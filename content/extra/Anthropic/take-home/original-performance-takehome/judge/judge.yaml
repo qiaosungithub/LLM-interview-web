@@ -1,0 +1,13 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+# Byte-identical copies of the official repository (materials/anthropic-original-performance-takehome/), which the
+# sandbox cannot see:
+#   problem.py          <- problem.py                (the answer's `from problem import ...`)
+#   frozen_problem.py   <- tests/frozen_problem.py   (the scoring machine and reference kernel)
+#   submission_tests.py <- tests/submission_tests.py (the official harness; tests.py calls its do_kernel_test)
+#   starter.py          <- perf_takehome.py          (the starter code, 147734 cycles)
+#   solution.py         <- ../anthropic-original-performance-takehome-solution/perf_takehome_staged.py (stage 9, 1040)
+# Measured on this host: the starter builds in 0.3 s and each run takes 0.77 s CPU (9 runs about 7 s); the
+# reference builds in 0.3 s and each run takes 0.08 s.
+special: perf
+timeout: 70       # seconds for the whole run: cases at 10 + 40 + 10 s CPU, plus about 10 (in practice 2 to 8 s)
+note: "按官方 tests/submission_tests.py 的做法评测：在冻结的模拟器上跑规模 10 / 16 / 256，先看 8 组随机输入的结果是否全对，再报告计时那一次的周期数和 8 个门槛（只报告，周期数多少都不会判错）。自定义运行和本地 python perf_takehome.py 一样，会跑文件末尾 unittest.main() 里的测试；想单独试几行代码，先删掉那一行。"

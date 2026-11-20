@@ -1,0 +1,30 @@
+{
+  "id": "OpenAI/coding/version-dependency",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "题目 Part 3 的例子",
+      "problem_zh": "题目用这九个版本说明“展平后不单调，所以不能直接二分”。结论没错，但在这个具体例子上，用页面自己的二分（first_true_index）对展平列表直接查找，第一次探测就落在 1.2.1 上，返回的恰好是正确答案 1.2.1，并不会出错。",
+      "action": "flag",
+      "change_zh": "没有改：原句说的是“二分不成立（没有保证）”，这是对的，只是这个例子本身演示不出错误结果。真正会出错的例子：只保留 1.2.0、1.2.1、1.3.0、1.3.1、1.3.2、1.3.3 这六个版本，直接二分会返回 1.3.3，而正确答案是 1.2.1。若要让例子自己就能演示出错，需要同时改题目例子、解答里的探测顺序和验证代码，改动偏大，留给负责人决定。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages)",
+    "Parts 1-2: 20,000 random version sets with leading zeros against an independent parser and a linear scan; Part 1 call count never exceeds floor(log2 n)+1; statement examples reproduced",
+    "Part 3: exhaustive enumeration of every support pattern on 800 random ragged version trees (up to 11 versions; 22,901 patterns satisfy A1-A3 as worded in the statement) plus 6,000 large random trees: result always equals the full scan, no version is probed twice, calls stay within the sum of floor(log2)+1 over the three levels",
+    "Part 3 trace: probe order on the statement's example is 0.9.0, 1.3.3, 1.1.0, 1.2.1, 1.2.0 (5 calls), as the page says",
+    "flat bisection on the nine-version example returns 1.2.1 (correct by luck); on the six-version subset 1.2.0..1.3.3 it returns 1.3.3 (wrong)",
+    "Part 4: 12,000 random registries (self-dependencies, unknown dependencies, leading zeros in versions and constraints) against an independent brute force over all version combinations and an independent validity checker (constraints, install order, no unneeded packages, DFS cycle check): reference returns a valid order exactly when one exists",
+    "Part 4 statement example: enumeration shows the valid choice is unique and equals the stated answer; the cyclic-choice follow-up (x@2.0.0 <-> y@1.0.0) returns x@1.0.0; the cycle-rejection path is exercised in 99 of 3,000 random registries",
+    "compared every code fence between README.zh.md and README.md (identical) and read the English prose against the Chinese"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

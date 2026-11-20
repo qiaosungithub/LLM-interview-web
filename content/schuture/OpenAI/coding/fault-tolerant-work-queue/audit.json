@@ -1,0 +1,22 @@
+{
+  "id": "OpenAI/coding/fault-tolerant-work-queue",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "wrote an independent model of the statement and compared the final Part 3 class against it on 6000 random runs of 150 calls (results, error types, ready-queue order, status and attempt counts after every call)",
+    "compared the Part 1-only and Part 2-only versions of the class against the same model on 2000 and 3000 random runs",
+    "replayed the three statement examples, plus dead-letter order when several leases expire in one reclaiming pass",
+    "lease boundary: valid at the deadline, expired one tick later",
+    "timed 200,000 mixed calls (0.4 s)",
+    "compared Chinese and English text; code blocks identical"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; nothing was changed."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

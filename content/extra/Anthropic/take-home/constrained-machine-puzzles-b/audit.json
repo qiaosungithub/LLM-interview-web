@@ -1,0 +1,39 @@
+{
+  "id": "Anthropic/take-home/constrained-machine-puzzles-b",
+  "verdict": "fixed",
+  "summary_zh": "写评测时发现参考答案注释里的分号会让题面检查器报错，已改注释。",
+  "issues": [
+    {
+      "where": "meta.yaml 的 roles",
+      "problem_zh": "来源文章只讲了性能工程团队的 take-home，这一页的岗位标签写的是 SWE、Infra Eng、RE，比来源说的范围宽。",
+      "action": "flag",
+      "change_zh": "没有改：题目和解答本身不受影响，另一页同来源的练习也用同样的标签。建议统一改成性能工程方向（Perf Eng）。"
+    },
+    {
+      "where": "参考答案代码（Part 3、Part 4 的程序注释）",
+      "problem_zh": "题面检查器先按分号切分指令、再去掉 # 注释，所以参考答案里注释中的分号会把注释切成一条无效指令，页面自己的答案被检查器拒绝（bad instruction）。",
+      "action": "fixed",
+      "change_zh": "把两处注释里的分号换掉：'; a 0 at the front means' 改成 ': a 0 at the front means'，'\"0\"; ROT' 改成 '\"0\", ROT'。程序本身没变。"
+    }
+  ],
+  "checked": [
+    "wrote my own interpreter for the queue machine from the statement alone, before reading the page's checker; the statement example and both quoted traces (8 5 9 4 and 7 7) match it step for step",
+    "ran every reference and first-version program on the whole input domain (all pairs for Parts 1, 2, 4; lengths 1-15 with all-1, all-99 and random values for Part 3): all valid; fifteen inputs reach exactly 16 queued values and still give the right answer",
+    "own C brute force and lazy searches over the full domain: Part 1 unique at 3; Part 2 none at <=5, unique at 6; Part 3 none at <=5, 3 at 6; Part 4 none at <=7 and exactly 6 at 8 (649,658,178 nodes), all starting INC; ROT; SUB; DUP, as the page says",
+    "re-ran my lazy search with the page's own test subsets: every node count in the page's table and the offline counts (3,934,348 / 3,032,766 / 3,188,570 / 43,806,960 / 649,658,178) match exactly",
+    "follow-ups: the 99,99 trap gives 0; the 10-instruction equality program is correct on 0..99 and my search finds nothing at <=8; min(a,b) program correct, none at <=4, 3 at 5; [4,0,4] breaks the Part 3 reference; Part 3 with zeros allowed: my search finds nothing at <=8 (4,697,817,540 nodes at length 8), as the page says",
+    "checked the origin line against the Jan 21 2026 Anthropic engineering article and the process page: every statement matches, the time-limit wording is accurate, it says the puzzles are our own design, no file paths; frequency medium kept because the article says the typical process now uses this puzzle take-home",
+    "ran the page with run_page.py (PASS, ~9 s) and with --hash-seeds (PASS); embedded checks only print timings, no wall-clock assertions",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "PASS normally and with PYTHONHASHSEED=0/1; about 9 s per run."
+  },
+  "env_evidence": [
+    "检查器不会告诉你哪个测试错了。没有调试器，需要工具就自己做：加 print，或者让 AI 编程助手写一个单步跟踪器。花多少时间做工具，本身就是考察的一部分。",
+    "时间 2 小时，可以使用 AI 助手。"
+  ],
+  "confidence": "high"
+}

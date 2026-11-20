@@ -1,0 +1,43 @@
+{
+  "id": "OpenAI/coding/memory-allocator",
+  "verdict": "fixed",
+  "summary_zh": "题目、例子和两个参考实现都没问题，和另外写的对照实现在 24 万次随机操作（含各种非法释放）上结果完全一致。只有 Part 2 讲解里一个词写反了：最佳适配要找“大小不小于 size 的最小空闲块”，在按大小排序的树上这是后继查询，原文写成了前驱查询，已改正。 写评测时补了一句：抛异常的调用不改变分配器状态。",
+  "issues": [
+    {
+      "where": "参考解答 Part 2（讲最佳适配的那一句）",
+      "problem_zh": "原文说最佳适配（返回仍然 >= size 的最小空闲块）“可以归结为在一棵按大小排序的树上做前驱查询”。前驱是比给定值小的那一侧，找“不小于 size 的最小块”应当是后继查询；页面自己的代码里 `_neighbours` 也是把“>= key 的最小者”叫作后继。拿 Part 2 例子里的两个空闲块 [0,12)、[15,21) 和请求 5 来说，按大小排序后请求 5 根本没有前驱，后继才是更贴合的 [15,21)。",
+      "action": "fixed",
+      "change_zh": "把这句里的“前驱查询”改成“后继查询”（英文 predecessor → successor），其余文字不动。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有涉及最佳适配的查询方向，测不出上面这个词写反了。",
+      "action": "fixed",
+      "change_zh": "在末尾加了一小段检查：把 Part 2 例子的两个空闲块按 (大小, 地址) 排序，用 bisect 找请求 5 的位置，断言它落在最前面、取到的是 (6, 15)，也就是后继；按原来的说法去取前驱则什么也取不到。"
+    },
+    {
+      "where": "Part 1 题面（free 那一段之后）",
+      "problem_zh": "题面没说抛出异常的调用会不会改动分配器；要公平地测试被拒绝的 free（比如大小不对），需要这一点。",
+      "action": "fixed",
+      "change_zh": "新增一句：allocate 和 free 抛出异常时都不改变分配器的状态（中英文都加了）。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "confirmed code blocks are identical in README.md and README.zh.md",
+    "replayed both statement examples (capacity 25 merge sequence, capacity 30 first-fit vs tighter-fit) on both classes",
+    "brute-force compare: 6000 random sequences, 242167 calls (52680 ValueError, 61556 MemoryError) against an independent oracle that stores only the allocated intervals; return values, exception types, free lists and the allocated map agree for MemoryAllocator and MemoryAllocatorLog after every call; invalid frees covered wrong size, double free, never-returned address, interior address, non-positive size, negative and out-of-range address",
+    "checked treap invariants after every call (BST order, heap order on priorities, max_size augmentation, no two adjacent free blocks)",
+    "four runs of 200000 calls at capacity up to 10**9 comparing the two classes; treap depth stayed <= 36 with up to 60000 free blocks (log2 is about 16), incl. frees in increasing address order and a 50000-hole fragmentation pattern where every allocate misses",
+    "checked the explanation's claims: first-fit descent, _delete by double split on integer keys, bisect + list.insert being O(n)",
+    "noted, not changed: the statement asks for O(log n) and the treap gives expected O(log n); the page says so itself and names AVL / red-black as the deterministic option",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. No solution code changed; the added check asserts the corrected wording (successor), and the old wording written as an assertion (a predecessor of 5 exists in size order) fails."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

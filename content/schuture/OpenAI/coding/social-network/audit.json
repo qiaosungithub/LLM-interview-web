@@ -1,0 +1,29 @@
+{
+  "id": "OpenAI/coding/social-network",
+  "verdict": "fixed",
+  "summary_zh": "参考解法本身没有问题（和暴力解对拍全部一致）。改了两处小地方：Part 4 的说明把 follow/unfollow 写成均摊 O(1)，但参考代码里每次写之前都先做一次二分，实际是 O(log e)，已改正并注明怎样才能做到 O(1)；题目例子里 erin、frank 没注册就被关注（按题面规则会报错），补了一句“再注册 erin 和 frank”，并把指代不清的“第二次 follow 调用”改成“这次 follow 调用”。",
+  "issues": [
+    {
+      "where": "参考解答 Part 4（代码后的说明）",
+      "problem_zh": "原文写“follow/unfollow 均摊 O(1)”，但参考代码的 follow()/unfollow() 都先调用 _following_at 做一次 bisect 来判断是不是重复调用，所以按写出来的代码它们是 O(log e)，不是 O(1)。",
+      "action": "fixed",
+      "change_zh": "改为：follow/unfollow 先用同一个二分判断当前状态（O(log e)），再做一次均摊 O(1) 的追加；并加一句说明：写操作按 t 非降序到达，状态判断只看列表长度的奇偶就够了，那样写操作才是均摊 O(1)。代码没有改。"
+    },
+    {
+      "where": "题目 Part 1 / Part 2 的例子",
+      "problem_zh": "Part 1 的例子只注册了 alice、bob、carol、dave，Part 2 的例子接着让 bob 关注 erin、carol 关注 frank；按题面“follow 遇到未注册用户抛 ValueError”，照着例子做会直接报错。另外 Part 1 例子里“在第二次 follow 调用之后再取一个快照”实际指的是第三次 follow（bob 关注 dave），按字面数是错的。",
+      "action": "fixed",
+      "change_zh": "Part 2 例子开头补上“再注册 erin 和 frank”；Part 1 例子里的“第二次 follow 调用”改成“这次 follow 调用”。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "replayed every statement example literally (Part 2 example raises ValueError on follow('bob','erin') unless erin/frank are registered)",
+    "independent brute-force compare of Snapshot (is_following/get_following/get_followers/recommend for k in 0,1,2,3,50, unknown-user errors, snapshot isolation) over 3000 random op sequences",
+    "independent brute-force compare of FollowTimeline over 4000 random call sequences with repeated timestamps, self-follows, redundant calls and queries interleaved at arbitrary t (1.69M queries)",
+    "confirmed follow()/unfollow() go through bisect, and that at every write bisect_right(events, t) == len(events) (80k writes), so the parity remark is true"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "No code changed; README.md and README.zh.md both pass."},
+  "env_evidence": [],
+  "confidence": "high"
+}

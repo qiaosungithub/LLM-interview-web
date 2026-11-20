@@ -1,0 +1,32 @@
+{
+  "id": "Anthropic/coding/isolation-forest-debug",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "iforest.py docstring 对 c(n) 的说明；参考解答 Part 2“和 c(n) 的关系”",
+      "problem_zh": "说 c(n) 是“由 n 个点建成的二叉搜索树里不成功查找的平均路径长度”，并说和 D(n) 是同一个量。严格地说，2(H_n − 1) 对应的是有 n 个外部节点（n − 1 个键）的二叉搜索树；用 n 个键建树时，不成功查找的平均长度是 2(H_{n+1} − 1)。这个说法照搬了论文原文，公式本身没有错，不影响题目和测试。",
+      "action": "flag",
+      "change_zh": "未修改：措辞与论文一致，docstring 在三处代码里重复出现，改动不算最小改动。"
+    }
+  ],
+  "checked": [
+    "extracted the buggy iforest.py and test_iforest.py exactly as shown into a scratch dir; reproduced the shown '2 passed, 7 failed' output",
+    "found and fixed the bugs independently before reading the solution; my list matched the page's 6 bugs exactly, and none of them contradicts the docstring",
+    "rebuilt the code with each single bug left in (after clearing stale __pycache__) and confirmed the page's bug-to-failing-test table",
+    "ran the tests on the fixed code across 100 seeds and with an alternative subsampling (rng.choice per tree): all pass with clear margins (e.g. outlier score min 0.68 vs > 0.6, inlier median 0.41-0.455 vs 0.35-0.53)",
+    "recomputed the quoted numbers (c(3), c(256), c(64)-based 0.00075, H_n approximation errors at n = 3 and 256, 2*gamma - 1)",
+    "checked the algorithm claims against Liu, Ting & Zhou 2008: c(n) = 2H(n-1) - 2(n-1)/n with H(i) ~ ln i + 0.5772156649, s = 2^(-E[h]/c(n)), l = ceiling(log2 psi), subsampling without replacement, split value between min and max with q < p going left, h = e + c(size), defaults psi = 256 and t = 100, swamping/masking descriptions",
+    "confirmed the sources contain no report of an Isolation Forest question, so the origin and the 'no one reported it' statement are honest; frequency is rare",
+    "ran tools/run_page.py on the folder normally and with --hash-seeds: all pass; timing is only printed, never asserted"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.zh.md passes run_page normally and with PYTHONHASHSEED=0/1. No edits made. Tests are deterministic and robust to alternative correct fixes."
+  },
+  "env_evidence": [
+    "不能用 scikit-learn 或任何现成的实现，不能用 AI。可以查 NumPy / Python 文档。"
+  ],
+  "confidence": "high"
+}

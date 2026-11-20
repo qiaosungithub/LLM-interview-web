@@ -1,0 +1,14 @@
+title: "Classic Reinforcement Learning: MDPs, TD Learning, Bandits and Off-Policy Evaluation"
+title_zh: "经典强化学习：MDP、时序差分、老虎机与离策略评估"
+summary_zh: "13 个口头小题：在一个两状态 MDP 上解贝尔曼方程、做策略改进、数值迭代要几轮；算 SARSA、Q-learning、Expected SARSA 的一步更新；比较蒙特卡洛与 TD；算 UCB1 指标、汤普森采样的选臂概率和遗憾的增长速度；算重要性采样的偏差和方差；解释致命三要素和基于势函数的奖励塑形。每个数字都有可运行的核对。"
+category: quiz
+kind_zh: "知识问答 · 口述，含推导"
+roles: [RS, RE, Intern]
+topics: [mdp, bellman-equation, value-iteration, policy-improvement, td-learning, q-learning, sarsa, multi-armed-bandits, ucb, thompson-sampling, importance-sampling, deadly-triad, reward-shaping]
+difficulty: medium
+frequency: low
+stage: [skills]
+format_zh: "13 个问题 / 约 60 分钟"
+order: 60
+added: true
+origin: "根据流程页的记录整理：2020–2021 年研究实习的一小时技术面抽查“数学、机器学习、强化学习和读代码”；大约 2022 年以前的小测验大多是本科考试的难度，其中一场 2022 年研究科学家小测验的第二位面试官问了强化学习。面经里没有留下 MDP、时序差分、老虎机这类经典强化学习的具体题目（提到过的“PPO 和 GRPO 有什么区别”属于大模型强化学习），这 13 问是按这个范围和难度补写的，不是真题。"

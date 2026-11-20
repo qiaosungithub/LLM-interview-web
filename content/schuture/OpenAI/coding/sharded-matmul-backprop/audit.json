@@ -1,0 +1,33 @@
+{
+  "id": "OpenAI/coding/sharded-matmul-backprop",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "Part 2 代码块（column_parallel_backward 的文档字符串）",
+      "problem_zh": "没说列并行反向返回的 dX 是每台设备的部分和，还是完整的 dL/dX；前向的 “(not gathered)” 还容易让人以为是部分和。",
+      "action": "fixed",
+      "change_zh": "文档字符串写明：dX_shards[k] 形状 (B, d_in)，是完整的 dL/dX，每台设备上都相同。英文版和 starter 同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages); all five code blocks identical in both files",
+    "redid the Part 1 derivations by hand (column-parallel: W_k grad local, X grad is an all-reduce; row-parallel: forward all-reduce, both grads local)",
+    "Part 2 reference vs torch autograd with a nonlinear scalar loss: 1500 random trials, B/d_in/d_out up to 50, entries up to +-100, shard counts from 1 up to the full axis length, uneven splits; output shapes and the 3,2,2 remainder rule checked",
+    "diffed the given Part 3 file against the fixed file: exactly the five claimed lines differ (plus comments)",
+    "ran the given file at every stage of the table: both ValueError messages and where they are raised, then Y 1.01 / dW1 0.50 / dW2 0.20 / dX 0.28, then dW1 0.77 / dX 0.31, then dX 0.29, then all ~1e-16 -- all reproduce",
+    "ran all 32 subsets of the five fixes: each bug alone (other four fixed) still shows its own symptom, and no subset short of all five passes",
+    "fixed file: check_gradients worst error 8.9e-16 over 3000 seeds; fixed pipeline agrees with torch autograd on 300 random shapes/shard counts and with central finite differences (6e-10)",
+    "tanh' = 1 - h^2 confirmed numerically (1 - z^2 is off by up to 45 on the same inputs); relu remark is asserted by the page's checks",
+    "follow-up claims checked by reasoning: ring all-reduce 2(n-1)/n and all-gather (n-1)/n of the array size per device, bias handling, softmax needing a gather",
+    "compared Chinese and English text",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,14 @@
+title: "72-Hour Open Research Take-Home: When Does a Small Model Store More Features Than It Has Dimensions?"
+title_zh: "72 小时开放研究：小模型什么时候能存下比维度更多的特征"
+summary_zh: "约 72 小时的开放研究 take-home，题目只有一句话：隐藏层只有 m 维的小模型，什么时候会表示多于 m 个特征（叠加），由什么控制。参考解答示范怎样把问题收窄、怎样安排三天，并给出一个 CPU 上就能跑完的核心实验：稀疏度从 0 升到 0.98，ReLU 模型存下的特征从 5 个增加到 14 个左右，线性对照始终是 5 个；再用一个“反向配对”的成本收益模型预测特征数，并指出它在哪里不成立。"
+category: take-home
+kind_zh: "研究 Take-home · 开放课题（约 72 小时）"
+roles: [RS, RE]
+topics: [superposition, interpretability, toy-models, sparsity, research-scoping, experimental-design]
+difficulty: hard
+frequency: low
+stage: [take-home]
+format_zh: "4 个部分 / 约 72 小时 / 书面报告 + 代码 + 评审通话"
+order: 64
+added: true
+origin: "Anthropic 面试流程汇总里的候选人反馈只说：研究岗的流程里有 4 小时的探索性 ML take-home，有些团队还有 72 小时的研究 take-home，内容因团队而异；没有记下任何具体题目；这道以叠加为主题的开放题、评审要求和参考解答都是我们补写的。"

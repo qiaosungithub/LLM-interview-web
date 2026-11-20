@@ -1,0 +1,41 @@
+{
+  "id": "Anthropic/coding/extratrees-debug",
+  "verdict": "fixed",
+  "summary_zh": "题目、bug、测试和参考解答都核对无误。只改了 meta.yaml 的 origin：原文说四家网站“都说”是第二轮、60 分钟、修 trees.py，并说这些来源“彼此并不独立”，实际上每一条细节只有一两家提到，能确认不独立的只有 csoahelp 和 VOprep（联系方式相同）。已改成逐条写明哪家说了什么。",
+  "issues": [
+    {
+      "where": "meta.yaml origin",
+      "problem_zh": "说 InterviewDB（Reddit 帖）、csoahelp、VOprep、FastPrep “都说”是第二轮在线测评、60 分钟、修好向量化的 trees.py 直到 test_trees.py 通过。实际上：第二轮只有 Reddit 帖和 csoahelp 提到；60 分钟只出现在 csoahelp 的标题里；trees.py / test_trees.py 只出现在 csoahelp 和 VOprep 的题面里；“向量化”只有 csoahelp 提到；FastPrep 只有一行题名和简介。“彼此并不独立”也只对 csoahelp 和 VOprep 成立（两家留的联系方式相同）。",
+      "action": "fixed",
+      "change_zh": "改写 origin，逐条写明每个细节出自哪家，说明 csoahelp 和 VOprep 不是独立来源，并写明对上网搜索的分歧是 Reddit 帖说只能查文档、csoahelp 和 VOprep 说可以搜索。其余内容不变。"
+    },
+    {
+      "where": "Part 2（回归版本的打分函数）",
+      "problem_zh": "测试用 y = 1e8 加小噪声的数据拒绝不先减均值的方差公式，但题面没说数据可能有这么大的偏移，只有参考解答提到要减均值。",
+      "action": "fixed",
+      "change_zh": "补一句：y 的均值可能比它的波动大很多个数量级（例如 1e8 加上方差约 1 的噪声），这时得分的误差也不能超过 1e-5。"
+    }
+  ],
+  "checked": [
+    "extracted the buggy trees.py and test_trees.py exactly as shown into a scratch dir; reproduced the shown '2 passed, 6 failed' output",
+    "found and fixed the bugs independently before reading the solution; my list matched the page's 6 bugs exactly, and none of them contradicts the docstring",
+    "rebuilt the code with each single bug left in (stale-bytecode-safe) and confirmed the page's bug-to-failing-test table",
+    "ran the tests on the fixed code across 200 seeds (ensemble accuracy min 0.9675 vs threshold 0.85) and with an alternative but spec-compliant RNG implementation: all pass",
+    "recomputed the quoted numbers (Part 2 example [0.5, 0.96, 0.0], bug-symptom counts, mean leaf depth 2(H_n - 1))",
+    "checked the algorithm claims against Geurts, Ernst & Wehenkel 2006 (Table 1, appendix score formulas, default n_min and K): split uniform in [min, max], K among non-constant attributes, stopping rules, 2I/(H_s+H_c), relative variance reduction, no bootstrap, majority vote",
+    "read the four sources as text and compared each origin detail against them",
+    "ran tools/run_page.py on the folder normally and with --hash-seeds before and after the edit: all pass; timing is only printed, never asserted",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.zh.md passes run_page normally and with PYTHONHASHSEED=0/1, before and after the meta.yaml edit (README unchanged). Tests are deterministic and robust to alternative correct fixes."
+  },
+  "env_evidence": [
+    "不能用 scikit-learn 或任何现成的树实现，不能用 AI。可以查 NumPy / Python 文档。能不能上网搜索，各家说法不一，按不能准备。",
+    "每个测试分值相同。测试运行时间上限 30 秒，内存 4 GB。死循环会让平台卡住。",
+    "原平台用 pytest，可以在代码里加 `breakpoint()`，再用 `pytest -k <测试名> --pdb` 调试。"
+  ],
+  "confidence": "high"
+}

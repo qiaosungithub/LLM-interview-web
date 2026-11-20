@@ -1,0 +1,7 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 30       # case limits add up to 20 s; importing torch takes ~3 s
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+load_cpu: 20      # tests.py has already imported torch; slack for answers that train at import time
+memory_gb: 6
+special: debug
+note: 只评测 Part 1：修好的 grpo_train.py 按题目训练 200 个外层步后留出集准确率要超过 0.5，另外分别检查 group_advantages、rollout 的采样分布和每个内层步 L(θ) 对 logits 的梯度。检查时判题程序会包装 reward(...) 和策略的前向计算来记录回答与梯度，所以 train 要像原文件那样调用它们。Part 2 的推导和追问不评测。

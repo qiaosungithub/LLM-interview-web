@@ -1,0 +1,35 @@
+{
+  "id": "Anthropic/system-design/one-on-one-chat",
+  "verdict": "fixed",
+  "summary_zh": "规模估算的所有数字、Kafka/Redis/TCP keepalive 的事实说法和投递仿真都核对无误。只改了一句与题目自相矛盾的话：题目要求的是“双方都在线时端到端投递延迟 p95 低于 300 毫秒”（消息到达接收方屏幕），架构走查却说 300 毫秒是照给发送方回复 message.sent 的那一刻来衡量的。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 架构（走查第一段）",
+      "problem_zh": "题目写的是“双方都在线时的端到端投递延迟目标：第 95 百分位低于 300 毫秒”，并要求消息“以低延迟到达接收方的屏幕”。走查里却说“300 毫秒这个目标就是照这一刻（给发送方回复 message.sent）来衡量的……接收方那边可能还差一步”，等于把端到端投递延迟换成了发送方收到确认的延迟，和题目的要求对不上。",
+      "action": "fixed",
+      "change_zh": "中英文都改为：message.sent 是发送方自己屏幕上在等的东西，但 300 毫秒这个目标不是照这一刻衡量的，它是端到端的，要算到消息出现在接收方的屏幕上，而接收方那边还差一步。代码没有改动。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "recomputed every number independently in a script: 1.2B messages/day, 13,889 avg and 41,667 peak messages/s, 4,000,000 connections, 20 -> 24 instances, 200-byte row, 240 GB/day, 87.6 TB/year and 262.8 TB at 3x, 266,667 heartbeat writes/s (6.4x peak), Little's law 4,000 connects/s and 8,000 transitions/s, 320,000 pushes/s (7.7x peak), 14 days / 30 s = 40,320, 250M topics x 20 KB = 5 TB",
+    "fact-checked named technologies: Linux TCP keepalive default 2 h and TCP_KEEPIDLE / TCP_KEEPINTVL, Redis Pub/Sub at-most-once delivery vs Streams, Kafka partitions / consumer groups / group coordinator / rebalance / ISR / acks=all / unclean leader election / log compaction",
+    "stressed the delivery simulation: 400 seeds with harsher drop / duplicate / offline rates, all-live and all-offline edge cases, direct out-of-order and duplicate arrivals into ChatClient; replaced the client with one that does no dedup and confirmed the trial's own assertion then fails",
+    "checked the mermaid diagram against the walk-through (send, pending write, registry lookup, best-effort publish, ack, delete, message.delivered)",
+    "compared Chinese and English text paragraph by paragraph; python block identical in both files",
+    "left alone as design judgement: 'messages not delivered live are a minority', the ~20 KB per-topic Kafka overhead figure, and 'last seen is written once on the transition to offline' (not elaborated later on the page)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass. Prose-only change with nothing code-checkable, so no check was added."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

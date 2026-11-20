@@ -1,0 +1,63 @@
+{
+  "id": "Google-DeepMind/system-design/recommendation-system",
+  "verdict": "fixed",
+  "summary_zh": "验证代码里的 NDCG@k 在 k 小于候选总数时会算错（把最好的内容排到前 k 名之外，仍可能得满分 1.0），已改对并加了一条检查。另外改了三处说错或前后矛盾的句子：NDCG 例子的解释、内容塔到底用哪些输入、新视频什么时候进入检索索引。规模估算的数字全部重算过，没有问题。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "验证代码 ndcg_at_k / brute_ndcg",
+      "problem_zh": "原来的 ndcg_at_k 先把相关度列表截到前 k 个，再在这 k 个里面排出“理想顺序”，所以只要 k 小于候选总数，理想顺序里就看不到被模型排到 k 名之外的好内容。例如真实相关度 [1, 0, 3]、k=2：最好的那条（相关度 3）被排在第 3 位，原代码仍然给出 1.0（满分），而按正文的定义（把全部候选按真实相关度从高到低排好再取前 k 个）应该约为 0.131。用来“独立对照”的 brute_ndcg 写法相同，犯的是同一个错，所以原来的 2000 组随机对比发现不了。我用自己写的标准实现（并和 scikit-learn 对过）比较，k 小于候选数的随机用例里约 76% 结果不一致。",
+      "action": "fixed",
+      "change_zh": "两个函数都改成：DCG 只累加模型排出的前 k 个，理想顺序则从全部候选里按相关度取前 k 个。新增一条检查 ndcg_at_k([1, 0, 3], 2) < 0.2，旧代码过不了（得 1.0），新代码通过（0.131）。正文里的例子 [3, 2, 3, 0]（k=4，等于候选数）不受影响，仍是 0.9595。"
+    },
+    {
+      "where": "参考解答 深入话题 (d) NDCG 例子",
+      "problem_zh": "原文解释 NDCG≈0.9595 时说“两个相关度为 3 的候选被调换了位置”。但模型顺序 [3, 2, 3, 0] 和理想顺序 [3, 3, 2, 0] 的差别，是第 2 位和第 3 位（相关度 2 和相关度 3）调换了；两个相关度同为 3 的候选互换，列表根本不变。",
+      "action": "fixed",
+      "change_zh": "改成“排在第 2、第 3 位的两个候选被调换了位置”。12.393、12.917、0.9595 这三个数字本身是对的，没有动。"
+    },
+    {
+      "where": "参考解答 数据与特征（内容塔的输入）",
+      "problem_zh": "“数据与特征”一节说内容塔同时消费上传时的元数据和滚动互动率特征；但冷启动一节说用于检索的内容嵌入“完全由内容塔从上传时的元数据算出”，双塔模型“本来就没有把互动数据当作输入”，追问里也说内容塔用的是手工构造的元数据特征。两种说法互相矛盾，而冷启动那段的论证正依赖“只用元数据”。",
+      "action": "fixed",
+      "change_zh": "把“数据与特征”里那句改成：内容塔只消费其中的元数据，滚动聚合特征是给排序模型用的。和冷启动、追问的说法统一。"
+    },
+    {
+      "where": "参考解答 深入话题 (b) 新视频冷启动",
+      "problem_zh": "原文说一条全新的视频“从上传的那一刻起”就在 ANN 索引里、能被双塔检索到。但“训练”一节说检索索引每天随双塔模型重训重建一次，从上传到下一次重建之间的空档靠新内容池覆盖；架构讲解也说新内容池是给“还没来得及在嵌入索引里占据一席之地”的新内容用的。两处对“新视频何时能被检索到”说法相反。",
+      "action": "fixed",
+      "change_zh": "改成新视频“在下一次索引重建时”进入 ANN 索引，此后靠双塔相似度就能被检索到；不需要等互动数据这一点不变。"
+    },
+    {
+      "where": "参考解答 深入话题 (c) 记录倾向分 vs 数据模型",
+      "problem_zh": "深入话题 (c) 说每一次曝光都要把倾向分一起记下来，但“互动”这一行的字段列表和 50 字节/事件的估算里没有倾向分这个字段（只有 ranking_score）。",
+      "action": "flag",
+      "change_zh": "没有改。如果再加一个 4 字节的倾向分字段，日志量是 2.16 TB/天而不是 2 TB/天，只差 8%，结论不受影响；面试时被问到“倾向分存在哪里”，回答“在互动行上多加一列”即可。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page before and after edits (both languages pass; python fences identical in both files)",
+    "recomputed every scale number in my own script (tools/out/scratch/b30/rec_check.py): 2e9 req/day, 23,148 / 69,444 rps, 462,963 / 1,388,889 items returned per s, 11,574,074 / 34,722,222 items scored per s, 25,000 items/s per replica, 1,389 -> 1,667 replicas, 64 GB index, 8 shards x 3 = 24 machines, 0.64 GB/day new embeddings, 50 B/event, 4e10 impressions/day, 2 TB/day, 60 TB hot window -- all correct",
+    "recomputed the NDCG worked example [3,2,3,0]: DCG 12.3928, IDCG 12.9165, NDCG 0.95945",
+    "compared page ndcg_at_k with a textbook NDCG@k (cross-checked against scikit-learn ndcg_score) on 20,000 random lists: identical when k == n, wrong in 11,406 of 14,981 cases with k < n before the fix, 0 mismatches after",
+    "confirmed the added check fails on the old code and passes on the new",
+    "compared in_batch_softmax_loss with torch cross_entropy on 200 random batches (max diff 7e-15) and on overflow-sized logits",
+    "re-ran the toy IVF index on 4 other seeds: recall is monotone in nprobe and exactly 1.0 with every cluster probed",
+    "checked the shrinkage formula limits (n=0 gives the prior, n=kappa the midpoint, large n the observed rate)",
+    "small simulation of sampled softmax with popularity-proportional negatives: popular items are pushed down without the logQ correction and much less with it, as the page says",
+    "read the architecture diagram edge by edge against the walk-through, data model and training section",
+    "compared Chinese and English paragraph by paragraph"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Page passed before the audit too; the NDCG bug was invisible because the brute-force comparison shared it."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

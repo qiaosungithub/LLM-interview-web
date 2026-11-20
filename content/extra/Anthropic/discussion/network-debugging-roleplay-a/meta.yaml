@@ -1,0 +1,13 @@
+title: "Network Debugging Role Play A: Intermittent Connection Resets on Reused Connections"
+title_zh: "网络排障角色扮演 A：复用的连接偶尔被重置"
+summary_zh: "面试官扮演值班同事，你主导排查：一个跑在 AWS 私有子网里的服务调外部支付接口，约 0.3% 的请求立刻报 “Connection reset by peer”，重试就好。8 步从缩小范围、按连接空闲时长分组、逐行读 tcpdump、确认 NAT 网关的 350 秒空闲超时，到“明明开了 keepalive 为什么没用”、今晚的修复（套接字级 TCP keepalive、只重试幂等请求）、长期修复（各层空闲超时怎么排、不同厂商的默认值、悄悄丢包的变体）和怎么更早发现。"
+category: discussion
+kind_zh: "角色扮演 · 排查网络故障"
+roles: [SWE, Infra Eng]
+topics: [network-debugging, tcp, nat-gateway, idle-timeout, tcp-keepalive, connection-pooling, tcpdump, incident-response]
+frequency: low
+stage: [onsite]
+format_zh: "8 步 / 约 45 分钟（时长是练习设定，证据没有记录）"
+order: 61
+added: true
+origin: "证据只有流程页里的两句话：性能和基础设施岗位的专项轮里有一场“网络排障角色扮演”（network-debugging role play），一位性能工程候选人的候选人门户也把它列在现场面里；没有任何报告记录过具体场景、时长或评分方式。这里的场景、数字和命令输出全部是补写的：输出格式对照本机的 tcpdump、ss、requests 核对过，数值不是实测；AWS 和各厂商的超时数值于 2026-11-18 对照官方文档核对。"

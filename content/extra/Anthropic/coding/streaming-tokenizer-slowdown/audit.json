@@ -1,0 +1,57 @@
+{
+  "id": "Anthropic/coding/streaming-tokenizer-slowdown",
+  "verdict": "fixed",
+  "summary_zh": "参考解答是对的：修复版和原版在各种切块、读写顺序下输出完全一样，线程版也没有死锁。改了两句说法：“把 batch 调大没用”原来说复制总量不变，其实复现脚本里把 batch 调到下游比网络快时复制会变成线性，现在说明积压由两边的速度差决定；Part 3 补了一句，一写一读时用 notify() 其实也够。另外把一组计时注明为一次测量。",
+  "issues": [
+    {
+      "where": "参考解答 Part 1 常见的错误判断（把 batch 调大）",
+      "problem_zh": "原文说切片和每批多少个无关、“复制总量不变”。实际复制量取决于积压，而积压取决于下游取得多快：在复现脚本里 20 万字符的文本，batch 为 256 时复制约 68 亿个字符，调到 2048（下游比网络快）时只有约 1.6 亿，并且随长度线性增长。",
+      "action": "fixed",
+      "change_zh": "改为：每次切片复制整个积压，积压由网络和下游的速度差决定，不由每批多少个决定，只要下游比网络慢就仍是平方级；并注明在复现脚本里调大 batch 等于假设下游变快了，不是线上能做的修复。"
+    },
+    {
+      "where": "参考解答 Part 3（notify_all 的理由）",
+      "problem_zh": "原文说两种等待者共用一个条件变量时，用 notify() 可能只叫醒同类线程、另一类永远睡下去。但本题只有一个写线程和一个读线程，且 max_pending ≥ L：写线程只在积压 ≥ max_pending ≥ L 时等，读线程只在积压 < L 时等，两边不可能同时在等，所以 notify() 也能正常工作。",
+      "action": "fixed",
+      "change_zh": "补充一句：在一写一读、max_pending ≥ L 的设定下两边不会同时等待，notify() 其实也够；有多个读线程或写线程时才会出现只叫醒同类线程的问题。用 notify_all() 仍是稳妥的写法。"
+    },
+    {
+      "where": "参考解答 Part 1 常见的错误判断（只修查表）",
+      "problem_zh": "“只修查表”之后的吞吐（36.6 万、4.7 万、2.4 万 token/s）写得像固定事实，其实是共享机器上的一次计时。",
+      "action": "fixed",
+      "change_zh": "改为“我们机器上的一次测量是……”。数字本身复测过，量级一致（100 KB 约 36 万、1.6 MB 约 4.7 万 token/s）。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原检查没有覆盖“batch 大小对复制量的影响”这句说法。",
+      "action": "fixed",
+      "change_zh": "新增一条确定性计数检查：读得比写得快（每 256 个字符取 128 个 token）时，原版的复制量随长度翻倍只变成约 2 倍。"
+    },
+    {
+      "where": "验证代码（Part 3 线程测试）",
+      "problem_zh": "线程测试用 join(10) / join(30) 之后断言线程已结束，严格说依赖墙钟时间。",
+      "action": "flag",
+      "change_zh": "没改：这是检测死锁的宽松超时，正常情况下几微秒就结束，去掉超时反而会在死锁时让页面一直卡住。其余断言都不看时间。"
+    }
+  ],
+  "checked": [
+    "ran page and ran it with --hash-seeds (PYTHONHASHSEED 0 and 1): pass before and after edits",
+    "found both hot spots from the given code before reading the solution (per-token slice of the backlog; per-token scan of all keys; plus += chunk on an attribute)",
+    "differential test given vs fixed on 20,000 random op sequences (random vocabularies with shared prefixes and duplicate ids, empty writes, read(0), reads after close, write after close, double close): every read result, pending(), chars_in, tokens_out identical; ids equal an independent brute-force longest match",
+    "hand cases: a cut inside a possible longer match ('aaa' then 'a' with 'aaaa' in vocab), 'abc' waiting for 'abcd', empty writes, read(0), empty closed stream, end of stream",
+    "every cut point of a 400-character repro text with mixed read sizes, both versions",
+    "Part 3: reasoned through the wait conditions (writer waits only at backlog >= max_pending >= L, reader only at backlog < L and not closed, all state changes under one lock, so no lost wakeup and no deadlock); 300 threaded stress runs with sys.setswitchinterval(1e-6), max_pending 5..10 at L=5: correct order, no hang, backlog bound holds; a notify()-only variant also never hung in 300 runs",
+    "recomputed the counter table (matches the page's asserted values), the ticket ratios, profile ratios and the 2.5 chars/token, 84% backlog figures",
+    "one measured run of the timing claims on this machine: profile read tottime 0.092 -> 1.007 s (page 0.091 -> 0.984); given 100 KB 51K tok/s, 800 KB 34.7K; only-lookup 100 KB 360K, 1.6 MB 46.6K; fixed 3.2 MB 2.54 s (506K tok/s)",
+    "batch claim: given-version copies at 200K chars for batch 256/1024/2048 = 6.79e9 / 3.11e9 / 1.65e8 characters",
+    "CPython 3.11.18: s += t on a local resized in place 9954/10000 times, on an attribute 0/10000; attribute += time grows ~4x per doubling",
+    "line_profiler/kernprof usage checked; meta.yaml origin checked against the source excerpt (one line in the virtual-onsite coding round of an anonymous Reddit post); frequency rare; no paths"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Page passes with and without --hash-seeds after the edits; the added batch-size check passes (ratios ~2.07, 2.03)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

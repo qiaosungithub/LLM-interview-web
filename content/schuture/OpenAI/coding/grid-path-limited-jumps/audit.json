@@ -1,0 +1,21 @@
+{
+  "id": "OpenAI/coding/grid-path-limited-jumps",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "wrote my own path enumerator and compared max_score, optimal_path (lexicographic tie-break), count_optimal_paths and max_score_with_bonuses against it on 6000 random boards (N<=8, M<=4, K from 0 to N, values up to +-1e9, X and Y from 0 to 1e9; about half the boards had tied optimal paths)",
+    "replayed the four statement examples by enumeration: the two tied paths of Part 2, the count of 2 in Part 3, base 22 / bonus 29 with a unique best path in Part 4",
+    "checked the follow-up that K can be capped at (N-1)//2 on 300 random boards",
+    "ran N=M=200 with K=200 (8 s) to confirm it terminates at the stated limits",
+    "compared Chinese and English text; code blocks identical"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; nothing was changed."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "Google-DeepMind/coding/state-space-bfs",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "verified all four worked examples by literally enumerating cell sequences from the statement's rules (8 moves / 1 path, unreachable, 8 moves / 2 paths, cost 5 / 2 paths)",
+    "compared the four functions with two brute forces written from the statement alone (literal path enumeration, and exact-cost walk counting with no visited logic) plus an independent reachability check, on 6000 small random grids (1x2 to 5x6, 0 to 6 key letters, repeated keys and doors, doors without keys, mud, walls) and 20000 larger maze-like grids (shortest lengths up to 39, 481 of them 14 or longer): all agree",
+    "no mud: weighted functions equal the unweighted ones, and _dijkstra's dist / ways tables equal _bfs's exactly (5515 grids)",
+    "hand-built key chains that force walking back and forth through six doors (25 and 19 moves)",
+    "mod handling: open 6x6 grid gives 252, mod 7 and mod 1 give 0; open 40x40 grid equals C(78, 39) mod 1e9+7",
+    "state count on a 30x30 grid with six keys: 55744 reached states against the bound 57600, 0.2 s",
+    "follow-up: A-star with the Manhattan heuristic returns the same cost on 3000 grids and settles fewer states on average (11.4 vs 26.4)",
+    "re-read the BFS-layer, state/cell bijection and Dijkstra counting arguments; compared formulas, inline code and numbers between README.md and README.zh.md; python blocks identical"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

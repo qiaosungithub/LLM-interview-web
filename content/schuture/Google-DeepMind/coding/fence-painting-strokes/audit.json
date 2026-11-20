@@ -1,0 +1,39 @@
+{
+  "id": "Google-DeepMind/coding/fence-painting-strokes",
+  "verdict": "fixed",
+  "summary_zh": "题目、三个部分的解法和证明都没问题，只改了最后一条追问：原文说“二维网格用整行或整列笔画覆盖”是最小集合覆盖、没有已知的高效精确算法，这不对——它是二分图最小点覆盖，用二分图匹配（König 定理）就能在多项式时间内精确求解。",
+  "issues": [
+    {
+      "where": "参考解答 追问（刷一个二维网格）",
+      "problem_zh": "原文说这个问题“变成了最小集合覆盖的一个实例，这一类问题目前没有已知的高效精确算法”。实际上每个格子恰好属于一个行笔画和一个列笔画，这是二分图上的最小点覆盖，由 König 定理等于最大匹配，多项式时间可解（经典题“用最少的横竖木板盖住泥地”就是它）。本页 Part 3 的栅栏本身就是这样一个实例：在 1500 组随机高度上，最大匹配的大小和 min_strokes 的结果完全一致。",
+      "action": "fixed",
+      "change_zh": "把这条追问的后半句改成：它仍有高效的精确解法——把笔画看成点、每个格子看成连接其行笔画和列笔画的一条边，就是二分图最小点覆盖，由 König 定理等于最大匹配，用二分图匹配在多项式时间内求出。代码和其他文字没有改。"
+    },
+    {
+      "where": "题目（木板高度 h[i] 的取值范围）",
+      "problem_zh": "测试用到 10^18 的高度，并要求逐行数的方法超时，但题面没给高度上界，也没给 Part 1、Part 3 的复杂度要求，而且题面自己的例子就是逐行数的。",
+      "action": "fixed",
+      "change_zh": "“h[i] >= 0。”改为“h[i] >= 0（没有上界，可能远大于 10^9，所以耗时不能和高度成正比）。”英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "Parts 1 and 3: compared with an exact set-cover search (BFS over covered-cell bitmasks, strokes enumerated straight from the statement's definition) on 1500 random fences (n <= 6, h <= 4) plus edge cases ([], zeros, single plank, flat, sorted)",
+    "Part 3: compared with an independent bipartite-matching solution (row runs vs planks) on 1500 random fences (n <= 14, h <= 20)",
+    "Part 2: 2000 random Fence objects x 30 updates (first/last plank, height 0, no-op updates) against recomputation; statement trace [1, 3, 3, 4]; input list not mutated",
+    "all statement examples ([2,1,3,3,1,2] -> 5; [1,5,1] -> 2 and 5 horizontal-only; the Fence trace)",
+    "complexity claims: sorted input n = 2000/4000/8000 takes 0.13/0.54/2.14 s (quadratic, no recursion error); random n = 200000 in 1.5 s",
+    "follow-up 2: single-split recursion gives the same value on 3000 random inputs",
+    "follow-up 3: BFS over range-increment operations equals Part 1's formula on 300 small targets",
+    "follow-up 4: brute-force minimum row/column-segment cover equals maximum bipartite matching on 400 random 2-D grids",
+    "re-read the Part 3 lower-bound proof step by step; compared Chinese and English text",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass. Only one follow-up bullet changed (prose about a different problem), so no check was added to the page; the claim was verified in a scratch script."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "OpenAI/system-design/multi-tenant-ci-cd",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages, both python blocks)",
+    "recomputed every capacity number in an independent script: 320,000 pushes/day and 2,240,000 jobs/day, 3.7 / 18.5 pushes per second and 25.9 / 129.6 jobs per second, W = 130 s, 16,852 running jobs at peak (3,370 average), 20,222 rounded to 20,300 nodes, 156.2 jobs/s and 83% utilisation, 54 events per job, 1.21e8 events/day, 1,400 and 7,000 per second, 520 status writes vs 1,560 lease renewals per second, 179.2 GB/day and 2.51 TB over 14 days, 7,200 active runs",
+    "checked the 47 s reclaim bound (30 s lease + 5 s scan + 12 s largest jittered backoff) against the statement's 50 s target and the retry policy",
+    "walked the prose rules (claim compare-and-swap with fencing token, conditional requeue on the store's clock, DAG advance inside the completing transaction, cancel, retries, log keys per token, change-stream consumer alternative) against the interleaving model in the second block, which also rejects eight broken variants",
+    "checked factual claims: Little's law, fencing tokens, microVM vs container isolation, weighted fair queuing with virtual time, subscribe-then-snapshot with per-row versions",
+    "checked the mermaid diagram against the walk-through",
+    "compared README.zh.md with README.md paragraph by paragraph and by the set of numbers in the prose; python blocks identical in both"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

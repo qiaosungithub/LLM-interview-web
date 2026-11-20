@@ -1,0 +1,7 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 90       # case limits add up to 74 s; the reference answer needs about 12 s
+case_cpu: 3       # CPU seconds per case unless the case says otherwise
+load_cpu: 20      # tests.py has already imported torch; slack for answers that train at import time
+memory_gb: 6
+special: debug
+note: Part 1 的样例按题目完整训练 400 步，要几秒钟。Part 2 的分类器由判题程序按参考解答的设置训练（最多 600 步），只能检查结果，检查不到是否用了平均池化。

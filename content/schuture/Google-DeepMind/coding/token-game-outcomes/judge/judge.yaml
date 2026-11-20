@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 66       # 26 cases: 22 x 2 s + 3 + 4 + 5 + 5 s CPU, + 5 s: covers an answer that times out on every case
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: 评测只能发现超过 20000 层的递归；先用 sys.setrecursionlimit 调高上限再沿着边递归的解法也可能通过，但它不满足题目“不能递归”的要求。

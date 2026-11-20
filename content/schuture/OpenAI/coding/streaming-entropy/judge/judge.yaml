@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 50       # 22 cases at 2 s = 44 s, plus slack; the reference needs about 0.5 s in all
+case_cpu: 2       # CPU seconds per case
+note: 第 3、4 部分用 tracemalloc 量调用期间的内存峰值，超过一个长度 N 的数组的四分之一就算分配了与 N 有关的数组（只能抓出这类明显的违规，不能证明额外空间是 O(1)）；题目没有时间要求，所以不测速度。第 1 部分只用不会上溢或下溢的输入；输入是 float32 时题目没规定累加精度，那个测试按 float32 的精度放宽容差。

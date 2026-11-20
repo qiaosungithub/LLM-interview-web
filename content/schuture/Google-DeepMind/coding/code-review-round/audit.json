@@ -1,0 +1,48 @@
+{
+  "id": "Google-DeepMind/coding/code-review-round",
+  "verdict": "relaxed",
+  "summary_zh": "题面列出的 7 个缺陷都在原始代码上复现了，修复后的代码也都把它们消除了。放宽了题面里两处参考解答做不到的要求：一是“进程被杀后目录和调用前完全一样”——真的用 SIGKILL 杀进程时，参考解答会留下一个临时文件（它不会被当成 checkpoint）；二是第四个测试要“在原始模块上失败、在修复上通过”——这个测试的成败其实取决于续训时用不用保存下来的位置和随机数状态，和用哪份代码无关。另外改正了追问里的一句话：它暗示 .npz 文件发生位翻转后会不报错地读出错误数字，实际上 .npz 自带 CRC-32 校验，读取时就会报错。",
+  "issues": [
+    {
+      "where": "题目 Part 2（原子性要求）",
+      "problem_zh": "题面要求进程在 save_checkpoint 中途任意时刻被杀死后，directory“要么和调用前完全一样，要么新的 checkpoint 已经完整存在”。参考解答的做法是先写临时文件再改名，进程被 SIGKILL 杀掉时来不及执行清理代码。实测：在写入中途杀掉子进程，目录里多出一个约 4.8 MB 的 .tmp-ckpt_2-xxxx.npz；在改名之前杀掉，留下一个 9.6 MB 的完整临时文件。原有的 ckpt_1.npz 没有受损，load_latest 仍然返回第 1 步的内容，但目录并不是“和调用前完全一样”。只有用抛异常来模拟崩溃时，临时文件才会被删掉。",
+      "action": "relaxed",
+      "change_zh": "改为：directory 里的 checkpoint 要么和调用前完全一样，要么新的 checkpoint 已经完整存在，绝不会出现一个只写了一半的 checkpoint 文件（残留一个不会被当成 checkpoint 的临时文件是允许的）。验证代码里加了一条检查：目录里留有一个半截的临时文件时，load_latest 仍返回上一个 checkpoint，这个临时文件也不会被列为 checkpoint。"
+    },
+    {
+      "where": "题目 Part 3（第四个测试）",
+      "problem_zh": "题面要求四个测试都“在原始模块上失败，在你的修复上通过”。但第四个测试（epoch 中途打断再续训，序列要和不打断时一致）的成败只取决于续训时是否使用保存下来的 epoch 内位置和随机数状态：实测原始模块在使用它们时照样通过，修复后的模块在不使用它们时同样失败。参考解答里这个测试是靠一个开关参数切换两种续训方式，而不是靠换代码来区分的。",
+      "action": "relaxed",
+      "change_zh": "在这一条后面加了一句说明：这一条区分的是两种续训做法，而不是两份代码——续训时只知道停在哪个 epoch、只能从头再来时应当失败，按修复所规定的做法续训时应当通过。验证代码里加了两行，直接展示原始模块配上位置和随机数状态也能通过、修复后的模块不配则失败。"
+    },
+    {
+      "where": "参考解答 追问（校验和验证那一条）",
+      "problem_zh": "原文说要把数组字节的校验和另外存进 JSON 旁路，否则一个发生位翻转的完整文件会“加载时不报错、内部数字却悄悄错了”。对参考解答自己用的 .npz 格式这并不成立：.npz 是一个 zip 归档，每个成员都带 CRC-32，numpy.load 读取时会校验。实测对一个 8568 字节的 .npz checkpoint 做 3000 次随机单比特翻转，2960 次加载时报错，40 次翻在不影响内容的位置、数据完好，读出错误数字的次数是 0。真正会悄悄读出错误数字的是原始模块的 pickle 文件和单独的 .npy 文件（实测翻转一位后 500.0 变成 500.00000000000006，没有任何报错）。",
+      "action": "fixed",
+      "change_zh": "改为：把校验和跟数据存在一起、加载时再校验；上面的 .npz 格式已经自带这一层（zip 每个成员的 CRC-32），原始模块的 pickle 文件或单独一个 .npy 则没有，那样的格式才需要自己把校验和加上。验证代码里加了一条检查：在数组字节里翻转同一个比特，.npz 加载时报错，pickle 不报错并读出一个错误的数。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "ran the statement's original module verbatim (extracted from the statement's code block) next to the page's fixed module; the statement's worked example holds on both",
+    "defect 1 (swallowed load error): original returns None for a truncated newest file, an empty newest file and an all-unreadable directory; fix falls back to the older checkpoint with a warning, raises RuntimeError when every file is unreadable, returns None only for an empty directory",
+    "defect 2 (non-atomic write): child process killed with a real SIGKILL mid-write leaves a partial ckpt_2.pkl on the original and load_latest returns None; on the fix, kills mid-savez, before the rename and after the rename all leave load_latest returning a complete checkpoint",
+    "defect 3 (string sort): steps 1..10 give latest = 9 and retention keeps [7, 8, 9] on the original, latest = 10 and [8, 9, 10] on the fix; also [500, 1000], [8..11], [98, 99, 100]",
+    "defect 4 (resume): the page's resume test under both settings of its flag on both modules (original+False fails, original+True passes, fix+False fails, fix+True passes)",
+    "defect 5 (sampler remainder): 2196 configurations (n <= 60, world_size <= 12): the original fails to cover exactly the 1608 with n % world_size != 0 and drops exactly n % world_size indices; the fix covers every index once in all of them, share sizes differ by at most one",
+    "defect 6 (mutable default): history accumulates across calls on the original; the fix does not mutate the caller's dict or a shared default",
+    "defect 7 (pickle): a crafted file runs its payload under the original's load_latest; the fix raises RuntimeError on a raw pickle named .npz and on an npz holding an object array, payload never runs",
+    "fix round trip on 39 random states (float32/float64 arrays, empty and 0-d arrays, nested JSON values, unicode, RNG state); retention never leaves more than keep files",
+    "Part 3: the other three tests raise AssertionError on the original and pass on the fix",
+    "checksum follow-up measured: 3000 single-bit flips of a saved .npz, plus one flip in the array bytes of a .npz, a pickle and a bare .npy",
+    "English and Chinese text compared paragraph by paragraph; code blocks identical",
+    "not verified: behaviour on non-POSIX or network filesystems (rename atomicity, fsync durability) and after power loss; the follow-ups on multi-host sharded checkpoints and asynchronous checkpointing were read, not run; the severity ranking in Part 1 is a judgement call and was not second-guessed"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass before and after. The added bit-flip check asserts the corrected sentence (the corrupted .npz is refused on load); the old sentence's reading (it loads with wrong numbers) fails that assertion. The other two added checks pass on the unchanged code and show what the two relaxed requirements now say."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

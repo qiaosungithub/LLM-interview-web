@@ -1,0 +1,33 @@
+{
+  "id": "Anthropic/coding/research-fundamentals-training-curves",
+  "verdict": "fixed",
+  "summary_zh": "推导、三处 bug 的现象和页面上引用的数字都重新算过、重新跑过，全部属实。只改了追问 2 标题里的“一定”：同一条追问自己就说明了，满批量的二次函数上少了 zero_grad 只会不停振荡、不会发散，所以不是“一定”出 nan。",
+  "issues": [
+    {
+      "where": "追问 2",
+      "problem_zh": "标题问“少了 zero_grad 为什么一定会出 nan”，但答案里写的（也是验证代码量到的）是：满批量、二次损失时，它等价于动量为 1 的重球法，损失在一个范围内来回振荡，2000 步里从没超过初值的 1.1 倍，既不收敛也不发散；只有换成小批量或者 MLP 时才会爆掉。标题和答案矛盾。",
+      "action": "fixed",
+      "change_zh": "标题改成“少了 zero_grad 为什么会出 nan？”，答案内容没有动。"
+    }
+  ],
+  "checked": [
+    "ran page before and after the edit, plain and with --hash-seeds (PYTHONHASHSEED=0/1), and once with 1 thread instead of 2: PASS every time",
+    "re-derived by hand: Var(y) = (1 - 1/pi) + (1/2 - 1/(2 pi)) + 1/4 + 0.01 = 1.76 - 3/(2 pi); best linear coefficients (1/2, -1/2, -1/2, 1/2) by Stein's lemma, explained variance 1, so MSE 0.76 - 3/(2 pi); intercept (sqrt2 - 1)/sqrt(2 pi) = 0.165; dropout identity from E[m/(1-p)] = 1, Var[m/(1-p)] = p/(1-p)",
+    "wrote my own train/evaluate (different indexing, loss before zero_grad, also an F.mse_loss variant) and my own colleague script with switchable fixes: val 1.392 -> 0.206 -> 0.0198, train end 0.0534, train_eval 0.017, dropout term 0.0359, Monte Carlo over 1000 masks 0.0531 vs eval + term 0.0530; my Part 1 loop (both loss variants) is bit-identical to the fully fixed colleague script",
+    "bugs, own code: as written -> train never below 1.38, peaks 3.25, nan from epoch 10; only A left -> nan at epoch 3, and bit-identical (nan included) to SGD(momentum=1.0) with A fixed; after A -> train 1.317 / val 1.264 (Var of train/val y 1.306 / 1.263); after A+B -> val 0.0623 in train mode vs 0.0231 in eval mode; follow-up 1 (eval without train) -> train 0.0121, val 0.0167",
+    "1 vs 2 threads: the only difference in my runs was the last digits of the (1000,1000) broadcast validation loss; all page assertions have room for it",
+    "Part 3 in numpy, independent of torch: L(theta_hat) 0.28926, h = 2.453 ... 1.702, kappa 1.44, eta* 0.8153, MP edges 1.64/2.40; GD at 0.9/1.0/1.1 x eta*: plateau 0.15109 = h_1 a_1(0)^2 / 2, late ratio 1.44 and minimum at step 2 for c = 1.1, factor -1.023 for direction 2, c = 0.9 factors in [-0.8, -0.249]; reduction='sum' threshold eta*/n = 8.15e-4; float64 FD error 3.4e-10, float32 FD errors 0.14 (eps 1e-6) and 1.3e-5 (eps 1e-2) with numpy summation vs the page's measured 0.15 and 2.4e-5",
+    "full 641x641 Hessian of the trained MLP (eval mode, float64) by torch.autograd.functional.hessian: lambda_max 9.806, 2/lambda_max 0.204, matching follow-up 5",
+    "checked the momentum-1 recurrence a_{t+1} = (2 - eta h) a_t - a_{t-1}, its closed form cos(omega (t + 1/2)) / cos(omega/2) and the amplitude 1/sqrt(1 - eta h/4) by hand",
+    "meta.yaml: origin matches the process page's research track sentence and says the problem was written for this site; no paths; frequency low; stage phone-screen"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "PASS before and after the edit. No check added: the edit removes a word that contradicted the page's own existing check (full-batch loss never exceeds 1.1x its start). The quoted epoch of the first nan and the float32 finite-difference errors are measured values from chaotic or float32 computations; the text calls them measurements and they reproduce with 1 and 2 threads on torch 2.15.0+cpu."
+  },
+  "env_evidence": [
+    "这一轮在共享的 notebook 里做，考的是“ML 研究基本功”：用 PyTorch 写一个很小的训练循环，看懂它画出来的曲线，并且**在画图之前先说出图会长什么样**。"
+  ],
+  "confidence": "high"
+}

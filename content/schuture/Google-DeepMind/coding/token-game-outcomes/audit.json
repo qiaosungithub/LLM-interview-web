@@ -1,0 +1,41 @@
+{
+  "id": "Google-DeepMind/coding/token-game-outcomes",
+  "verdict": "fixed",
+  "summary_zh": "题目、三个 Part 的参考解法和例子都没问题。只改了追问里的一句话：原文说“两个平局分量相加，结果未必还是平局”，实际上两个平局相加一定还是平局，会变的是“平局 + 非平局”的组合。",
+  "issues": [
+    {
+      "where": "参考解答 追问（含环图上的多枚棋子）",
+      "problem_zh": "原文写“两个平局分量相加，结果未必还是平局”。在约 6000 张随机小图的乘积图上直接算：两枚棋子各自都是平局时，39,441 个局面全部还是平局（再加第三枚任意棋子也一样）；真正会变成必胜的是“平局棋子 + 必胜棋子”的组合（2,384 个里有 308 个先手必胜）。",
+      "action": "fixed",
+      "change_zh": "改为“含有平局分量的和未必还是平局，因为平局分量一旦和一个不是平局的分量组合在一起……（如果只是两个平局分量相加，结果仍是平局）”，其余不动。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有覆盖这条追问里的说法。",
+      "action": "fixed",
+      "change_zh": "加了一个 4 个节点的小例子（1→0，2→1，2↔3）：在乘积图上用 Part 2 的 outcomes 直接算，节点 2 单独是平局，但另一枚棋子在节点 1 上时先手必胜；两枚棋子都在平局节点上时仍是平局。"
+    },
+    {
+      "where": "Part 3（规模和不能递归）",
+      "problem_zh": "n 的上限和“不能沿着边递归”只写在 Part 1，Part 3 的测试同样要求。",
+      "action": "fixed",
+      "change_zh": "Part 3 补一句：n 同样最多可达 10^5，同样不能沿着边递归。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "all three statement examples traced by hand and asserted by the page's checks",
+    "Part 1: compared outcomes_dag / winning_move / outcomes with an un-memoised game-tree search on 3000 random DAGs (n=1..9, shuffled labels, empty edge lists, complete DAGs); n=0; n=1e5 path runs in 0.14s with no recursion",
+    "Part 2: compared outcomes with an independent brute force that enumerates every pair of positional strategies and simulates play, on 3905 random digraphs (n=1..5)",
+    "Part 3: compared first_player_wins with a minimax over token tuples on 3000 cases (k=0..4, tokens sharing nodes)",
+    "follow-ups: retrograde analysis on the 2- and 3-token product graph to test the drawn-components sentence; distance-to-mate rule against a depth-limited definition on 3000 digraphs (0 mismatches); misere Nim closed form against brute force on all 3-heap positions with heaps < 6",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass. The added check exercises the corrected sentence; no reference code changed, so there is no before/after failure to show for it."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

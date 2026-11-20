@@ -1,0 +1,44 @@
+{
+  "id": "Google-DeepMind/coding/unit-conversion-graph",
+  "verdict": "fixed",
+  "summary_zh": "题目、三个 Part 的参考解法和例子都没问题。只改了追问里“在对数空间中计算”的一句话：原文说累加对数“只会积累一次舍入误差”，实测并非如此，对数做法并不更精确，它真正的好处是连乘不会上溢或下溢。",
+  "issues": [
+    {
+      "where": "参考解答 追问（在对数空间中计算）",
+      "problem_zh": "原文写“沿路径把 log r 累加起来、最后只在末尾取一次指数，只会积累一次舍入误差，而不是每条边都积累一次”。实际上每次取对数、每次相加都会舍入。和精确的有理数乘积对比：1000 条边的链上，直接连乘的相对误差约 1e-15，累加对数再取指数约 1e-13（300 组随机链里对数做法更准的只有 3 组）；页面自己的例子 5280 × 12 × 2.54，直接乘正好是 160934.4，走对数得到 160934.39999999973。",
+      "action": "fixed",
+      "change_zh": "把这半句改成对数做法真正的好处：“可以避免一长串特别大或特别小的系数在连乘途中上溢或下溢”，并补一句“这样做并不会让结果更精确……链条一长，直接连乘的结果通常反而更接近真实值”。后面关于 rel_tol 含义变化的内容保留，只把“代价是”改成“另一个代价是”。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有覆盖这条追问里的说法。",
+      "action": "fixed",
+      "change_zh": "加了一个检查：一条 1000 条边的随机链上，直接连乘比“累加对数再取指数”更接近精确乘积；另有 1e200 × 1e200 × 1e-200 × 1e-200，直接连乘得到 inf，走对数得到约 1.0。"
+    },
+    {
+      "where": "Part 3（规模）",
+      "problem_zh": "有一个超时测试，题面却没给调用次数的规模。",
+      "action": "fixed",
+      "change_zh": "补一句：调用总数可达约 10^5 次。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "all statement examples (Part 1 four calls, Part 2 trace with its 30.0 / 0.7 figures, Part 3 eleven-call trace) recomputed by calling the reference",
+    "convert: compared with an exact-Fraction brute force (naive fixed-point propagation over the fact list) on 6000 random fact sets with hidden ground-truth unit sizes, several components, duplicate and reversed facts, unknown units, src == dst, value 0 and negative (36000 queries)",
+    "first_contradiction: compared with the exact-Fraction brute force on 6000 random fact lists, 2/3 of them with perturbed facts; rel_tol argument honoured",
+    "Converter: 3000 random add_fact/query interleavings (16864 accepted, 4281 rejected) against the brute force, against Part 1's convert on the accepted facts and against Part 2's first_contradiction; every query unchanged after a rejected add_fact",
+    "edge cases: empty facts, duplicate fact, the same fact stated backwards, contradicting restatement in either direction",
+    "scale: convert on a 200000-edge chain (0.66s, iterative); Converter with 200000 add_fact in forward, backward, random and pairwise-doubling order (about 1s each, max tree depth 8, no recursion problem)",
+    "follow-ups: log-space claim measured against exact rational products (three factor distributions, chain lengths 3 to 1000, compensated summation included); affine composition formula re-derived; Fraction and contradiction-explaining bullets read and found correct",
+    "English and Chinese compared paragraph by paragraph; python fences identical",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass. The added check exercises the corrected sentence; no reference code changed, so there is no before/after failure to show for it."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

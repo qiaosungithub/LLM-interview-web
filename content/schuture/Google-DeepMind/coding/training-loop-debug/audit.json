@@ -1,0 +1,19 @@
+{
+  "id": "Google-DeepMind/coding/training-loop-debug",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "executed the statement's buggy listing verbatim: printed losses 25.5481 / 26.7524 / 26.8433, nan from epoch 16, validation accuracy 0.333 -- identical to the statement; no exception, only overflow warnings",
+    "diffed the buggy listing against the reference listing: exactly six bug sites and nothing else (besides the prints)",
+    "built variants of the statement's listing by literal string patches (independent of the page's train_with_bugs) and reproduced every row of the Part 1 table (fix order 2,3,1,6,4,5: reported/true 0.333/0.333, 0.333/0.333, 0.333/0.243, 0.333/0.957, 0.963/0.957, 0.953/0.957, 0.957/0.957) and every row of the Part 2 table (each bug alone); all six patches applied == reference train() bit for bit",
+    "bugs 5 and 6 alone leave the loss curve bit-identical to the correct run; bug 5 alone gives 0.937-0.967 over 200 repeated evaluations of the same parameters",
+    "single-bug symptoms and the >= 0.9 claim rechecked on seeds 1-5 (fixed pipeline 0.923-0.967)",
+    "ran the reference sanity_checks against the literal buggy variants: bug 2 fails 4 of 5, bug 5 fails batching + gradient check, bug 6 fails only its own, bug 3 fails the gradient check; fixed pipeline passes; bug 2 initial loss 6.38 vs ln 3 = 1.10",
+    "compared Chinese and English prose; py listing and all python blocks identical in both"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": ""},
+  "env_evidence": [],
+  "confidence": "high"
+}

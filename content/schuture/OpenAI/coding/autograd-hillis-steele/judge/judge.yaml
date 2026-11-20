@@ -1,0 +1,6 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 35       # 14 cases at 2 CPU seconds each; importing torch is charged to load_cpu
+case_cpu: 2       # CPU seconds per case
+load_cpu: 20      # tests.py imports torch
+memory_gb: 6
+note: 只评测各函数的返回值和梯度：和逐个相乘的循环及其 autograd 梯度比较（float64，误差允许最大元素的 1e-9；返回 float32 时、Part 1(b) 的 float32 代码按 1e-4，题目例子按 1e-6 比较）。Part 1 另外检查不改写输入 W；Part 2 只看 autograd 能否算出正确的 W.grad，不直接检查是否用了原地操作；Part 3 不检查是否用了 autograd；Part 4 用 N = 128 统计矩阵乘法和逐元素乘法的调用次数（前向不超过 4⌈log₂N⌉ 次、反向不超过 8⌈log₂N⌉ 次），以此确认没有对 i 写循环。Part 1(b) 的解释、各部分的推导和追问不评测。

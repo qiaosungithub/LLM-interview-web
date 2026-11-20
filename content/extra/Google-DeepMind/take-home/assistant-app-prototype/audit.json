@@ -1,0 +1,42 @@
+{
+  "id": "Google-DeepMind/take-home/assistant-app-prototype",
+  "verdict": "fixed",
+  "summary_zh": "参考解答的计算器没有检查表达式里直接写的数字：输入 1e999 会得到无穷大，再写进 SSE 事件就成了不合法的 JSON，题目明明要求拒绝。现在数字常量也要过同一道大小检查，并加了一条对应的测试。",
+  "issues": [
+    {
+      "where": "参考解答 calculator / 验证代码",
+      "problem_zh": "calculate(\"1e999\") 返回 {\"value\": inf}，序列化后是 {\"value\": Infinity}，不是合法 JSON；150 位的整数常量也会直接放行。题目要求“任何一步的结果是绝对值超过 10^100 的整数，或者不是有限的小数，拒绝”，只检查了运算结果，没检查常量本身。",
+      "action": "fixed",
+      "change_zh": "ev() 里遇到数字常量时改成 return _checked(node.value)，和运算结果走同一道检查；验证代码的拒绝列表里加了 (\"1e999\", \"result is too large\")，改之前这条失败，改之后通过。"
+    },
+    {
+      "where": "参考解答 HTTP 层",
+      "problem_zh": "请求体超过 64 KB 时返回 413，而题目只写了“格式不对返回 400”。",
+      "action": "flag",
+      "change_zh": "413 是更准确的状态码，也不会误导做题的人，没改。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "大约一半的运行会在测试输出里打印一段 ConnectionResetError 的服务器端堆栈（客户端先断开，服务器还在等下一个请求）。测试本身都通过。",
+      "action": "flag",
+      "change_zh": "只是日志噪声，不影响结论，没改。"
+    }
+  ],
+  "checked": [
+    "ran page normally and with --hash-seeds (PYTHONHASHSEED 0 and 1): all pass after the fix; the new check fails before the fix (AssertionError: 1e999) and passes after",
+    "probed the calculator on edge cases: 1e999, -1e999, 10**100 (accepted), 10**101 (rejected), 1e308, 2**65, 9**9**9, 201-char input, (-8)**0.5, 5 % 0, 0.0 ** -1",
+    "independent raw-socket HTTP probe against the reference server on 127.0.0.1 port 0: SSE framing, Content-Type text/event-stream, no Content-Length, Connection: close, 201 on create, 400 for over-long / non-string / missing / non-object / empty / invalid-UTF-8 bodies without calling the model, 4000-char text accepted, keep-alive after 404, other conversations stream while one is blocked, 409 for a second turn on the same conversation and the lock released afterwards, failed turn and client disconnect leave no history",
+    "mutation runs against the page's own HTTP tests: a server that buffers the whole turn and one that queues instead of answering 409 are both caught",
+    "ran the EchoModel server and drove it with curl: output matches the page's transcript format",
+    "checked the 9**9**9 size figures (about 3.7e8 digits, about 153 MB)",
+    "checked the Gemini adapter's API names and event shapes against the Interactions API docs (streaming, function-calling, API reference pages): create(stream=True, model, input, tools, previous_interaction_id, system_instruction), event and delta types, function_result fields, gateway_timeout error; all match",
+    "ran the adapter code against a fake SDK built from the documented shapes: tool loop, error mapping to model_timeout with no commit, previous_interaction_id continuing from the last successful interaction",
+    "checked meta.yaml: origin presents the link to interviews as a guess and has no paths; frequency is rare"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "The Gemini adapter is a py block and was never run against the real SDK or service; the page says so."},
+  "env_evidence": [
+    "评审会在自己的机器上，从一份干净的代码检出（clean checkout）开始。要求一条命令启动服务，一条命令跑测试，两者都**不需要 API key，也不联网**。",
+    "不用 AI 编程助手。DeepMind 的官方面试指南写明：除非另有通知，面试任务中不要使用任何 AI 工具。你的应用调用 Gemini 是作业本身的内容；用 AI 帮你写代码，则以招聘方的通知为准。"
+  ],
+  "confidence": "high"
+}

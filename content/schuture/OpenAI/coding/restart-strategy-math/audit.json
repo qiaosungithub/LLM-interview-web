@@ -1,0 +1,19 @@
+{
+  "id": "OpenAI/coding/restart-strategy-math",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "redid every derivation by hand: Markov bound and its non-attainment, (5,5) = 0.96, 1-(m/10)^m, m = 10/e -> 4 attempts 0.9744, exponential/memoryless and its converse, two-attempt piecewise worst case (ranges 1/2 <= a <= 10/3, bounds 9/400 and 1/18), general m!/10^m with gaps 10/(m(m-i+1)), 9!/10^9",
+    "100k random mean-1 discrete distributions: failure of equal schedules never exceeds (m/10)^m and failure of the closed-form unequal schedules never exceeds m!/10^m (m = 1..10)",
+    "independent random-search adversary (atoms just above the timeouts) agrees with the page's SLSQP worst case on 10 schedules, incl. (2.5,7.5)=0.02, (5,5)=0.04, (4,6)=1/36, (0.3,9.7)=0.0745",
+    "300 random perturbations of the optimal schedule for m = 4, 5, 6: none has a lower worst case than m!/10^m",
+    "recomputed follow-up numbers: Cantelli 1/17 with the two-point distribution (mean 1, variance 1), restart cost c = 0.5 gives 3 equal / 5 unequal attempts, Luby sequence",
+    "Weibull shape 0.5/0.8/1.5/2.0 with random splits: decreasing hazard favours splitting, increasing favours one attempt",
+    "compared Chinese and English text paragraph by paragraph"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass."},
+  "env_evidence": [],
+  "confidence": "high"
+}

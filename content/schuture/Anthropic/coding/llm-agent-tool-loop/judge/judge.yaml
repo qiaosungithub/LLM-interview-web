@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 65       # seconds for the whole run: 29 cases x 2 s CPU, plus margin
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: 测试把 client 换成按脚本回复的假模型（ref.ScriptedClient），每次调用 create 时检查发来的对话（run_agent 还检查 tools 和 system 是否原样传入）。Part 3 写给模型的工具描述和 system prompt 没有唯一答案，create 的调用次数取决于模型，这两样不评测。

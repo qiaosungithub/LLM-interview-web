@@ -1,0 +1,20 @@
+{
+  "id": "OpenAI/coding/infection-spread",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "confirmed code blocks are identical in README.md and README.zh.md",
+    "re-derived every statement example by hand and with an independent whole-grid simulator (Part 1 day-by-day grids, Part 2 answers 6 and -1, Part 3 trace for D=2 and D=1, Part 4 version A five-day trace, Part 5 costs 9 / 11 / 4)",
+    "brute-force compare on 30000 random grids up to 5x5 with immune cells: days_until_all_infected, days_until_outbreak_ends, simulate with random D, spread threshold and death threshold; min_deaths on 8309 of them",
+    "checked the Part 3 closed form (d_max + D for D >= 2, 1 for D = 1) against the simulation on the same 30000 grids",
+    "checked the follow-up claims: death threshold <= spread threshold kills every later-infected cell, death threshold 5 kills nobody",
+    "checked the 'corridor of immune cells takes ~R*C days' claim on snake grids (41x41 takes 880 days)",
+    "confirmed column 3 is the line with the most infected cells in the Part 5 example and that burning it (11) is worse than burning nothing (9)",
+    "confirmed the input grid is never mutated"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass; no edits made."},
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "Google-DeepMind/system-design/robot-learning-data-flywheel",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目“留出的 50 个任务” vs 参考解答 流水线（整理 / 训练）",
+      "problem_zh": "题目说评估套件是“一组固定的、留出的 50 个任务”，数据模型里也用 is_eval_task 标出这 50 个任务；但参考解答讲训练数据时又说任务配比“在 50 个任务之间重新采样”、机器人数据太多会“在这支机队恰好拥有的这 50 个任务上过拟合”，深入话题 (b) 还说日常收集的任务一旦退化会“在评估里冒出来”。也就是说，解答实际上把机队日常收集、训练用的任务和评估套件当成了同一批 50 个任务，这和“留出”的字面意思（评估任务不进训练集）对不上。",
+      "action": "flag",
+      "change_zh": "没有改，因为拿不准作者的本意：可能是任务相同、评估时用的是留出的场景布局和试验，也可能是另有一批训练任务。数字和结论都不受影响。面试时自己要说清楚：用来评估的任务（或至少评估用的场景布局）不能进训练集。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages pass; python fences identical in both files)",
+    "recomputed every scale number in my own script (tools/out/scratch/b30/robot_check.py): 1.8 MB/s, 51.84 GB/robot-day, 10,368 GB (10.4 TB)/fleet-day, 28.8 MB and 5.76 GB/day low-dim, 1,800x ratio, 480 / 96,000 / 28,800 / 67,200 episodes, 10,373.76 GB/day, 3.79 PB/year, 37.9 PB at 10x -- all correct",
+    "Wilson interval for 42/60 recomputed two independent ways (root-finding on the score equation; scipy binomtest): [0.575, 0.801], centre 0.688; Wald [0.584, 0.816] and wider, as stated",
+    "exact binomial coverage of Wald vs Wilson at n=20 and n=60: Wilson stays 0.93-0.98 while Wald drops to 0.33-0.81 near p=0.95-0.98, supporting the page's claim",
+    "two-proportion sample size recomputed (355.94 -> 356 per arm); exact power of the pooled z-test at n=356 by enumerating both binomials = 0.8013, exact size 0.0503; Monte Carlo on other seeds 0.794-0.802, consistent with the quoted 0.7999",
+    "712 trials = 11.87 h; 50 x 356 x 2 = 35,600 trials = 593.3 h = 24.7 days",
+    "simulated paired (McNemar) vs unpaired design with a shared scene effect: paired power equals unpaired with no scene effect and exceeds it otherwise (0.87 / 0.97 vs 0.80), supporting 'no more trials, generally fewer'",
+    "latency arithmetic (70 ms / 30 ms margin; 8 + 10 + 30 = 48 ms / 52 ms margin; 1.25 Hz at H=8; 700 ms runway) and a small control-loop model: a 180 ms call stalls H=1 and is absorbed at H=8",
+    "re-ran the page's priority-collection simulation on 40 other seeds and wrote my own deterministic version over 200 random initial conditions: no starvation, more budget to the hardest task, less to the easiest, better worst-task gap in every run",
+    "checked DAgger attribution (Ross, Gordon & Bagnell 2011) and the Wald/Wilson derivations",
+    "read the pipeline diagram edge by edge against the walk-through, data model and API; rollout slice sizes 2/20/100/200",
+    "compared Chinese and English paragraph by paragraph"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

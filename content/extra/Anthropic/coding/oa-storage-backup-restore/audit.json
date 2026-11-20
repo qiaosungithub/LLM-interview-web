@@ -1,0 +1,25 @@
+{
+  "id": "Anthropic/coding/oa-storage-backup-restore",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "meta.yaml origin",
+      "problem_zh": "来源说明写“把它和 Anthropic 联系起来的只有一个付费题库目录里的题名”。收集的材料里其实不止一处：那个题库目录给这道题标了 9 次公开报告（站方自称，未核实），另一个备考仓库的参考列表里也有一篇第三方的“Anthropic 在线测评：云存储”文章。这些都只是题名，看不到题面，没法确认就是这一套四关。",
+      "action": "flag",
+      "change_zh": "没改。这里是说少了，不是说多了，读者得到的结论（和 Anthropic 的联系很弱，只有题名）不变，frequency 写 low 也合适。要不要把“只有一个”改成“只有几个第三方备考网站上的题名”，留给负责人决定。"
+    }
+  ],
+  "checked": [
+    "ran page, and with --hash-seeds (PYTHONHASHSEED 0 and 1): all pass",
+    "read the four LibreSignal storage level files as text and compared rule by rule: operations, return strings, tie order, admin rule, merge, backup and restore notes all match the page, which only adds explicit rules where the source is silent (user must exist, merged id can be reused, admin never appears as a userId)",
+    "confirmed the three source problems named in the origin line: level 2 writes n as 'file.txt'; level 4's last row says 1 although nothing took /file3.mp4, and the written rules give 2 (my model and the reference both return 2 on the source table); the merge sentence has two readings, and only 'limits add up' gives the example's 70 (the other gives 20)",
+    "my own implementation written from the 题目 section alone (one dict name -> [size, owner]), compared with solution() on all four example tables and 6,000 random histories of up to 200 commands, with digit-only names, names that are prefixes of each other, user id '10', merges, re-created users and repeated restores: identical output, and the 'restore never exceeds the limit' assertion never fired",
+    "checked the restore-capacity argument by reasoning: a backup is dropped when its user is merged away, limits only grow, and restore brings back a subset of the backup",
+    "checked the follow-up claims about the other cloud-storage page on the site: it really fails the whole restore on any name clash and resets the capacity to the backed-up value",
+    "the earlier classes StorageL1-L3 still pass their own level's examples"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "Page passes as written, also under PYTHONHASHSEED 0 and 1. No edits; one flag on the origin wording."},
+  "env_evidence": [],
+  "confidence": "high"
+}

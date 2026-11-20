@@ -1,0 +1,5 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 28       # 11 cases at 2 s = 22 s, plus slack; the reference needs about 0.5 s in all
+case_cpu: 2       # CPU seconds per case
+special: debug
+note: 只评测第 2 部分修好的代码的行为（原子保存、按步数排序、checkpoint 读不出来时不能静默返回 None、去掉可变默认参数、各 worker 的分片恰好覆盖一次）；第 1 部分的评审意见、第 3 部分的测试，以及序列化方案、信任假设、余数怎么分配这些书面说明都不评测。原子性测试在子进程里调用 save_checkpoint，在它写的任一个文件写到某个字节数时（也包括写在后面的小文件）直接结束进程、不运行任何清理代码；state 只含 numpy 数组和整数/浮点数，哪些文件属于哪个 checkpoint 按每次保存新建的文件判断，不看文件名。运行样例只跑题目例子，原来有缺陷的代码也能通过，通过样例不代表缺陷已经修好。

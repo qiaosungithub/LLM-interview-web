@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 37       # 16 cases at 2 CPU seconds each; the reference answer needs well under a second in total
+case_cpu: 2       # CPU seconds per case
+note: 只评测各函数的返回值：和按公式写的下标循环比较，误差允许 1e-8（题目的三个例子按 4 位小数比较）。是否用 np.einsum 做收缩、Part 2 的中间形状说明和 Var(q·k) 的推导不评测。

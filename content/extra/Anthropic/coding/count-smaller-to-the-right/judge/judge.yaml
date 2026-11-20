@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 85       # seconds for the whole run: covers an answer that times out on every case (27 x 2 + 3 x 6 + 5, plus 8)
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "Part 1 的比较次数和用时估算、Part 3 (c) 的口头比较不评测。复杂度只按 2×10⁵ 个元素的用时检查，不检查是否真的用了归并排序或树状数组。"

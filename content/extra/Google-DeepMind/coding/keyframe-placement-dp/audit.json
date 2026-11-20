@@ -1,0 +1,33 @@
+{
+  "id": "Google-DeepMind/coding/keyframe-placement-dp",
+  "verdict": "fixed",
+  "summary_zh": "题目、例子、参考解答和追问里的数字都核对过，没有发现错误。只改了来源说明里的一个词：流程汇总原文说的是“组合数学题”，草稿引成了“组合计数题”。",
+  "issues": [
+    {
+      "where": "meta.yaml origin",
+      "problem_zh": "来源说明用引号引用流程汇总，写成“建立在候选人自己代码上的组合计数题”，但原文是 combinatorics question（中文流程页写作“组合数学追问”），“计数”是草稿自己加的，让这道计数题看起来比实际更有出处。",
+      "action": "fixed",
+      "change_zh": "引号里的“组合计数题”改为“组合数学题”，其余不变。"
+    }
+  ],
+  "checked": [
+    "solved the statement cold before reading the reference: own bitmask brute force (counts exact) and own forward DP over (frame, run of long gaps) with (cost, count) pairs",
+    "every statement example in Parts 1-3 re-derived by hand (all compositions of the gaps listed) and by the brute force; all match the page",
+    "6000 random inputs, n 0..14 (page's own checks stop at 10), G up to n+2, costs from all-zero to 1e9: min_cost, min_cost_limited and count_optimal equal the brute force (count mod 1e9+7); my DP with R = 1..4 equals the brute force",
+    "30 inputs with n 50..300 and tiny costs (huge numbers of ties): count_optimal equals my DP after the modulus",
+    "follow-up code: deque versions and the at-most-R-long-gaps version equal the O(nG) DP / my DP on 400 inputs up to n = 400",
+    "claim 'one value per frame gives 4 instead of 3' traced by hand on c = [0, 2, 1, 3, 0], G = 2, H = 1: correct",
+    "follow-up 3 claim (H = G >= n - 1 gives 2^(n-2) plans) checked by brute force for n = 2..11; Fibonacci and t[m] = t[m-1] + t[m-3] recurrences checked",
+    "timing at n = 2000 printed only: Part 1 0.03 s, Part 2 0.06 s, Part 3 at most 0.36 s for several (G, H), well inside '1 s' and 'a few seconds'",
+    "'n = G = 2000 is four million comparisons' is the nG bound; the exact count is about 2 million. Left unchanged (loose big-O style estimate, not misleading)",
+    "origin compared with the Google DeepMind process page (English and Chinese): DP-and-backtracking quote and the combinatorics follow-up exist; no concrete problem recorded; one quoted word corrected; no paths or internal names; frequency low",
+    "ran page normally and with --hash-seeds before and after the edit: PASS"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 80       # seconds for the whole run: 37 cases at 2 s each, plus 5 (the reference needs under 1 s)
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "失败时显示的“调用”里，is_supported 写成对 support 字典的查找，Part 4 写出了重建注册表的代码，都可以粘贴到“自定义运行”重现（要保留文件里的 Registry、CountingProbe）。Part 1 题目没有限定调用次数，只报告不评测；Part 3 的“O(log M + log N_minor + log P) 次”按 2 × (三层各自二分的探测次数之和) + 2 判定，并检查同一个版本没有被探测两次。"

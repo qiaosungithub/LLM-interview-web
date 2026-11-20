@@ -1,0 +1,7 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+# vector_machine.py is the statement's own code (simulator, reference, mem_layout / make_memory / run_program,
+# build_baseline), copied verbatim from the code blocks of README.md (the same in README.zh.md); only a docstring is
+# added. solution.py is the page's Step 4 with Step 2's _setup/_finish, also verbatim.
+special: perf
+timeout: 20       # every case is well under its 2 s CPU limit even for build_baseline (whole run about 1 s)
+note: "用题目自己的 VectorMachine 和 run_program 评测 build_optimised：各种 n（包括 0 和不是 8 的倍数）的结果都要在题目检查用的容差内等于 reference；周期数、加速比和下界只报告，周期数多少都不会判错。不评测文字报告部分。"

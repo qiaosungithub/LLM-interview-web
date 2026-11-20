@@ -1,0 +1,40 @@
+{
+  "id": "Anthropic/discussion/network-debugging-roleplay-b",
+  "verdict": "fixed",
+  "summary_zh": "两处命令输出前后对不上，都改得很小。Q5 路由器抓包里的序号是绝对值，可抓包里包含了握手，tcpdump 默认会显示相对序号，所以命令补上了 -S。Q6 钳制后的抓包只列了两个数据段，可初始窗口能发九个，所以在说明里注明是开头部分、省略了其余数据段。其余数字和内核行为都核对过，没有问题。",
+  "issues": [
+    {
+      "where": "题目 Q5 路由器抓包的命令",
+      "problem_zh": "抓包是在 trainer-a 新发起下载之前开始的，文件里有这条连接的握手。这时 tcpdump 默认显示相对序号，数据段应该显示成 seq 124:1572 这种小数字，而页面上是 seq 3851142341:3851143789 这种绝对值。Q4 用的又是相对序号，前后对不上。",
+      "action": "fixed",
+      "change_zh": "命令从 `tcpdump -nn -r rtr-dc2-lan.pcap` 改成 `tcpdump -nn -S -r rtr-dc2-lan.pcap`（-S 表示显示绝对序号），输出不变。"
+    },
+    {
+      "where": "题目 Q6 钳制后抓包的说明",
+      "problem_zh": "原文说“抓了一次新连接的开头”，列出的行从握手一直到客户端的 ack 2820，中间只有 2 个数据段。可是按 Q4，初始窗口是响应头加 9 个数据段，下载同一个 5 MiB 文件时，客户端的确认到达之前服务器应该已经发了 9 个段。",
+      "action": "fixed",
+      "change_zh": "说明改成“同事在服务器上又抓了一次新连接，下面是开头部分（省略了其余的数据段）”，抓包内容和答案都没动。"
+    }
+  ],
+  "checked": [
+    "ran page normally and with --hash-seeds (PYTHONHASHSEED=0,1): PASS before and after the edits",
+    "rebuilt the Q5 router lines as pcaps and printed them with local tcpdump 4.99.1: the data line and 'ICMP 10.10.0.21 unreachable - need to frag (mtu 1400), length 556' (576-byte IP packet) match the page exactly; with the handshake in the file, default output shows relative seq and -S shows the page's absolute numbers",
+    "independent script parsed the statement captures and recomputed: RTT 11.798 / 11.849 ms, 10-packet initial window, 2 new segments after ack 124, TLP gap 33.383 ms, first RTO 212 ms after the TLP, backoff 424/848/1696/3392/6784 ms, rto 212*64 = 13568, unacked/lost 12, retrans 1/6",
+    "Linux v5.19 source (tcp_output.c, tcp_timer.c, tcp_input.c, tcp.h): the RTO is srtt plus rttvar, with rttvar at least 200 ms; tcp_send_loss_probe restarts the RTO timer from the probe; the TLP timeout is 2*srtt + TCP_TIMEOUT_MIN, which gives 32 ms at HZ=250 (the page hedges on the exact value)",
+    "Linux v5.19 tcp_mtu_probing black-hole timing: retrans_stamp is the time of the first retransmission (set after tcp_transmit_skb refreshes the skb timestamp); tcp_model_timeout(3) = 3000 ms; detection fires at the 5th retransmission, 6.36 s after the first retransmission and 6.617 s after the first data segment, as the page says; MSS then goes to about tcp_base_mss",
+    "tcp_base_mss: TCP_BASE_MSS is 1024 in source and the local sysctl reads 1024, while tcp(7) on this machine says 512; tcp_mtu_probing 0/1/2 and default 0; tcp_retries1 = 3 (ip-sysctl.rst, tcp(7))",
+    "iptables-extensions(8) TCPMSS: --clamp-mss-to-pmtu is path MTU minus 40 for IPv4, and the 'connect then hang with no data' symptom text; ip-route(8): 'mtu lock' disables PMTUD and drops DF for IPv4",
+    "ran curl 7.81.0 against loopback servers (headers then a stall; a 2-byte body): the verbose output lines match Q1, including the timeout message and '{ [2 bytes data]'",
+    "ping statistics and mtr layout recomputed by the page checks and re-read; iputils 'Frag needed and DF set (mtu = N)', 'local error: message too long, mtu=N' and '+3 errors' accounting checked from memory of the iputils 20211215 source",
+    "tunnel overheads (IPIP 20, GRE 24, VXLAN 50, WireGuard 60/80, default MTU 1420) and the ICMPv6 Packet Too Big / 1280 / RFC 4890 claims; the nstat counter names exist on this kernel",
+    "read each step: every question is answerable from what was revealed before it, and no step gives away a later answer",
+    "origin line checked against the process page (network-debugging role play for performance and infrastructure roles; listed in a performance engineering candidate's portal): accurate, does not claim a real question, no paths; frequency low kept"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "PASS normally and with --hash-seeds. Both edits change only the text around two captures (a tcpdump flag and a sentence). No captured line or checked number changed, so no check was added."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

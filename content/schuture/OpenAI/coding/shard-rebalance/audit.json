@@ -1,0 +1,46 @@
+{
+  "id": "OpenAI/coding/shard-rebalance",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "题目 第 5 步（填补空洞）",
+      "problem_zh": "并列时没说用哪个起点来比较：步骤 4 得到的起点，还是填补之后的起点。",
+      "action": "fixed",
+      "change_zh": "写明用步骤 4 得到的起点最小的，再比 id。英文版同样修改。"
+    },
+    {
+      "where": "题目 最后一句（返回顺序）",
+      "problem_zh": "没说排序是在填补空洞之前还是之后。",
+      "action": "fixed",
+      "change_zh": "写明按最终的 (start, end, id) 排序返回。英文版同样修改。"
+    },
+    {
+      "where": "题目 要求列表（规模）",
+      "problem_zh": "测试里有一个计时的 locate 测试，题面却没给规模。",
+      "action": "fixed",
+      "change_zh": "补一条：同时存在的分片最多 20 个；一次测试会调用 locate 最多约 11 万次，只有几秒 CPU 时间。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages); code blocks identical in both files",
+    "own brute force of Part 1 written from the five statement steps (coverage counter, key-by-key hole scan): 60000 random inputs (0-10 shards, limit 1-5, negative and large offsets, many ties, identical ranges, containment) all agree with the reference; coverage stays in [1, limit] over the whole envelope, start/end never move backwards, input not mutated, output sorted",
+    "statement example replayed from a shuffled input; the example's three comments re-derived by hand from the rule",
+    "the four test-case kinds the statement asks for (hole, containment, identical ranges, limit = 1) run by hand; rebalance is idempotent on its own output (3000 trials)",
+    "timed 20k/40k/80k shards with keys up to 1e9: near-linear, no dependence on key magnitude",
+    "Part 2: locate matches an independent ring walk for random id sets, any add order and add/remove history; identical results under three PYTHONHASHSEED values; ValueError/LookupError cases",
+    "Part 2: every key moved by add goes to the new shard, keys moved by remove are exactly the removed shard's (N = 3, 12, 20); quoted numbers reproduce (8.1% / 8.4%, 3.55x, 11%); exact arc-length spread over 60 random 20-shard rings averages 8.3% at 150 vnodes, matching 1/sqrt(150)",
+    "follow-up claim about adding one shard to a rebalanced output: 60000 further random trials (new shard before, inside and after the envelope), 0 violations",
+    "compared Chinese and English text paragraph by paragraph",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

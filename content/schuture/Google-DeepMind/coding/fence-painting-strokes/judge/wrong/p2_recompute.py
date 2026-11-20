@@ -1,0 +1,64 @@
+# expect: TLE
+# Part 2 stores the heights and recomputes Part 1's sum in strokes(): right, but O(n) per call.
+
+def min_horizontal_strokes(h: list[int]) -> int:
+    total = 0
+    previous = 0
+    for height in h:
+        total += max(0, height - previous)   # NOTE: never negative -- a shrink starts no new run
+        previous = height
+    return total
+
+
+class Fence:
+    def __init__(self, h: list[int]) -> None:
+        self._h = list(h)
+
+    def set_height(self, i: int, new_height: int) -> None:
+        self._h[i] = new_height
+
+    def strokes(self) -> int:
+        return min_horizontal_strokes(self._h)
+
+
+def _runs_above(h: list[int], lo: int, hi: int, floor: int) -> list[tuple[int, int]]:
+    """Maximal contiguous sub-ranges of [lo, hi] where every plank's height exceeds floor."""
+    runs = []
+    i = lo
+    while i <= hi:
+        if h[i] <= floor:
+            i += 1
+            continue
+        j = i
+        while j <= hi and h[j] > floor:
+            j += 1
+        runs.append((i, j - 1))
+        i = j
+    return runs
+
+
+def _solve_range(h: list[int], l: int, r: int, base: int) -> int:
+    """Minimum strokes to paint cells (i, y) with l <= i <= r and base <= y < h[i]."""
+    answer: dict[tuple[int, int], int] = {}
+    info: dict[tuple[int, int], tuple[int, list[tuple[int, int]]]] = {}
+    stack = [(l, r, base, False)]   # NOTE: explicit stack -- a sorted array needs depth O(n), past Python's limit
+    while stack:
+        lo, hi, b, expanded = stack.pop()
+        if not expanded:
+            m = min(h[lo:hi + 1])
+            children = _runs_above(h, lo, hi, m)
+            info[(lo, hi)] = (m, children)
+            stack.append((lo, hi, b, True))
+            for cl, cr in children:
+                stack.append((cl, cr, m, False))
+        else:
+            m, children = info[(lo, hi)]
+            horizontal = (m - b) + sum(answer[child] for child in children)
+            vertical = hi - lo + 1
+            answer[(lo, hi)] = min(vertical, horizontal)   # NOTE: (lo, hi) is a safe key alone -- ranges never collide
+    return answer[(l, r)]
+
+
+def min_strokes(h: list[int]) -> int:
+    n = len(h)
+    return sum(_solve_range(h, lo, hi, 0) for lo, hi in _runs_above(h, 0, n - 1, 0))

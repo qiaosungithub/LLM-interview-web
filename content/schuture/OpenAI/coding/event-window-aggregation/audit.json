@@ -1,0 +1,21 @@
+{
+  "id": "OpenAI/coding/event-window-aggregation",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages, also under PYTHONHASHSEED=0 and 1); page is byte-identical to the original; code blocks match across languages (the three example blocks differ only in translated comments, which say the same thing)",
+    "worked the three statement examples by hand from the stated rules",
+    "Part 1: 3,000 random in-order streams (window jumps of 0, exactly window, window+1, 3*window) against a count written straight from the statement; after every call the tracker's key set equals the set of sessions with an event in the window",
+    "Part 2: 3,000 random streams against the literal definition (a ping in the window with no later-recorded close for that session), same-timestamp ping/close in both call orders included; no per-user entry when the count is 0, per-session state only for sessions with an event in the window",
+    "Part 3: 6,000 random runs with records ahead of the clock, late inside the window, exactly at C - window and beyond it (17,878 of those), against rule 2 applied to every event ever fed, dropped ones included; after every call the remembered sessions are exactly those whose latest timestamp is within window of C, and the heap holds no other session",
+    "rule 3's claim that a record older than C - window cannot change any later answer: argued and confirmed by the comparison above",
+    "follow-ups: a ring of window+1 buckets in place of the heap gives identical answers and state on 4,000 runs; a now below _clock is answered as of _clock",
+    "Part 4 answers 1 and 3: trackers partitioned by user_id, and by (user_id, chat_id) with summed counts, match one global tracker on 1,500 runs",
+    "Part 4 answer 4: after a crash, replaying only records that arrived in the last window reproduces every later answer (4,000 runs); one unit less is wrong on 353 of them",
+    "time per call flat from 50,000 to 800,000 calls for all three classes"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass; no edits made."},
+  "env_evidence": [],
+  "confidence": "high"
+}

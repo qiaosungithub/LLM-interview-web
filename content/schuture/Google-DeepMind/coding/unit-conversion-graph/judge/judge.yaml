@@ -1,0 +1,2 @@
+timeout: 60  # 27 cases: 26 x 2 s + 3 s CPU, + 5 s
+case_cpu: 2

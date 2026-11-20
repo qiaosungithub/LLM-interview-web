@@ -1,0 +1,40 @@
+{
+  "id": "Anthropic/coding/qkv-attention-einsum",
+  "verdict": "fixed",
+  "summary_zh": "题目、三个例子和参考解答都是对的。只改了 Part 3 里解释 `//` 这个 bug 的一句话：原文说它是“先把 QK^T 向下取整再除”，实际上 `//` 是先除以 √d、再对结果向下取整。",
+  "issues": [
+    {
+      "where": "参考解答 Part 3「得分定标」",
+      "problem_zh": "原文说 `//` 把 QK^T 的每个元素先向下取整（英文版写的是“在相除之前取整”）。实际 a // b 等于 floor(a / b)，是先除后取整：例如 3.9 // 2 = 1（先取整再除会得到 1.5），-3 // 2 = -2。原文后半句“最多砍掉 1”也只有按先除后取整才说得通。",
+      "action": "fixed",
+      "change_zh": "改为“`//` 是先除、再向下取整：每个定标后的得分 QK^T/√d 都被取整成不大于它的整数”，其余不变。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有验证 `//` 的取整顺序。",
+      "action": "fixed",
+      "change_zh": "加了三行检查：[3.9, -3.0] // 2 等于 [1, -2]，并且不等于“先取整再除”的结果。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "compared scaled_dot_product_attention with an independent pure-Python index-loop implementation on 3000 random inputs (random / all-False / all-True / no mask, d_v != d, score scales 1, 30, 1e3) with RuntimeWarnings turned into errors: max abs diff 2.7e-14, fully masked rows give exact zeros and no nan",
+    "compared multi_head_self_attention with pure-Python loops built from the statement's column rule (head h, feature e = column h*d_head+e) on 400 random inputs: max relative diff 7e-15",
+    "traced every intermediate shape of Part 2 and checked each einsum string against the equivalent transpose / matmul",
+    "compared the fixed Part 3 block with pure-Python loops on 400 random inputs: max abs diff 3.4e-14",
+    "recomputed all three worked examples by hand and with the loops",
+    "ran the buggy Part 3 code exactly as printed in the statement: raises the ValueError quoted in the table; the table's 1.32 / 0.56 / 0.17 are asserted by the page",
+    "Var(q.k) = d_head derivation re-derived; the page's simulation check passes",
+    "benchmarked einsum vs optimize=True vs @ (numpy 2.4.6, 1 and 2 threads): default einsum 5-9x slower, optimize=True closes the gap",
+    "confirmed torch SDPA bool attn_mask means True = may attend, float16(-1e9) = -inf, an all -1e9 row gives a uniform softmax",
+    "confirmed a // s == floor(a / s) and != floor(a) / s on 100k random floats",
+    "code fences identical in README.md and README.zh.md"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass before and after. The added check encodes floor-after-divide; the old sentence (floor before dividing) is contradicted by it."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

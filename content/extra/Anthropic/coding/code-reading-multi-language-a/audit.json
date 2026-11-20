@@ -1,0 +1,42 @@
+{
+  "id": "Anthropic/coding/code-reading-multi-language-a",
+  "verdict": "fixed",
+  "summary_zh": "三段代码的输出、每个错误、修好的版本和问题清单里的数字都重新编译运行核对过，全部属实。只改了一处：题目说 Node.js 14 或更新都行，但参考解答里“不传第二个参数”那条追问的答案（进程报 TypeError、退出码 1）要 Node 15 起才成立，Node 14 只打印一条警告、退出码是 0，所以把题目的版本要求改成 16 或更新。",
+  "issues": [
+    {
+      "where": "题目 运行环境（影响参考解答 Part 2 的第一个追问）",
+      "problem_zh": "题目写“JavaScript 用 Node.js（14 或更新）”。参考解答说调用 fetchAll([1, 2, 3]) 时 Node 打印 TypeError、进程以退出码 1 结束。Node 的官方文档写明，未处理的 Promise 拒绝从 v15.0.0 起才默认当成未捕获异常，之前只发一条警告。用机器上自带的 Node 12 实跑：只打印 UnhandledPromiseRejectionWarning，退出码 0。按 Node 14 作答的人会给出和参考解答不同、但正确的答案。",
+      "action": "fixed",
+      "change_zh": "题目的运行环境改为“Node.js（16 或更新）”，和页面验证代码本来的版本门槛（低于 16 就跳过）一致。其余内容没有改。"
+    },
+    {
+      "where": "追问 5（SQL 换数据库）",
+      "problem_zh": "这一条说改法里尽量用不依赖各家差异的写法，但修好的查询里 ORDER BY avg_loss IS NULL 在表达式里用了输出列的别名。PostgreSQL 文档写明输出列名只能单独出现在 ORDER BY 里，不能放进表达式，所以这条查询原样搬到 PostgreSQL 会报错。页面没有说这条查询能在 PostgreSQL 上跑，题目也限定了 SQLite。",
+      "action": "flag",
+      "change_zh": "没有改。页面没说错话，只是少提了一处方言差异；要不要补一句由负责人决定。没有在 PostgreSQL 上实际运行。"
+    }
+  ],
+  "checked": [
+    "ran page before and after the edit, plain and with --hash-seeds (PASS); ran the check block directly and confirmed none of the three parts was skipped (gcc 11.4.0 x86_64, node 24.22.2, SQLite 3.53.1)",
+    "confirmed every displayed c/js/sql fence is byte-identical to the string the check block runs",
+    "own script: compiled the buggy and fixed C at -O0/-O2/-O3 with default, -fsigned-char and -funsigned-char: buggy prints mean=14 bright=0% contrast=146 (signed, the x86-64 default) and mean=100 bright=0% contrast=240 (unsigned); fixed prints mean=100 bright=33% contrast=240 everywhere; no warnings even with -Wconversion -Wsign-conversion -Wpedantic",
+    "own driver reading raw frames, built with -O1 -fsanitize=address,undefined: 8K of 127 -> signed overflow report then mean=-2; 8K of 255 with signed char -> mean=-1, no report; with unsigned char 4K white fits (mean=255) and 8K white overflows; empty frame -> division by zero report; fixed version clean on all of these; buggy sample under sanitizers produces no report",
+    "empty frame in plain builds: -O0 SIGFPE, -O2 prints all zeros (as stated); -O3 dies with SIGILL, which only strengthens the page's point",
+    "recomputed 2147483647/255 = 8421504.5, 3840*2160*255 = 2115072000, 7680*4320 = 33177600, signed sum 88 -> 14, contrast 146",
+    "ran buggy and fixed JS 5 and 3 times on node 24 (identical output each time); ran the no-opts variant (TypeError, exit 1 on node 24; warning, exit 0 on node 12); my own 'fix only the waiting' variant gives [ 'thumb-2', 'thumb-1' ]; a sequential for..of version gives [ 'thumb-1', 'thumb-2', null ] in about 60 ms",
+    "reasoned through Node timer ordering under load: expired timers fire in expiry order with microtasks between callbacks, so the event order is stable even when the machine is slow; the page's own timing asserts are lower bounds only",
+    "SQL: re-ran buggy and fixed queries with and without the NULL row, recomputed the intended report from the raw rows in plain Python, and confirmed NULL-first ordering and integer division on both SQLite 3.53.1 and 3.37.2",
+    "spot-checked outside facts against docs: Node CLI docs (unhandled-rejections default changed to throw in v15.0.0), PostgreSQL ORDER BY docs (NULLS LAST default for ASC; output alias cannot be used in an expression), MySQL docs (3/5 returns 0.60, DIV truncates)",
+    "checked statement for hints and ambiguity: platform (gcc x86-64, 32-bit int), timer assumption and SQLite are all stated, so the asked-for outputs are definite; meta.yaml origin matches the interviewing.io guide's sentence about reviewing code in different languages in the hiring-manager call"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "PASS before and after, plain and PYTHONHASHSEED=0/1. No check was added: the change only narrows the stated Node version to the floor the existing check already uses (it skips the JS part below Node 16). Each subprocess has a 120 s hang guard, which is not a timing assertion."
+  },
+  "env_evidence": [
+    "面试官在共享文档里依次贴出三段代码，每段换一种语言，每段大约十分钟。",
+    "代码不能运行，你要一边读一边讲出来。"
+  ],
+  "confidence": "high"
+}

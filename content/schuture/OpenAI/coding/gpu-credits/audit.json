@@ -1,0 +1,21 @@
+{
+  "id": "OpenAI/coding/gpu-credits",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "recomputed both statement examples by hand and with my own brute force",
+    "wrote an independent brute force (no heap, one grant at a time) and compared all three classes against it on 4000 random scenarios: in-order calls with queries in between, arbitrary-order calls with interleaved and repeated queries, ties in expiry time, expiration 0, amounts up to 1e9",
+    "Part 3 bound: timed get_balance under the pattern the statement names (non-decreasing queries, events arriving ahead of them) at U,Q up to 2e5 - total time grows linearly (0.04 s at U=Q=2e4)",
+    "reproduced the measured claim: 2000 out-of-order calls then 20000 sorted queries, Part 3 about 2000x faster than Part 2",
+    "compared Chinese and English text; code blocks identical"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; nothing was changed."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

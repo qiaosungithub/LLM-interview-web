@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 45       # 34 cases x 1 s CPU + 2 cases x 2 s, plus margin
+case_cpu: 1       # CPU seconds per case
+note: "Part 2 只评测 dfs_order（应是迭代版本，要通过 10 万个节点的链）；递归版本不单独评测。"

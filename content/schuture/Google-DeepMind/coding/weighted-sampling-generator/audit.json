@@ -1,0 +1,25 @@
+{
+  "id": "Google-DeepMind/coding/weighted-sampling-generator",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "Part 1: iter_ints against a rule restated from the statement on 20000 random inputs (None, 0, negatives, huge ints, int subclass, bool/float/str/bytes/list/complex/Fraction/NaN/object) passed as list, tuple, generator and iterator; yielded values, error index in the message, exact laziness (pull count after every next(), nothing read past the bad element), input unchanged; infinite input with None interleaved",
+    "Part 2: weighted_sampler's u -> value mapping against an exact-Fraction inverse CDF with a stub rng on 136084 (weights, u) pairs over 20000 weight vectors (zeros at either end, equal, integer, 1e-300 and 1e300 scales, 24 orders of magnitude of range); u = 0, u = 1 - 2^-53 and u aimed at every prefix boundary never raise and never return a zero-weight value",
+    "validation: 11 invalid inputs (length mismatch, empty, negative, inf, -inf, NaN, all-zero, overflowing sum) raise ValueError at call time in both weighted_sampler and AliasSampler; 6 unusual valid inputs accepted; statement examples reproduced",
+    "empirical distribution, weighted_sampler: 36 weight vectors (n = 1 to 1000, zeros, dominant, Zipf, geometric, huge/tiny scales) x 400000 draws each, chi-square goodness of fit against weights/sum(weights): p-values look uniform (KS p = 0.44), zero-weight values drawn 0 times; the one small p-value (1e-4 on one vector) went to 0.41 at 10x the draws and to 0.07-0.97 over 12 fresh seeds x 1.5M draws",
+    "empirical distribution, AliasSampler.sample(): same 36 vectors x 400000 draws, min p 0.0027, KS p = 0.07; rechecked on 12 fresh seeds x 1.5M draws for the two lowest vectors (p 0.02-0.96); __iter__ path: 36 vectors x 100000 draws, min p 0.018",
+    "statement example [0.1, 0.1, 0.8]: 300 seeds x 40000 draws per sampler, fraction of p < 0.05 is 6.3% / 4.0%, KS vs uniform p = 0.11 / 0.81; a sampler off by 0.5 percentage points gives p = 1e-22 at 400000 draws",
+    "independence of successive draws: contingency test on (x_t, x_t+1) pairs, 80 seeds x 100000 pairs for three weight vectors and both samplers; p-values uniform (KS p 0.25-0.90)",
+    "AliasSampler table read exactly (Fractions) on 6000 weight vectors up to n = 3000: worst relative error 1e-11, 91219 zero-weight columns have probability exactly 0, every prob in [0, 1]",
+    "AliasSampler makes exactly one randrange and one random call per sample() and none in __init__; global random state untouched; same seed reproduces; __iter__ gives the same stream as repeated sample()",
+    "cost: alias build 0.04 ms / 0.29 ms / 34 ms / 346 ms for n = 10 / 1e3 / 1e5 / 1e6 (linear); alias draw 540-870 ns across the same n; prefix-sum draw 235 ns -> 1655 ns",
+    "follow-ups: Efraimidis-Spirakis ordered top-2 against successive weighted draws (5 runs x 300000 trials, p 0.03-0.60) and the size-k heap keeps the same items; random.choices source uses accumulate + bisect; numpy Generator.choice(p=...) reproduces cumsum + searchsorted(side='right') on the same uniform stream",
+    "not acted on: with a sub-normal total (all weights below about 2.2e-308, e.g. [5e-324]) rng.random() * total can round up to the total and weighted_sampler raises IndexError; never happens for a normal-range total (argued and tried on 200000 totals) -- float trivia, left alone",
+    "compared Chinese and English prose; all python blocks identical in both"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": ""},
+  "env_evidence": [],
+  "confidence": "high"
+}

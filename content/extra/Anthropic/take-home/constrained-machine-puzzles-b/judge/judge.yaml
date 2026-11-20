@@ -1,0 +1,5 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+special: puzzle
+timeout: 90       # seconds for the whole run: 27 cases at 2 s and 3 full-domain cases at 10 s, plus 6 (in practice a few seconds)
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "用题目给的检查器（parse / run）运行 q1 … q4。Part 1、2、4 的检查器测试已经是全部输入，这里先用小数对和边界值给出好读的报错，再跑全部测试；Part 3 另外按题目写明的输入范围做了穷举和随机测试。每道题的指令数显示在它的第一个样例下面。"

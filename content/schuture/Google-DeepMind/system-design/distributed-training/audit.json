@@ -1,0 +1,42 @@
+{
+  "id": "Google-DeepMind/system-design/distributed-training",
+  "verdict": "fixed",
+  "summary_zh": "所有数字（算力、用时、显存、通信量、检查点间隔、故障次数）重算后都对得上。只补了一处前后不一致：替换掉队主机时，原文说只从别的副本拷 bf16 权重，但按本页自己的分片方案，这台主机名下那 1/32 的优化器状态别的副本都没有，现在写明要从掉队者本身拷过来；另外架构图里“每 T_opt 步”改成了“每隔 T_opt、约 45 分钟”。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 深入话题 (b) 替换掉队者",
+      "problem_zh": "原文说替补主机只需从同一 (tp_rank, pp_stage) 位置的其他 31 个数据并行副本拷贝当前 bf16 权重，“实际上什么都没有丢失”。但本页前面的设计是把 fp32 主权重和两个 Adam 矩按数据并行 rank 分片，每块加速器只存自己名下的 1/32（约 0.41 GB），检查点清单也写明这部分“按数据并行 rank 各不相同”——这一片别的副本手里没有，只拷 bf16 权重的话替补主机无法继续做优化器更新。",
+      "action": "fixed",
+      "change_zh": "补了一句：这个位置自己名下那 1/32 的优化器状态切片（约 0.41 GB）要从仍然存活的掉队者本身拷过来；拷贝量相应写成“bf16 权重加上这一小片优化器状态”，合计约 2.6 GB、按 50 GB/s 约 52 毫秒，原文“几个 GB、几十毫秒”的结论不变。"
+    },
+    {
+      "where": "参考解答 架构图",
+      "problem_zh": "图里写“检查点写入（每 T_opt 步一次）”，但正文里 T_opt 是时间（约 2,717 秒、45 分钟，折合约 530 步），不是步数。",
+      "action": "fixed",
+      "change_zh": "改为“每隔 T_opt、约 45 分钟一次”。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit; code blocks identical in README.md and README.zh.md and unchanged",
+    "recomputed in my own script: C=5.88e23, peak 8.192e17, T=1.794e6 s (20.8 d, 498 h), 350,000 steps, 5.13 s/step, 12Ld^2=64.4e9 (8% under 70e9)",
+    "recomputed memory plan: 16 B/param -> 1.12 TB, ceil(1120/96)=12, TP-only 140 GB, 64-way 17.5 GB, DP=32, optimiser 13.125 -> 0.41 GB, bf16 w+g 4.375 GB, <5 GB total, 64 MiB activation per sequence",
+    "recomputed ring reduce-scatter + all-gather: 4.24 GB, 85 ms, 1.65% of a step",
+    "recomputed checkpoint 840/980 GB, 42/49 s; host MTBF 6,250 h, cluster MTBF 24.4 h; Young-Daly 2,717 s; 1.55% + 1.55% = 3.1%; about 20 failures",
+    "independent checkpoint simulation (different model: failures can also hit during the write) over the same 11 interval factors -- minimum at factor 1.0, 3.13% overhead; exact renewal-model optimum 2,690 s / 3.16%",
+    "read the architecture diagram edge by edge against the prose and the data model",
+    "compared Chinese and English text paragraph by paragraph"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the edits; no code was changed."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

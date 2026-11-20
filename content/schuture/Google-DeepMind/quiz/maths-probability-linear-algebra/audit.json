@@ -1,0 +1,50 @@
+{
+  "id": "Google-DeepMind/quiz/maths-probability-linear-algebra",
+  "verdict": "fixed",
+  "summary_zh": "12 道题的数值答案全部重算无误。改了三处解答里的说法：Q12 把 1/λ_max 说成“不发散的最大步长”是错的（上限是 2/λ_max）；Q9 的 PCA 把除数写成 n−1，按题目记号应是行数 m−1，中心化也写清楚是“每列减去列均值”；Q7 解答里凭空出现的“峰在 ±3”改成明确举的一个例子。",
+  "issues": [
+    {
+      "where": "Q12 answer",
+      "problem_zh": "原文说“η = 1/λ_max 已经是沿最陡方向不发散的最大步长”。这不对：步长只要小于 2/λ_max 都收敛（例如特征值 1、3、8、25 时，步长 1.5/λ_max 的最慢收缩因子是 0.94，比 1/λ_max 的 0.96 还好）；超过 2/λ_max 才发散。",
+      "action": "fixed",
+      "change_zh": "改为：更小的步长更慢，更大的步长也帮不上多少——超过 2/λ_max 就发散，最优固定步长 2/(λ_min+λ_max) 也只把最慢因子改善到 (κ−1)/(κ+1)，仍接近 1。验证代码里加了一条对应的检查。"
+    },
+    {
+      "where": "Q9 answer",
+      "problem_zh": "题目设 X 是 m×n、每行一个观测，解答却写协方差是 X_c^T X_c 除以 (n−1)、解释方差是 σ_i²/(n−1)；按题目记号 n 是列数（特征数），应除以行数减一。另外中文“减去按行的均值”容易读成每行减自己的均值，而正确做法是每列减去列均值。",
+      "action": "fixed",
+      "change_zh": "两处 (n−1) 改为 (m−1)；中心化的说明改为“每一列减去该列在 m 行观测上的均值”。"
+    },
+    {
+      "where": "Q7 answer",
+      "problem_zh": "题目只说“两个峰分离良好的高斯混合”，解答却直接写“由于 p 关于 ±3 对称、每个分量方差为 1”，这些数字题目里没有给；中文“关于 ±3 对称”本身也说不通。",
+      "action": "fixed",
+      "change_zh": "改为“举个具体例子：取 p = ½N(−3,1) + ½N(3,1)”，后面的结论 N(0,10) 不变。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "Q1 exact enumeration over urn and ordered ball pairs; Q4 exact fractions",
+    "Q2 Conway leading-number formula plus a plain loop simulation (200k runs each)",
+    "Q3 symbolic integration in sympy for general n",
+    "Q5 symbolic expectation of the MLE variance for n=4",
+    "Q6 coordinate descent on the Laplace-prior negative log posterior vs lasso with lambda=2*sigma^2/b (identical; lambda=sigma^2/b differs); ridge closed form has zero posterior gradient",
+    "Q7 both Bernoulli KL values; mixture mean/variance by quadrature; forward KL minimum at N(0,10) and reverse-KL local optimum near one mode by quadrature + Nelder-Mead",
+    "Q8 recomputed 9604 and the exact binomial coverage at n=9604, p=0.5 (0.951)",
+    "Q9 PCA explained variance vs np.cov eigenvalues on a 50x3 matrix: rows-1 matches, columns-1 does not; per-row centring gives a different answer; defective 2x2 example",
+    "Q11 all three gradients against torch autograd",
+    "Q12 per-direction factors for steps 1/lmax, 1.5/lmax, 1.99/lmax, 2.01/lmax and 2/(lmin+lmax)",
+    "Q10 read the proof; numbering Q1-Q12 lines up one to one in both languages; code blocks identical in both files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. Added one Q12 check (steps below 2/lambda_max still contract; best fixed step gives (kappa-1)/(kappa+1)); it asserts the opposite of the sentence that was removed."
+  },
+  "env_evidence": [
+    "Quiz · oral, with derivations",
+    "12 questions / 45–60 min",
+    "Confirm the convention for $\\log$ (natural, used throughout) and, where a question asks for a derivation, whether a standard identity may be quoted or should be shown from first principles; every derivation below is given in full regardless."
+  ],
+  "confidence": "high"
+}

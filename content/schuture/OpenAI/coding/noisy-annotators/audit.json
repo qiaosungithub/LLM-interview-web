@@ -1,0 +1,41 @@
+{
+  "id": "OpenAI/coding/noisy-annotators",
+  "verdict": "fixed",
+  "summary_zh": "Part 3 开头那句动机写错了：原文说丢掉一个标注者会把“获胜标签依赖他那一票”的样本都丢掉，实际上被丢掉的只是“只有被标记的标注者标过”的样本，其余样本只是标签可能改变。已改正这一句，代码和数字都没问题。",
+  "issues": [
+    {
+      "where": "题目 Part 3 第一句",
+      "problem_zh": "原文：“丢掉一个标注者，也会丢掉每一个其获胜标签依赖于该标注者投票的样本”。这和题目自己的例子矛盾：小矩阵最后一个样本的获胜标签正是靠标注者 3 那一票，丢掉标注者 3 后它并没有被丢，只是标签从 1 变成 0。在 seed=7 的数据上，过滤后被丢掉的是 46 个样本（它们只被标注者 4、5 标过），另有 334 个样本标签变了但仍然保留。",
+      "action": "fixed",
+      "change_zh": "改为“丢掉被标记的标注者，也会连带丢掉那些只有他们标注过的样本”，与参考解答 Part 2 的说法一致。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只断言过滤后样本数变少，没有检查到底丢的是哪些样本。",
+      "action": "fixed",
+      "change_zh": "在 10 个种子的循环里加了一条检查：被丢掉的行恰好是“只有被标记的标注者标过”的行，并且确实存在标签改变但仍保留的行。"
+    },
+    {
+      "where": "参考解答 Part 3 末尾",
+      "problem_zh": "原文说 seed=7 时加权投票的测试准确率 0.88 略高于过滤的 0.86，这个数字本身没错；但在 seed 0–9 上两者平均都是 0.86 左右，10 个种子里加权只有 5 个不低于过滤，谈不上稳定更准。",
+      "action": "flag",
+      "change_zh": "没有改：原文只针对 seed=7 下结论，数字属实。读的时候记住加权的好处是“不丢样本”，准确率和过滤基本持平即可。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "hand-computed the toy example: reliability [4/7, 4/6, 4/7, 2/7], flag only annotator 3, full-matrix labels, last label 1->0 after dropping annotator 3, weights [0.29, 0.69, 0.29, 0]",
+    "pure-Python brute force for aggregate_labels and annotator_reliability vs the reference on 3000 random small matrices (all-missing rows, zero weights, exact ties)",
+    "reproduced every seed=7 number on the page: reliability, weights, accuracies 0.724 / 0.862 / 0.877, 1954 of 2000 rows kept",
+    "re-derived the log-odds weight w_j = log(r_j (K-1) / (1-r_j)) from the noisy-channel likelihood",
+    "seeds 0-9: flagged set is [4, 5] with either population or sample standard deviation; counted dropped rows vs kept rows whose label changed (46 vs 334 at seed 7)",
+    "compared code blocks between README.md and README.zh.md (identical)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. The added check tests the corrected sentence (dropped rows == rows labeled only by flagged annotators, and some kept rows change label); the reference code itself was not changed, so the check also passes on the old code."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

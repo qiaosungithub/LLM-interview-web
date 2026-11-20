@@ -1,0 +1,19 @@
+{
+  "id": "Anthropic/coding/reservation-service-concurrency",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page, and with --hash-seeds (PYTHONHASHSEED 0 and 1): all pass",
+    "worked the Part 1 and Part 3 example sequences by hand from the statement's rules and confirmed the reference returns them",
+    "single-caller compare of AtomicReservationService against my own unit-slot model on 400 random histories x 120 ops, including reserve_all with repeated resources, self-overlapping legs, empty requests, unknown resources and empty intervals (same exception type, nothing booked)",
+    "forced the requirement-3 interleaving (one cancel held inside its critical section, a second cancel of the same id waiting): the loser returns False and its next reserve of the same slot succeeds, for both locked classes",
+    "my own 16-thread storm with random multi-resource reserve_all in random resource order, cancels and queries, switch interval 1e-5: no deadlock, ids exactly 1..K, no id cancelled twice, final calendars equal issued minus cancelled, query snapshots never overlap",
+    "reviewed the page's own race tests: the barrier timeouts cannot fill by speed alone, so nothing depends on how fast the machine is",
+    "checked the follow-up facts: 5 ms default switch interval, free-threaded build optional since 3.13, PostgreSQL exclusion constraint syntax and btree_gist, FOR UPDATE not blocking new inserts, SERIALIZABLE failing with 40001 while REPEATABLE READ allows the write skew",
+    "checked the origin line against the Reddit post: an anonymous, self-described L4 offer post lists 'Design and implement a reservation service with concurrency constraints' under the virtual onsite coding round, nothing more"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "Page passes as written, also under PYTHONHASHSEED 0 and 1. No edits."},
+  "env_evidence": [],
+  "confidence": "high"
+}

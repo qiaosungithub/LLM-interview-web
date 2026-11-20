@@ -1,0 +1,43 @@
+{
+  "id": "Anthropic/safety/mission-and-governance",
+  "verdict": "fixed",
+  "summary_zh": "治理部分有几处已经过时：长期利益信托现在是四名受托人，不是五名；公司页面上的董事已经没有 Jay Kreps，所以“信托任命的董事占多数”只能说是 2026 年 4 月的官方说法；OpenAI 的营利部门 2025 年 10 月也改成了公益公司。这几处都已改正。",
+  "issues": [
+    {
+      "where": "笔记·长期利益信托；Q3 解答",
+      "problem_zh": "写的是信托“由五名受托人组成”，用的是现在时。五名是 2023 年公布时的人数；信托页面的脚注写明，截至 2026 年 10 月受托人是四位（Neil Buddy Shah、Richard Fontaine、Ben Bernanke、Christopher Stubbs），之前有五人先后卸任。",
+      "action": "fixed",
+      "change_zh": "改成“公布时五名，截至 2026 年 10 月是四位”，并写出四位的名字；Q3 解答同步修改。"
+    },
+    {
+      "where": "笔记·2026 年 4 月 14 日；Q3、Q4 解答",
+      "problem_zh": "按 4 月公告列了七位董事（含 Jay Kreps），Q4 还说“信托任命的董事已经真的占了多数”。但公司页面现在只列六位董事，没有 Kreps；Kreps 是信托任命的，他离开后是否仍是多数，官方没有说明。",
+      "action": "fixed",
+      "change_zh": "补一句“公司页面现在只有六位董事，Kreps 已不在名单上，是否仍占多数官方没有说明”；Q3、Q4 改成“2026 年 4 月官方宣布占多数，之后名单有变化”。"
+    },
+    {
+      "where": "笔记·结构对比",
+      "problem_zh": "说 OpenAI “有它自己的非营利控制结构”，没有提到它的营利部门 2025 年 10 月已改成公益公司（OpenAI Group PBC），容易让人以为只有 Anthropic 是公益公司。",
+      "action": "fixed",
+      "change_zh": "改成：OpenAI 2025 年 10 月重组后营利部门也是公益公司，但由非营利的 OpenAI Foundation 控制并任命董事。这一点依据的是新闻报道。"
+    },
+    {
+      "where": "参考解答·出处与核对情况",
+      "problem_zh": "写着“受托人现在具体是哪五位也没有核对”，人数本身就过时了。",
+      "action": "fixed",
+      "change_zh": "改为注明现任受托人和董事名单的出处，并说明 Kreps 离开的时间、Liddell 是否由信托任命都查不到。"
+    }
+  ],
+  "checked": [
+    "verified every English quote against the constitution, the company page, Core Views on AI Safety (2023-03-08), the LTBT post (2023-09-19) and the Narasimhan announcement (2026-04-14)",
+    "compared the current board and trustee lists on anthropic.com/company and the LTBT page footnote (as of October 2026)",
+    "checked LTBT appointment announcements for Jay Kreps and Reed Hastings, and the Chris Liddell announcement",
+    "confirmed the OpenAI Group PBC recapitalization (2025-10-28) from news coverage; openai.com returned 403",
+    "generic search confirming the early-2026 Pentagon contract dispute exists; the page already marks it as media-reported",
+    "checked the origin and frequency lines against the Anthropic process page (HR screen and culture round repeatedly ask why Anthropic and what AI safety means)",
+    "ran build.py --check"
+  ],
+  "code_run": {"ran": false, "passed": null, "notes": "no runnable code on this page"},
+  "env_evidence": [],
+  "confidence": "medium"
+}

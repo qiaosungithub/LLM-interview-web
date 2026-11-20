@@ -1,0 +1,29 @@
+{
+  "id": "OpenAI/system-design/url-shortener",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md and README.md in full and compared them paragraph by paragraph (same figures; the only differences are unit wording such as 4,330 万 vs 43.3 million; code block identical; mermaid edges identical)",
+    "ran page four times (1 block, about 10 s, both languages pass every time; the thread-race negative control is not flaky)",
+    "recomputed every estimate in my own script (tools/out/scratch/b21/t3_url.py): n = 2.19e9 codes, 62^6 = 5.68e10 (3.9% full), 62^7 = 3.52e12 (0.062% full), expected retries R = 43.3M exact vs 42.2M approximate at k = 6 and 681,000 at k = 7 (exact value from digamma at 40 digits), 1 insert in 1,608 retried at year 5, 681,000 colliding pairs for the hash scheme, 7e-21 for a 128-bit hash, 167 + 31 bytes -> 297 bytes on disk, 650 GB per copy, 1.95 TB at 3x, 5 shards / 15 nodes, 1,389 and 6,944 redirects/s, under 70 creates/s",
+    "recomputed the cache figures with numpy: top 1M of 5M Zipf(1.1) codes draw 95.6%, 126 MB, 68M entries per 8 GiB, TTL hit rate 71.3% at 120 s and 95.3% at 24 h, about 2,000 and 330 miss reads/s at peak, 2.3M distinct codes per region per day (284 MB), 34,700 unflushed clicks, 1,389 increments/s per shard leader",
+    "validated the x/(1+x) TTL hit-rate model with a Monte Carlo TTL cache under Poisson arrivals (simulated 0.7506 vs model 0.7508)",
+    "checked HTTP claims against RFC 9110: 301 and 308 are heuristically cacheable, 302 and 307 are not; 307/308 only forbid changing the method; 410 Gone for retired codes",
+    "checked the mermaid diagram (write path and read path) against the walk-through and the tombstone / add-if-absent argument for deletes"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

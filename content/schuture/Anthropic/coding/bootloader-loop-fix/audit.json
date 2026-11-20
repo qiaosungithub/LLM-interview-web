@@ -1,0 +1,35 @@
+{
+  "id": "Anthropic/coding/bootloader-loop-fix",
+  "verdict": "fixed",
+  "summary_zh": "Part 2 说“只有翻转某一行才能让程序正常结束”，但题目自带的例子里翻转第 2 行和第 6 行都能正常结束，例子和题目自相矛盾。已把例子第 4 行从 jump +2 改成 jump -1，现在只有第 2 行能修好，答案仍是 (2, 13)；参考解法本身没有问题。",
+  "issues": [
+    {
+      "where": "题目 Part 1 / Part 2 的示例程序",
+      "problem_zh": "Part 2 保证“恰好一行翻转后能正常结束，改动其他任何一行都做不到”。但示例程序里除了第 2 行（得到 (2, 13)），把第 6 行的 jump -3 翻成 next 也能正常结束（0→1→2→3→4→6→7→8→结束，累加器 113），所以 (6, 113) 按题意同样是合法答案，例子违反了题目自己的前提。",
+      "action": "fixed",
+      "change_zh": "把示例第 4 行从 jump +2 改为 jump -1，Part 1 的执行过程相应少一步（pc=4 直接跳回 3）。Part 1 的结果 (False, 106, 3) 和 Part 2 的结果 (2, 13) 都不变，而且现在只有翻转第 2 行能让程序结束（翻转第 4 行会走到第 5、6 行再跳回第 3 行，仍是死循环）。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只验证了随机生成的程序修复唯一，没有验证题目里的示例。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：逐行翻转示例程序，断言能正常结束的只有第 2 行（改之前这条检查得到 [2, 6]，会失败）。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "enumerated every single flip of the worked example with an independent simulator: old example terminates for lines 2 and 6, new example only for line 2",
+    "exhaustive comparison of run_program against an independent simulator on all 6.57M programs with n <= 5 and values in -n..n",
+    "find_fix and find_fix_brute_force both equal the unique fix on all 646,401 looping unique-fix programs in that set and on 19,321 random ones with n <= 14",
+    "parse_program on 20 edge-case lines (missing sign, '+ 4', '+4.0', '++4', upper-case op, trailing '#', CRLF, line numbering across blank/comment lines)",
+    "new check fails on the old example and passes on the new one",
+    "checked the python blocks are identical in README.md and README.zh.md"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass after the change; the added uniqueness check fails with the original example ([2, 6])."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 70       # seconds for the whole run: covers an answer that times out on every case (32 cases x 2 s)
+case_cpu: 2       # CPU seconds per case
+note: "「get 是 O(1)」和「菱形里每个格子只重算一次」是用 120 层菱形链上的运行时间检查的：在 get 里重新求值，或按路径重算，都会超时。"

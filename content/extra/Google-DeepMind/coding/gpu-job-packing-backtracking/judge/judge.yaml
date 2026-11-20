@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 72      # seconds for the whole run: covers an answer that times out on every case (31 x 2, plus 10)
+case_cpu: 2       # CPU seconds per case
+note: "口头部分（为什么剪枝不会漏解、复杂度、追问）不评测。Part 2 的节点数只按题目要求在 A、B 上检查；其余输入只检查结果，以及 n = 14 的难输入能否在每组 2 秒 CPU 内跑完。"

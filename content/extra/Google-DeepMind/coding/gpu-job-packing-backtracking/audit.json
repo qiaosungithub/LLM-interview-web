@@ -1,0 +1,27 @@
+{
+  "id": "Google-DeepMind/coding/gpu-job-packing-backtracking",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "solved the statement cold before reading the reference: own Part 1 search written from the statement's description, own pruned search with on/off switches, own exact feasibility by subset DP (bins used, load of open bin) with binary search for the minimum peak",
+    "every statement example re-derived by hand and by my code; A and B sums, the A partition, and the 'nothing can fill the 21 next to 40' argument for B checked",
+    "node counts quoted in the statement and the Part 2 table reproduced with my own implementations: 66005 / 350105, 15491 / 13356, 13 / 1577, 13 / 16",
+    "C: my LPT gives 69, lower bound 61, subset-DP optimum 62; [3,3,2,2,2] LPT gives 7; n = 16 instance: 4 smallest sum to 4025, my search needs 3904649 nodes at cap 4024, wasted-space bound saves 73% ('about three quarters')",
+    "3000 random small inputs vs exhaustive enumeration (lexicographically smallest assign, feasibility, min peak) and 400 random inputs with n 8..14, k 1..7 vs the subset DP: all match",
+    "n = 14 speed requirement: 4 x 300 s random search with hill climbing plus 150 s on narrow-band near-equal sizes for k = 2..8; worst found was 57k nodes for pack_fast at cap = best - 1 and 212k nodes (0.16 s) for min_peak, so 'about one second' holds on everything tried (not a proof of the worst case)",
+    "statistics paragraph re-run on seeds 8, 1, 2, 3: infeasible median 438-964x, never worse; about 43% of those inputs are rejected by the O(n) total check, and the median over the rest is still 111-219x; feasible median 3.8-7.1x with 6-12% of inputs getting worse. Wording holds",
+    "memoisation follow-up: [5]*14, k = 4, cap = 19 gives 2035 -> 61 with my own memo version; on distinct sizes the median reduction is 1.00x, as the page says",
+    "Stirling bound: 934120 recounted by enumerating restricted growth strings; sum of 4^d = 22369621; 4^14 = 2.7e8; injectivity argument for the bound re-checked by hand",
+    "proofs re-read: lexicographic order of Part 1, mirror-swap argument for equal-load symmetry, '>= best' bound, early stop at the lower bound, wasted-space bound (global smallest job is a safe under-estimate)",
+    "page does not claim the problem is new or an interview original (close to LeetCode partition-to-k-subsets / minimum time to finish jobs); origin matches the process page; no paths; frequency low",
+    "ran page normally and with --hash-seeds: PASS"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

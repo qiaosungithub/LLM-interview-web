@@ -1,0 +1,39 @@
+{
+  "id": "Google-DeepMind/quiz/cs-fundamentals",
+  "verdict": "fixed",
+  "summary_zh": "十道题的答案结论都对（逐题重算、模拟过）。只改了三处讲解里说错的小细节：Q7 缓存淘汰的先后顺序、Q8 机器精度的“等价说法”、Q3 环回收器要不要管“不成环的实例”。",
+  "issues": [
+    {
+      "where": "Q7",
+      "problem_zh": "讲解说“等访问到第 4 行时，第 0 行所在的缓存行早已被第 1—3 行挤掉”。实际上缓存能装 4 条，第 0—3 行正好装满，是第 4 行的访问才把第 0 行那条挤掉（上面的追踪表本身写的也是这样），两处自相矛盾。另外中文追踪表里用“第 2 行”表示“2 号缓存行”，容易看成数组的第 2 行。",
+      "action": "fixed",
+      "change_zh": "改成“访问数组第 4 行时把第 0 行所在的缓存行挤掉，第 5—7 行再依次挤掉第 1—3 行的”；中文追踪表里的“第 N 行”改写成“缓存行 N”。16 次和 128 次这两个答案没有变。"
+    },
+    {
+      "where": "Q8",
+      "problem_zh": "原文说机器精度“等价于使 1+ε≠1 成立的最小正数”。这不对：比如 1.0 + 1.2e-16（小于 ε=2^-52≈2.2e-16）算出来也不等于 1.0，因为会向上舍入。",
+      "action": "fixed",
+      "change_zh": "改成“使 1+ε≠1 成立的最小的 2 的幂”，并在验证代码里加了一行 1.0 + 1.5·2^-53 != 1.0 来说明这一点；ε=2^-52 的结论不变。"
+    },
+    {
+      "where": "Q3",
+      "problem_zh": "原文说“不成环的实例”不会给环回收器带来任何开销。实际上 CPython 会跟踪所有类实例（gc.is_tracked 为 True），它事先并不知道一个实例成不成环；真正不被跟踪的是数字、字符串这类不可能持有引用的对象。",
+      "action": "fixed",
+      "change_zh": "改成“不可能持有引用的对象（数字、字符串）不会给它带来任何开销”，并在验证代码里加了一行 gc.is_tracked 的检查。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "Q4: enumerated all 20 interleavings independently (2 give x=2, 18 give x=1; every x=1 schedule has both loads before either store)",
+    "Q7: independent LRU simulation with an eviction trace (16 and 128 loads; row-major still 16 with a 1-line cache)",
+    "Q8: exact Fraction arithmetic for 0.1+0.2-0.3; 1+x != 1 for x between 2^-53 and 2^-52; relative error of 1-cos(x) vs 2sin^2(x/2) against 50-digit mpmath at x=1e-3..1e-8",
+    "Q9: recomputed max / epsilon / smallest normal / smallest subnormal for fp32, fp16, bf16 from the bit layouts and compared with numpy and torch finfo; fp16(1e-8)==0 and the 2^16 loss-scaling round trip",
+    "Q10: doubling copies == m-1 < 2n for every n < 5000; growth-1.125 model stays under 9n (max 8.998n); measured real CPython 3.11 list growth ratios (1.125) with sys.getsizeof",
+    "Q3/Q5: gc.is_tracked on ints, strings, instances; gc thresholds; sys.getswitchinterval() == 0.005",
+    "Q1, Q2, Q6: read against standard definitions (no numeric content)",
+    "numbering 1..10 in questions and answers in both languages; python/py fences identical in both files; Chinese read against English answer by answer"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass after the edits. Two one-line checks added (gc.is_tracked for Q3, 1.0 + 1.5*2**-53 != 1.0 for Q8); two code comments in the Q8 block corrected."},
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 53       # seconds for the whole run: covers an answer that times out on every case
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: 评测程序扮演 check / check_batch / check_round，违反题目规则的调用会被拒绝并判错。标着“最坏情况”的测试里评测是对手：每个回答都与某个秘密数字一致，并尽量让候选数字最多，等你返回时才从与全部已揭示结果相符的数里选定秘密数字。

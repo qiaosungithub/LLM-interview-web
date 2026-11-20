@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 85       # seconds for the whole run: covers an answer that times out on every case
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "Part 4 是问答题（为什么 cd 必须是 shell 内建命令），不评测。"

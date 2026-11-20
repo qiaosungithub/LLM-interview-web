@@ -1,0 +1,16 @@
+{
+  "id": "Anthropic/safety/capability-work",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "verified the two company-page quotes and the Core Views quote on not publishing capabilities work",
+    "verified the RSP-page items: the noncompliance reporting and anti-retaliation policy, its March 2026 update with informal inquiries, and the Responsible Scaling Officer and anonymous channel (via the GovAI summary)",
+    "checked that the page does not repeat the outdated claim about unredacted Risk Reports going to all regular-clearance staff",
+    "checked that the page separates stated policy from inference and labels scenario answers as suggestions",
+    "ran build.py --check"
+  ],
+  "code_run": {"ran": false, "passed": null, "notes": "no runnable code on this page"},
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,36 @@
+{
+  "id": "Google-DeepMind/system-design/molecule-reaction-ml-design",
+  "verdict": "fixed",
+  "summary_zh": "数字、公式和模拟实验都核对无误；只改了中文版追问里一处翻译：“组合数量随着组数增长”应为“随着每组分子个数的增加而增长”（从二元组到三元组）。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 追问（预测三个分子），仅中文版",
+      "problem_zh": "中文写的是“可能的组合数量会随着组数以组合数的方式增长”，“组数”读起来是“有多少组”；英文原意是随着每组的大小（两个分子变三个分子）增长。",
+      "action": "fixed",
+      "change_zh": "改为“可能的组合数量会随着每组分子个数的增加以组合数的方式增长”。英文版本来就是对的，没有改动。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "recomputed C(20000,2)=199,990,000, 0.1% coverage, 20 rows per molecule, 5.12 MB fingerprint table in my own script",
+    "checked that 5% replicated pairs only moves coverage/partners to ~0.095% / ~19 (still consistent with the page's rounding)",
+    "simulated the noise floor: perfect predictor RMSE = sigma; pooled within-pair std recovers sigma",
+    "re-implemented the page's synthetic experiment and ran 12 seeds: additive model R^2 on the molecule-disjoint split equals the global-mean baseline every time (<= 0), symmetric-fingerprint ridge keeps R^2 0.54-0.76, ordered-concatenation model changes its prediction by 0.26-0.32 when the pair is swapped",
+    "checked h(a)^T S h(b) symmetry claim numerically",
+    "read the self-attention cost, GNN readout, L1/L2/Huber, UCB/EI, scaffold-split and ECFP claims against what I know; none is false",
+    "compared code blocks in README.md and README.zh.md: identical"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; code untouched."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

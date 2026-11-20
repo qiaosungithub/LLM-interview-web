@@ -1,0 +1,29 @@
+{
+  "id": "OpenAI/coding/type-inference",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "Part 2 错误列表前的那句话",
+      "problem_zh": "题面没说三类错误怎么抛出，参考解答自己也把“分别用三种异常类型还是一种类型加错误码”列为要问面试官的问题；评测需要固定的名字。",
+      "action": "fixed",
+      "change_zh": "“可能出现三类错误：”改为“可能出现三类错误，每类抛出一个同名的异常类：”。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages)",
+    "confirmed the Part 1 example and all six Part 2 examples (three results, three error messages) are asserted by the page's checks and follow from the statement's rules",
+    "brute-force compare on 400,000 random signatures and calls against an independent implementation on nested Python tuples (empty tuples, zero-parameter functions, generics not spelled T<digits>, arity changes, mutated arguments): same result, same error class, same ArityError/GenericConflictError message every time",
+    "aliasing: the returned tree shares no Node object with the function, the call, or an earlier result, and has no internal sharing; inputs are not mutated",
+    "edge cases: () -> int, a generic bound to [], tuple-vs-primitive in both directions raise TypeMismatchError",
+    "compared every code fence between README.zh.md and README.md (identical) and read the English prose against the Chinese",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "A generic that appears only in the return type (never in a parameter) raises KeyError; the statement does not cover that input, so it was left alone."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

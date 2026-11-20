@@ -1,0 +1,35 @@
+{
+  "id": "Anthropic/take-home/llm-black-box-probing",
+  "verdict": "fixed",
+  "summary_zh": "页面里的代码、表格和结论都重新跑过，全部对得上；只有一处描述和表不符：严格解析器的准确率原文说“压在六成上下”，表里其实是 40% 到 62%（后三档只有四成多），已改成“四到六成”。",
+  "issues": [
+    {
+      "where": "参考解答 Part 1（读预实验表）",
+      "problem_zh": "原文说用严格解析器时“准确率被压在六成上下”。表里严格解析器六档分别是 29、31、27、23、20、22（满分 50），也就是 58%、62%、54%、46%、40%、44%，后三档只有四成多，平均约五成，不是“六成上下”。",
+      "action": "fixed",
+      "change_zh": "改成“准确率被压在四到六成”；验证代码里对应的注释改为 40% 到 62%，并加了一条检查六档都在这个范围内。"
+    }
+  ],
+  "checked": [
+    "ran page (README.zh.md) before and after the edit, and with --hash-seeds (PYTHONHASHSEED=0 and 1): all pass",
+    "captured stdout of every python block and diffed it against each quoted ```text block: all 8 output blocks identical (pilot table, reply shapes, grid table, both effects, H1, held-out test, error breakdown, H2, chain test, prompt table, replication, budget tally)",
+    "checked every number quoted in the prose against the printed output: 47/50 vs 28/50 and non-overlapping Wilson intervals, 18 = 47-29, 207/49/34/10 shapes, corr 0.88, -0.033 [-0.082,+0.019], -0.206 [-0.259,-0.143], 0.037 [0.028,0.045], 294/216 [196,236]/177, 117 errors = 59+31+27, 90 single lost carries, 31/90 about one third vs 9.5% share, H2 rates, chain counts and predictions, 73 vs 15 at L=7, prompt diffs, -0.336 strict artefact, 179 pairs +0.011, 3000-call tally, 97 silent replies, 15/15 split, half-widths 0.14/0.11/0.06, 1-0.95^3=0.14, Bonferroni 98.3%, design effect 2.84 and 5/2.84=1.8",
+    "independent implementations: carry counting by explicit column addition vs carry_profile on 20000 random pairs incl. unequal lengths; Wilson via quadratic roots; stratified Agresti-Caffo recomputed; paired t vs scipy ttest_rel (and McNemar exact p=0.016 for terse); profile-likelihood intervals for H1 and H2 recomputed by grid search with a separate Nelder-Mead optimiser on the logit scale (agree to the third decimal)",
+    "measured the planted rates directly from the simulator on 6000 distinct single-carry problems: generated 0.037, propagated 0.241 (=0.96*0.25), both halved with digit grouping; confirmed the product form by comparing estimator mean/sd on simulator data vs Bernoulli(product) data on the same problems (300 reps: q_gen sd 0.0041 vs 0.0040)",
+    "re-simulated the coverage figures that are quoted but not run on the page, with the page's own generators and fresh seeds: profile-likelihood intervals 93.7-94.2% per parameter over 600 reps (simulator) and 94.9-95.7% over 1500 reps (exact product model) vs quoted 94.7-96%; bootstrap percentile interval for r0 89.5-90.5% at 200 reps (91.2% at 250) vs quoted 88-89%; predictive intervals for the three chain counts 94.0-96.0% over 250 reps vs quoted 95.6-96.4%. Same conclusions, differences within Monte Carlo error, so the text was left as is",
+    "checked that 'such long chains are rare in earlier data': grid has no propagated carries; of 300 natural problems 20 have a chain of 3, 1 of 4, none of 5 or more",
+    "statement: budget (3000 calls), API (complete(prompt) -> str, fresh conversation, no sampling params), time (5 h) and deliverables (notebook + 10-min talk) are all stated; the planted findings (propagated vs generated carries, digit grouping, no wording effect) are not given away; the 4821+3579 carry example is correct",
+    "statistical methods: Wilson for single proportions, Agresti-Caffo style stratified differences, profile likelihood with chi2_1/2 = 1.92, concavity of the log-likelihood in theta = -log(1-r), predictive interval combining parameter draws and binomial noise, held-out logic (H2 tested only on new chain data), paired comparisons, replication of the exploratory surprise: all appropriate and described correctly",
+    "meta.yaml origin re-read against the 2025 fellowship blog and the title-only Glassdoor item: accurate, does not present the page as a real question, plain Chinese; frequency low"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.zh.md passes (11 blocks, about 4 s) before and after the edit and under PYTHONHASHSEED=0/1. Scratch scripts: tools/out/scratch/audit-e/blackbox/ (compare_outputs.py, indep.py, rates.py, checks2.py, timing.py, coverage.py, fastcov.py, spread.py, missed.py)."
+  },
+  "env_evidence": [
+    "这里的模型是研究对象，只能通过 client 调用。写代码时能不能用 AI 助手，以邀请信为准；没写就当作不能。",
+    "交付两样东西：一个可以从头跑到尾的 notebook，和一次 10 分钟的讲解（讲完是问答）。"
+  ],
+  "confidence": "high"
+}

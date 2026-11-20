@@ -1,0 +1,32 @@
+{
+  "id": "Google-DeepMind/discussion/hiring-manager-ml-judgement",
+  "verdict": "fixed",
+  "summary_zh": "所有统计数字（标准误、麦克尼马尔检验、样本量、多重比较、集成方差、20 选 1 的期望最大值）都重算过，都对。改了一处说法：Q5 原来说温度缩放“分数排序不变，指标却可能明显变好”，但排序不变时 AUC、固定召回率下的精确率这类指标根本不会变；已改成提升来自选对工作点，校准的用处是让按概率写的阈值选得准，并加了一条检查。",
+  "issues": [
+    {
+      "where": "参考解答 Q5 第 7 步",
+      "problem_zh": "原文说“先校准（例如温度缩放），再按业务要求选工作点。分数排序不变，指标却可能明显变好。”温度缩放对二分类是单调变换，排序不变，所以在验证集上重新选阈值时，“召回率 95% 时的精确率”和 AUC 一点都不会变（实测完全相同）；连 0.5 这个阈值对应的判定也不变。能变好的是阈值写成概率的情况，比如“概率超过 0.9 才自动处理”。",
+      "action": "fixed",
+      "change_zh": "最后一句改成：指标的提升来自选对工作点；校准本身不改变分数排序，AUC、固定召回率下的精确率这类只看排序的指标不会因它变化，它的用处是让“概率超过 0.9 才处理”这类按概率写的阈值选得准。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有覆盖校准对指标的影响。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：同一组分数做温度缩放前后，召回率 95% 时的精确率完全相同，而“概率超过 0.9”的样本数会变。"
+    }
+  ],
+  "checked": [
+    "ran page and with --hash-seeds (PYTHONHASHSEED 0 and 1) before and after the edit: all pass",
+    "ran the page's checks with SEED 1..40 in place of 0 after the edit: all 40 pass; no wall-clock asserts",
+    "recomputed Q2 micro/macro averages, the medical-domain standard errors, the Simpson's-paradox rates and both re-weightings, the ratio arithmetic/geometric means",
+    "Q3: single, unpaired and paired standard errors (bootstrap of the 200 paired outcomes gives 0.0245, matching 2.4 points), exact McNemar p = 0.541 via scipy binomtest, Connor's paired sample size 2352 vs the page's 2347 (both about 2350), unpaired 6036 per version, exact-McNemar power 0.80 at n = 2350 by simulation, 1 - 0.95^10 = 0.401, one-sided lower bound -4.0 points and n = 361 for the -3 gate, pass probability of a true 3/4/5-point regression under a point-estimate gate (0.50/0.34/0.21)",
+    "Q6 ceilings, 8.4% corrected error, the 25% +/- 8.5% interval; Q7 ensemble variance 0.68 and 0.92; Q8 expected max of 20 normals 1.8675 by numerical integration, and the simulated observed best-minus-baseline (mean 0.37, mode about 0.32, so 0.3 is the typical noise-only result)",
+    "showed numerically that temperature scaling leaves precision at 95% recall and accuracy at p > 0.5 unchanged on a miscalibrated binary scorer",
+    "checked StyleGAN2-ADA (augment only the discriminator's inputs, adaptive probability) and EDM (augmentation labels as conditioning, set to none at sampling) descriptions",
+    "checked the origin line against the DeepMind process page: one ML software-engineer loop for a Gemini applications team through Google's channel; the hiring-manager round asked exactly the two questions; frequency low"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "Passes before and after the edit, also under PYTHONHASHSEED 0 and 1 and with SEED 1-40. The added check asserts the behaviour the corrected sentence describes; no code under test changed, so it contradicts the old sentence rather than failing against old code."},
+  "env_evidence": ["用人经理（hiring manager）轮里的两道开放题，口头回答，每题大约 10 分钟，面试官会顺着你的回答往下追问。"],
+  "confidence": "high"
+}

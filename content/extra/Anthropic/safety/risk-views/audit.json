@@ -1,0 +1,33 @@
+{
+  "id": "Anthropic/safety/risk-views",
+  "verdict": "fixed",
+  "summary_zh": "实验数字和引文都对。改了两处：RSP 的自动化研发门槛在 2026 年 7 月的 3.4 版又改写过，原文只写了 3.0 版的定义；Glasswing 那句“不打算公开发布”补上了官方同一句话的后半句（最终目标是让用户能安全地使用这一级别的模型）。",
+  "issues": [
+    {
+      "where": "笔记·RSP 里与错位对应的两条线",
+      "problem_zh": "自动化 AI 研发门槛只写了 3.0 版的“把 2018 到 2024 年两年的进展压缩到一年”。RSP 3.4 版（2026-07-08）已改写这条门槛：模型能以有竞争力的成本完全替代全部研究科学家和工程师，或者 AI 总体能力进展速度翻倍且很可能来自研发自动化，满足其一即算越线；新正文里已经没有 2018 到 2024 年的说法。",
+      "action": "fixed",
+      "change_zh": "标明原定义属于 3.0 版，并补上 3.4 版的新定义。"
+    },
+    {
+      "where": "笔记·网络·Project Glasswing",
+      "problem_zh": "只引了“We do not plan to make Claude Mythos Preview generally available”，Q6 又把它当作公司做了对自己不利的事的例子。官方同一句话后半句是“but our eventual goal is to enable our users to safely deploy Mythos-class models at scale”，只引前半句会显得公司比实际更克制。",
+      "action": "fixed",
+      "change_zh": "补上后半句的意思：最终目标是让用户能安全地大规模使用这一级别的模型。"
+    }
+  ],
+  "checked": [
+    "verified the five section headings, 'country of geniuses in a datacenter' and the transparency-legislation quote in The Adolescence of Technology (January 2026)",
+    "verified the biology quote is Dario's, in the open-weights post (signed 'A post by Dario Amodei', 2026-07-27)",
+    "verified Agentic Misalignment (2025-06-20): 16 models, 96/96/80/80/79 percent, both caveat quotes, and the recommendation of human approval for irreversible actions used in Q7",
+    "verified Alignment Faking (2024-12-18): Redwood, Claude 3 Opus, free/paid setup, 12 percent, 78 percent after RL, and the caveat quote",
+    "verified the espionage post (2025-11-13): mid-September 2025, high confidence, roughly thirty targets, 80-90 percent, 'first documented case' quote",
+    "verified the Glasswing page: April 7, 2026, twelve launch organizations, over 40 more, up to $100M credits, 'thousands of high-severity vulnerabilities'",
+    "read the automated R&D threshold in the RSP 3.4 PDF",
+    "generic search confirming the early-2026 Pentagon dispute exists; the page marks it as media-reported",
+    "ran build.py --check"
+  ],
+  "code_run": {"ran": false, "passed": null, "notes": "no runnable code on this page"},
+  "env_evidence": [],
+  "confidence": "high"
+}

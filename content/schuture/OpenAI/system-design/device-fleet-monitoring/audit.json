@@ -1,0 +1,28 @@
+{
+  "id": "OpenAI/system-design/device-fleet-monitoring",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md and README.md in full and compared them; the two say the same thing and their code blocks are identical; folder is byte-identical to the original",
+    "ran page (2 blocks, both languages pass)",
+    "recomputed every number independently (tools/out/scratch/b19/t7_device_fleet.py): 100,000 reports/s and 30 MB/s baseline, 1.90 TB/day and 26.6 TB for 14 days, +60,000/s during an 800,000-thermostat command (160,000/s, 48 MB/s), 400,000 devices reconnecting at 80,000/s unjittered vs 2,000/s over 200 s, 8 -> 10 instances vs 320 -> 368 (36.8x), 1,600 handshakes in flight, 720-record cache, 360 records x 400,000 = 144M backlog draining at 40,000/s, 200,000/s and 60 MB/s combined, 760,000 / 40,000 / 608,000 / 114,000 / 38,000 / 88,000 breakdown, 65.0% -> 68.4% (+3.4 points), 138,800 expired at finalize and the four end states summing to 800,000, 112.5 GB of delivery rows, 376,200 pushes/s = 75 MB/s = 3.8x the uplink message rate",
+    "exercised apply_update beyond the page's own table: for every device-consistent timeline (any ladder prefix, with some reports lost, optionally ending in a rejection) all arrival orders plus random duplicates end in the device's true last state (306 sequences); equal timestamps and the finalize sweep behave as the prose says",
+    "noted, not reported: a device that refuses and then reports progress later ends as rejected or executing depending on arrival order - the statement never has an owner agree after refusing, so the guard is consistent for the behaviour the problem describes",
+    "checked the seven delivery states against the statement, the mermaid edges against the walk-through (the diagram draws the console reading only the delivery store while the prose also mentions the telemetry store - a simplification, nothing false), and the protocol claims (MQTT / gRPC streaming as full-duplex push, lease-based presence, unique (device_id, seq) for idempotent upload)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "estimate block plus the state-machine guard block, 0.1 s"
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

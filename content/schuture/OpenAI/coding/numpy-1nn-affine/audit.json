@@ -1,0 +1,50 @@
+{
+  "id": "OpenAI/coding/numpy-1nn-affine",
+  "verdict": "relaxed",
+  "summary_zh": "题目要求并列时一定取最小下标、并且 Part 2 的结果对任何输入都和 Part 1 完全相同，但参考解法用的展开式有浮点舍入，在带小数的数据上做不到（例如训练点 0.0、0.6 和查询点 0.3）。已把这两条要求放宽为“舍入误差以内的并列任选其一都算对”，推导和代码本身没有问题。",
+  "issues": [
+    {
+      "where": "题目（并列规则）/ 参考解答 Part 1",
+      "problem_zh": "题目规定距离相同时取下标最小的训练点。但参考解法用 |q|²+|x|²−2q·x 展开来算距离，舍入误差会打破真正的并列：训练点 [0.0, 0.6]、查询点 0.3 到两点的距离完全相等，按规则应选下标 0，参考解法却返回下标 1。原页面的测试只用了小整数坐标（运算精确）和随机正态数据（没有并列），所以没测出来。",
+      "action": "relaxed",
+      "change_zh": "题目里加了一句：并列规则按精确算术理解，两个训练点的距离只差在浮点舍入误差以内时，返回哪一个都算对。参考解答 Part 1 的说明里加了一句，点明展开式有舍入误差并给出上面这个例子。"
+    },
+    {
+      "where": "题目 Part 2 最后一句",
+      "problem_zh": "原文要求“对任何输入，labels 都必须与 predict_1nn 的输出相同”。两种写法的舍入方式不同，在坐标为 0.1 的整数倍的随机数据上（n=2000、d=4、m=2000），2000 个查询里有 158 个标签不一样；改用 argmax(logits) 也仍有 190 个下标不同。",
+      "action": "relaxed",
+      "change_zh": "改为“……必须相同，只有上面所说舍入误差以内的并列可以例外”。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有覆盖“坐标不是整数的并列”。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：训练点 [0.0, 0.6]、查询点 0.3 时，双重循环的定义选下标 0，展开式选下标 1，仿射层选下标 0——用来说明放宽后的要求。"
+    },
+    {
+      "where": "题目（并列规则那一句）",
+      "problem_zh": "原句按字面理解，精确并列（距离差为 0）时返回哪个下标都算对，和例子里 q0 必须取下标 0 的答案 [2,0,1] 矛盾。",
+      "action": "fixed",
+      "change_zh": "加上“坐标都是小整数时运算没有舍入，并列必须取最小下标；其他情况下……”，舍入误差以内可任取的说法只用于其他情况。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "recomputed the statement's distance table and the W_1, b_1, z, 5 - z worked example by hand; both are also asserted by the page",
+    "re-derived z_i = 2 x_i.q - |x_i|^2 = |q|^2 - |q - x_i|^2 and the Gaussian-kernel form of the softmax; confirmed numerically (page check plus own run)",
+    "compared predict_1nn, predict_1nn_affine and a chunked (m, n, d) definition on random normal data up to n = m = 2000, d = 50, with float duplicates, queries equal to training points, small-integer grids: all identical",
+    "0.1-step decimal grids: 158 of 2000 labels differ between predict_1nn and predict_1nn_affine (n=2000, d=4); 190 indices differ even with argmax(logits)",
+    "enumerated all 1-D two-point cases on the 0.1 grid: 13 mismatches, e.g. train [0.0, 0.6], query 0.3 is an exact tie on the float values (0.6 == 2 * 0.3 in binary) and predict_1nn returns index 1",
+    "scale and offset stress: data scaled by 1e-8 makes every softmax probability tie (the page's own NOTE covers this); an offset of 1e8 breaks the expansion by cancellation (not reported, standard caveat)",
+    "verified follow-ups: soft vote 0.64 example, non-convex L1 cell example, cosine-similarity layer, torch.nn.Linear stores (n, d) and computes x @ weight.T + bias",
+    "compared code blocks between README.md and README.zh.md (identical)",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. No reference code changed; the added check pins the behaviour that contradicted the old wording (loops -> index 0, expansion -> index 1, affine layer -> index 0 on train [0.0, 0.6], query 0.3)."
+  },
+  "env_evidence": [],
+  "confidence": "medium"
+}

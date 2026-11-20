@@ -1,0 +1,54 @@
+{
+  "id": "Anthropic/take-home/interp-double-descent",
+  "verdict": "fixed",
+  "summary_zh": "实验、公式和结论都核对过，是对的；改了三句把“插值”说反或说过头的话：插值阈值是模型还能精确拟合训练集的最大 n（原文写成最小 n）；只有 n ≤ d 时才能精确拟合所有训练标签（原文说 n ≥ d 时也能）；方差期望的闭式公式在 |n−d| ≥ 2 时才有限（原文说 n ≠ d 就有限）。",
+  "issues": [
+    {
+      "where": "题目 背景",
+      "problem_zh": "原文把插值阈值定义为“模型恰好有足够容量精确拟合训练数据所需的最小 n”。方向反了：固定模型规模时，n 越小越容易拟合，n ≤ d 的每个 n 都能精确拟合，阈值是其中最大的那个（本题里是 n = d = 100）。",
+      "action": "fixed",
+      "change_zh": "改为“模型还有足够容量精确拟合训练数据的最大 n”。"
+    },
+    {
+      "where": "参考解答 Part 1 第一段",
+      "problem_zh": "原文说“一旦 n ≥ d 且 X 满列秩，或者一旦 n ≤ d 且 X 满行秩，就存在一个能精确拟合每一个训练标签的权重向量”。前半句是错的：n > d 时方程比未知数多，带噪声的标签拟合不到零误差（实测 n = 150 时最小二乘解的训练残差平方和约 46，n ≤ 100 时约 1e-25）。",
+      "action": "fixed",
+      "change_zh": "删去 n ≥ d 那半句，改为“只要 n ≤ d 且 X 满行秩，就存在精确拟合的权重向量；而 n > d 时方程比未知数多，带噪声的标签一般就无法再被精确拟合了”。"
+    },
+    {
+      "where": "参考解答 Part 2（方差闭式公式之后）",
+      "problem_zh": "原文说“只要 n ≠ d，两项都是有限的”。但紧挨着的公式分母是 d−n−1 和 n−d−1，在 n = d−1 和 n = d+1 时就已经是 0：这两处方差的期望同样是无穷大（实测 n = d±1 时样本均值随抽样次数增加一直往上涨，|n−d| = 2 时才收敛到公式值）。实验网格里正好有 n = 99 和 101 这两个点。",
+      "action": "fixed",
+      "change_zh": "改为“只要 |n−d| ≥ 2，两项都是有限的（n = d 和 n = d±1 时方差项的期望是无穷大）”。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有验证“只有 n ≤ d 才能插值”这件事。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：n = 50、100 时最小范数解的训练残差为 0，n = 150 时不为 0。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "printed the full min-norm and ridge curves: all quoted table values, the 32.0x / 1579.6x / 165.8x ratios and 'ridge is monotone non-increasing on the whole grid' hold for the page's seeds",
+    "training residual of the min-norm fit at n = 10..300: ~1e-25 for n <= 100, positive for n > 100",
+    "closed-form E[bias^2] = (1-n/d)||w*||^2 and E[var] = n/(d-n-1), d/(n-d-1) against 4000-design Monte Carlo at n = 20, 50, 80, 90, 97, 103, 110, 150, 300 (agree within ~1%)",
+    "running mean of sum(1/s_i^2) over 2e5 designs at n = d-2..d+2 (d = 20): converges to the formula at |n-d| = 2, keeps growing at n = d and d +- 1",
+    "ridge conditional bias/variance SVD formula against 4000 noise draws at n = 60, 100, 140, and the 1/(4*lambda) variance cap",
+    "lambda sweep at n = D: lambda* risk 10.03 vs best grid risk 10.07 and best fine-sweep risk 10.00 (the 'within about 1%' claim holds)",
+    "sqrt(d)*sigma_min for square Gaussian matrices at d = 25..200 (scale 1/sqrt(d) confirmed); Marchenko-Pastur edge numbers within 9% as quoted",
+    "model-wise curve at fixed n = 50, d = 10..2000: peak at d = n, plateau at ||w*||^2 as d grows, matching the bias+variance formula",
+    "re-ran the whole experiment with 5 other ground truths and seed sets: peak at n = 100 every time, ridge removes it (ridge curve has small Monte Carlo wiggles of up to ~10% between neighbouring n near the threshold with 40 seeds)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass (about 4 s each). Only prose changed, so the added check passes on the old code too; it asserts the corrected claim (no exact fit for n > D), which the old sentence contradicted."
+  },
+  "env_evidence": [
+    "限制条件。 从头到尾四个小时。可以使用 NumPy 和一个绘图库，以及标准库；在这个规模下不需要其他任何东西，也不需要机器学习框架。不得使用 AI 编程助手——实验、解释和幻灯片都必须是你自己完成的工作。",
+    "交付物。 一份 notebook，包含实验代码、数值结果和简要说明；以及一份不超过八页的幻灯片，用于现场评审，内容涵盖问题本身、你的设置、结果、你的解释、补救办法、其局限性，以及你接下来会尝试的方向。",
+    "现场评审。 提交 notebook 和幻灯片之后，你要当面展示并回答问题：为什么做出这些选择，你的解释在不同的数据分布或不同的模型类别下是否依然成立，以及如果有更多时间你会如何扩展这个实验。"
+  ],
+  "confidence": "high"
+}

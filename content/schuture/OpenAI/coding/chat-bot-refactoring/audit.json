@@ -1,0 +1,44 @@
+{
+  "id": "OpenAI/coding/chat-bot-refactoring",
+  "verdict": "fixed",
+  "summary_zh": "题目和参考解答本身没有问题，只改了中文版 Part 2 里的一句话：原文说时钟对象“由聊天室注入”给机器人，实际上（英文版和下面的接口都是这样）时钟是在构造机器人时传进去的，聊天室只负责推进它。",
+  "issues": [
+    {
+      "where": "题目 Part 2（仅中文版）",
+      "problem_zh": "中文写的是“需要 now 的机器人由聊天室注入一个会被它推进的时钟对象”，意思成了聊天室把时钟交给机器人。但紧接着给出的接口是 FocusBot(clock, focus_until)，参考解答里聊天室也从不向机器人传时钟；英文版说的是“机器人拿到一个由聊天室推进的时钟对象”。",
+      "action": "fixed",
+      "change_zh": "改成“需要 now 的机器人会在构造时拿到一个时钟对象，这个时钟由聊天室推进”。英文版和所有代码都没动。"
+    },
+    {
+      "where": "题目 Part 3 —— 机器人之间的事件",
+      "problem_zh": "题面没给 Part 3 两个新机器人的类名，也没说它们怎么拿到总线，测试无法构造。",
+      "action": "fixed",
+      "change_zh": "补一句：新类叫 DecisivePollBot 和 RewardedCheerBot，构造时传入同一个总线，Part 2 的三个类行为不变；并加上两个类的构造函数签名。英文版同样修改。"
+    },
+    {
+      "where": "Part 2 和 Part 3（ChatRoom 注册机器人的顺序）",
+      "problem_zh": "没说 ChatRoom 按什么顺序注册机器人，而日志的先后取决于这个顺序，测试按固定顺序注册。",
+      "action": "fixed",
+      "change_zh": "Part 2 写明依次注册 FocusBot、CheerBot、PollBot；Part 3 补一句：ChatRoom 依次注册 FocusBot、DecisivePollBot、RewardedCheerBot。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages), before and after the edit",
+    "walked SCRIPT by hand against EXPECTED_LOG (focus end 565 = 09:25, reminders at 550 and 561, tallies, the four ignored commands, B reaching 3 at minute 612 with Maya as author)",
+    "counted the legacy code's line numbers: every line reference in Part 1's questions and answers (12, 15-18, 20, 21, 25-27, 21-38, 41, 61, 61-71, 74, 82) points at the right line",
+    "wrote my own simulator from the statement's prose alone and compared it, the legacy handle_message and the Part 2 ChatRoom on 300 seeds x 300 adversarial messages (names that are substrings of commands or of each other, odd whitespace, malformed arguments, '|' and '@' edge cases, time jumps past midnight): 153552 log lines, all three identical",
+    "Part 3: DecisivePollBot/RewardedCheerBot against my simulator with the 3-vote rule on the same 90000 messages (325 polls closed), identical; the statement's extra log line reproduced",
+    "claims: CheerBot/PollBot registration order does not matter (0 of 60 runs differ) while FocusBot not first does (51 of 60 differ); RewardedCheerBot registered before DecisivePollBot is one message late (page check); mutual republish gives RecursionError; publish is depth-first over a snapshot of handlers",
+    "Part 4 numbers: 1430 = 23:50, +20 min shows 00:10; 9:00 on day two = 1980",
+    "compared Chinese and English prose sentence by sentence; code fences are identical in both files",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Only Chinese prose changed, so no check was added."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

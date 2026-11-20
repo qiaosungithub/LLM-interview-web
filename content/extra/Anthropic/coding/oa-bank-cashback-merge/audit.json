@@ -1,0 +1,36 @@
+{
+  "id": "Anthropic/coding/oa-bank-cashback-merge",
+  "verdict": "fixed",
+  "summary_zh": "题面、例子和参考解答都对，没有改。只改了来源说明：原文说网上那份清单“只用一行”列出了这道题，实际是三行要点；另外去掉了一个像文件名的项目编号，并补全了一处删掉名字后留下的空缺。",
+  "issues": [
+    {
+      "where": "来源说明（origin）",
+      "problem_zh": "原文写“网上一份整理清单 也只用一行列出了‘延迟返现、余额历史、支出排行’”：中间有一处删掉名字后留下的空缺，读不通；而且那份清单把“银行账本”列在在线测评题下面，写了三行要点（开户、存款和转账；24 小时后到账的返现；余额历史和支出排行），不是一行。另外“mock-bank-4”是那个练习集里的文件编号，用户看不懂。",
+      "action": "fixed",
+      "change_zh": "改成“网上一份 Anthropic 面试整理清单把‘银行账本’列为在线测评题，也只有三行要点（……），没有题面”；“Fellowship Trainer 的 mock-bank-4”改成“Fellowship Trainer 里的银行四关模拟题”；“检查代码里”改成“本页的验证代码里”，和页面上的标题一致。其余说法（两个练习集都自称模拟题、LibreSignal 第 2 关和第 4 关例子表数字对不上、两份参考实现对被合并账户的历史余额处理不同）都核对过，属实，没有改。"
+    }
+  ],
+  "checked": [
+    "ran page and with --hash-seeds (PYTHONHASHSEED 0 and 1), before and after the edit: all pass",
+    "wrote my own implementation of all four levels from the statement only (union-find style owner pointers, unsorted pending list, linear history scan) before reading the reference; it reproduces every statement example in all four levels, and so does the page reference",
+    "compared my implementation with the page reference on 7,000 random operation sequences (5,000 of 60 ops, 2,000 of 200 ops) with timestamps placed exactly on, 1 ms before and 1 ms after cashback due times and time_at placed on creation, merge and due times +-1; ids reused after merge, self-transfer, self-merge, unknown ids, zero amounts, overdrafts, unknown payment ids: 0 mismatches",
+    "checked the random comparison has teeth: mutated references (settle with <, cashback booked at call time, pending cashback not redirected on merge, get_balance only for live ids) are each caught",
+    "ran hand-built edge cases on both implementations: chain merge with cashback landing in the final owner, merge exactly at a due time, an id merged away and reopened twice with old payments invisible to the new account, zero-amount pay and transfer",
+    "looked for rules the statement leaves open (cashback exactly at the due time, cashback due exactly at a merge, time_at equal to creation/merge time, reopened ids, payment ownership after chained merges, tie order in top_spenders): each is either stated or has no observable effect",
+    "read the LibreSignal bank level 2 and level 4 statements: confirmed the level 2 table's transfer(10, account1, account2, 2500) is impossible (account1 holds 1000) and the first level 4 table's 1500 / 3000 / 3906 do not follow from its rules (1000 / 3500 / 3610); checked the page's transcription of the LibreSignal unit tests and its marked timestamp fixes against the source test file",
+    "read the LibreSignal and Fellowship Trainer reference solutions: LibreSignal returns None unless the id exists now and mixes both accounts' snapshots; the trainer replays the merged transaction logs and redirects a merged-away id to the surviving account; matches the origin line and the follow-up bullet",
+    "checked the online list: an Anthropic prep gist lists 'Bank Ledger' under CodeSignal OA questions with three bullet points and no statement",
+    "checked the page's claim about 750/1000 and 800/1000 against the Anthropic process page"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Page passes as written, also under PYTHONHASHSEED 0 and 1. Only meta.yaml was edited; README.zh.md is unchanged."
+  },
+  "env_evidence": [
+    "按顺序实现下面四关：只有前一关的测试全部通过，下一关的测试才会运行；每一关都在同一个 `Bank` 类上继续加方法，不是另起一个类。",
+    "90 分钟四关，分量前轻后重。",
+    "写完一个方法就跑一次平台给的测试，不要攒到一关写完再跑。"
+  ],
+  "confidence": "high"
+}

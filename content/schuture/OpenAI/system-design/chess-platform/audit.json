@@ -1,0 +1,28 @@
+{
+  "id": "OpenAI/system-design/chess-platform",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md and README.md in full; the two say the same thing and their code blocks are identical",
+    "ran page (both languages pass)",
+    "recomputed every number in an independent script (tools/out/scratch/b19/t4_chess.py): 300k online = 6% of 5M, 150k games, 6 s between moves, 25,000 moves/s, 50,000 WS messages/s, 7.5 MB/s, 15+2 gateways, 30+2 game instances, 50k average concurrent games, 104 starts/s, 9.0M games/day (3.6 games per daily player - plausible), 6.4 KB/game, 57.6 GB/day, 21 TB/yr, 150k tick writes/s = 6x move rate, 833 moves/s per stateless shard, 312.5 peak starts/s, 625 joins/s, 1,250 queue entries, 18 s to the +-400 cap, 4 s of latency charged over 40 moves",
+    "walked through the timer-vs-move ordering argument (per-game event queue, receive stamp taken on enqueue, version check on firing) for a move stamped before and after the deadline - the outcome depends only on the stamp, as claimed",
+    "checked the clock formula (Fischer increment), the chess rules stated (stalemate, threefold repetition key, fifty-move rule = halfmove clock 100, FEN halfmove field, UCI notation), and the lease / fencing-token / consistent-hashing claims",
+    "checked the mermaid diagram against the walk-through prose and the message list - consistent"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "single estimate-check block; README.md and README.zh.md both pass"
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

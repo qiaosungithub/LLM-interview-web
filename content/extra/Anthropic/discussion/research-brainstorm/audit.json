@@ -1,0 +1,31 @@
+{
+  "id": "Anthropic/discussion/research-brainstorm",
+  "verdict": "fixed",
+  "summary_zh": "九篇论文的作者、年份和结论都对照原文摘要核对过，全部属实；标准误、配对差的标准误和 McNemar 统计量也都重算过，数字和用的检验都没问题。只改了一处：Q2 的暗示实验先只留下模型稳定答对的题，对照组里却有一组“暗示指向正确答案”，在这些题上答案本来就是正确选项，不可能有变化。现在注明这一组要换成模型原本答得不稳的题。",
+  "issues": [
+    {
+      "where": "参考解答 Q2（对照组第 3 条）",
+      "problem_zh": "实验数据先只留下“不加暗示时采样 5 次都对”的题，对照 (3) 又要在这些题上加指向正确答案的暗示，看暗示的作用是不是双向的。可这些题上模型本来就选正确答案，暗示指向正确选项时答案没有变化的余地，这一组按原文的做法永远测出零，说明不了任何事。面试里这样讲，很容易被追问住。",
+      "action": "fixed",
+      "change_zh": "在这一条后面补了一句：这一组要换成模型原本答得不稳的题，在稳定答对的题上答案已经是正确选项，看不出变化。其余内容没有改。"
+    },
+    {
+      "where": "meta.yaml 的 summary_zh",
+      "problem_zh": "简介里写“提示注入实验”。中文里“提示注入”通常指 prompt injection（一种攻击），页面正文用的是“暗示注入”（在题目里加一个指向某个选项的暗示），两者不是一回事，只看简介可能会误会。",
+      "action": "flag",
+      "change_zh": "没有改：按规则这里只能改 origin 和 frequency。建议把简介里的“提示注入实验”改成“暗示注入实验”，由负责人决定。"
+    }
+  ],
+  "checked": [
+    "ran page before and after the edit, plain and with --hash-seeds: PASS",
+    "downloaded the arXiv abstracts of all nine cited papers (2305.04388 Turpin/Michael/Perez/Bowman 2023; 2307.13702 Lanham et al. 2023; 2505.05410 Chen et al. 2025; 1810.03292 Adebayo et al. 2018; 1902.10811 Recht et al. 2019; 2405.00332 Zhang et al. 2024; 2410.05229 Mirzadeh et al. 2024; 2404.12391 Ge et al. 2024; 2203.06026 Kynkaanniemi et al. 2022) and compared every attributed finding, number, author and year: all match (36% / 13 BBH tasks / GPT-3.5 and Claude 1.0; 6 hints, >=1% but often <20%, RL plateaus, monitoring promising but not sufficient; task variation and less faithful with scale; models/data independence and edge-detection analogy; 3-15% and 11-14% drops attributed to harder images; GSM1k up to 8%, Spearman r^2 = 0.36, frontier models minimal overfitting; GSM-Symbolic numbers-only drop and instance variance; FVD only slightly up under large temporal corruption; FID reduced by aligning Top-N class histograms)",
+    "read the Lanham and Adebayo PDFs for details not in the abstracts: Lanham uses early answering (truncation), adding mistakes, paraphrasing and filler tokens; Adebayo uses model-parameter (cascading) randomization and data randomization tests",
+    "own script: recomputed SEs 1.789 / 2.086 / 2.748 (z = 4.37; pooled z = 4.33), paired table 315/85/25/75 consistent with 80% and 68%, paired SE 2.028 by closed form, by item-level differences and by item bootstrap (2.018); McNemar 32.73 (p = 1.1e-8; 31.6 with continuity correction; exact binomial p = 7.8e-9); Q3 algebra x = 0.625, 150 of the 400 items change",
+    "judged test fit: unpooled two-sample SE is labelled as the independent-sample view, then correctly replaced by the paired SE and McNemar for the paired original/rewrite design; the page's multinomial simulation does check the paired SE formula",
+    "checked the origin line and the reference section's account against the text copy of the Feb 2025 faillearnrepeat.net blog and the Anthropic process page: 15-minute brainstorm with the head of alignment, two open questions, no insider LLM knowledge needed, three minutes of silence, references notified after about an hour, rest of the onsite cancelled next day; no actual questions or grading recorded; the page says its questions are written for the site; frequency low; no file paths",
+    "read every strong-answer and lost-points item for research soundness; only the Q2 control above was internally inconsistent"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "PASS before and after, plain and with --hash-seeds. The edit is prose only and not something the embedded checks can test, so no check was added. No wall-clock assertions."},
+  "env_evidence": [],
+  "confidence": "high"
+}

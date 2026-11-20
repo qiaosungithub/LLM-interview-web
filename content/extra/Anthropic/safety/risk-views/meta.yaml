@@ -1,0 +1,13 @@
+title: "What Anthropic Thinks the Big Risks Are"
+title_zh: "Anthropic 眼里的主要风险：五类风险和几项关键证据"
+summary_zh: "Dario Amodei 2026 年 1 月文章里的五类风险、“错位”到底在担心什么、两项常被引用的实验（智能体错位、对齐伪装）和它们的限定条件、生物与网络安全方面的公开案例。七个自测问题，后三个是开放题。"
+category: safety
+kind_zh: "复习笔记 · 自测"
+roles: [All]
+topics: [risk-categories, misalignment, agentic-misalignment, alignment-faking, biosecurity, cybersecurity]
+frequency: high
+stage: [onsite]
+format_zh: "7 个问题 / 约 35 分钟"
+order: 4
+added: true
+origin: "根据你保存的对话记录《Anthropic AI Safety 深度剖析》（2026-11-16 导出）整理；数字和引文于 2026-11-17 对照官方页面核对，对话记录里与原文不符的地方已改正并在解答开头列出。"

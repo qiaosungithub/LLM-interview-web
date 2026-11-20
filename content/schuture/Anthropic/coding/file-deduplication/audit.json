@@ -1,0 +1,29 @@
+{
+  "id": "Anthropic/coding/file-deduplication",
+  "verdict": "fixed",
+  "summary_zh": "题目和三个参考解法都没有问题，只改了追问里一个名称：原文说文件系统通知接口“Linux 上是 inotify，其他系统上是 fsnotify”，但 fsnotify 并不是其他操作系统的接口，已改成“macOS 上是 FSEvents”。",
+  "issues": [
+    {
+      "where": "追问 实时检测",
+      "problem_zh": "原文写“文件系统通知接口（Linux 上是 inotify，其他系统上是 fsnotify）”。fsnotify 不是 Linux 以外的操作系统提供的接口：它是 Linux 内核里 inotify 底层的通知框架的名字，也是一个跨平台 Go 库的名字；macOS 上对应的接口是 FSEvents（或 kqueue），Windows 上是 ReadDirectoryChangesW。",
+      "action": "fixed",
+      "change_zh": "把“其他系统上是 fsnotify”改为“macOS 上是 FSEvents”（英文版同步修改）。只改了这几个字，代码和其余文字都没动。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "built the statement's example tree with the literal relative paths and confirmed all three functions (and the process-pool variant) return exactly the listed groups in the listed order",
+    "compared all three implementations against an independent brute force (own directory walk with lstat, grouping by the actual bytes) on 400 random trees: empty files, same-size-different-content, files sharing a full 4096-byte prefix but differing later, sizes 4095/4096/4097, symlinks to files, to directories and dangling, hard links, FIFOs, chmod-000 files and chmod-000 directories, odd names; process pool cross-checked on 10 of them",
+    "Part 2 requirement: on 60 files of distinct sizes neither find_duplicate_files_fast nor the concurrent version opens a single file",
+    "Part 2 'full read only after size and prefix match': instrumented open() per path -- unique-size file never opened, same-size files with a unique prefix read exactly 4096 bytes, only prefix-colliding files read in full",
+    "verified the os.walk claims (symlink to a directory is listed but not descended into; symlink to a file and a dangling link appear among the files), and the 2^30 / 4096 = 262,144 figure",
+    "compared Chinese prose with English paragraph by paragraph; python blocks identical in both files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass. The edit is prose only (a name in a follow-up bullet), so no check was added."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,48 @@
+{
+  "id": "Anthropic/coding/oa-worker-grant-management",
+  "verdict": "fixed",
+  "summary_zh": "题面四关的规则、示例和参考代码都对得上，代码没有改。只改了解答里两处写错的复杂度：calculate_pay（Level 4）写成了 O(n + p)，实际是 O(n·p)；top_k_workers 写成 O(m log m)，漏掉了每次都要把所有员工的时段重新加总一遍的开销。",
+  "issues": [
+    {
+      "where": "参考解答 Level 4 复杂度说明",
+      "problem_zh": "原文说 calculate_pay“每个时段的开销是 O(n + p)”。代码是对每个时段把所有双倍薪资时段扫一遍，每个时段 O(p)，合计 O(n·p)。实测 100 个时段、100 个双倍薪资时段时 _overlap 被调用 10000 次，而不是 200 次左右。",
+      "action": "fixed",
+      "change_zh": "改为“每个时段的开销是 O(p)，合计 O(n·p)”，并把 p 说明为合并后的双倍薪资时段数量。"
+    },
+    {
+      "where": "参考解答 Level 2 复杂度说明",
+      "problem_zh": "原文说 top_k_workers 是 O(m log m)、开销主要来自排序。但排序键里对每个员工调用了 _closed_time，会把他所有已结束时段重新加一遍：3 个员工、共 6000 个时段时，一次 top_k_workers 要加 6000 个时段，排序本身几乎不花时间。",
+      "action": "fixed",
+      "change_zh": "改为 O(S + m log m)，S 是所有员工已结束时段的总数，并说明排序键要先把每个员工的时段重新加总一遍。"
+    },
+    {
+      "where": "Level 1 与 Level 2 的例子（以及文末可运行的检查代码）",
+      "problem_zh": "例子里 clock_in/clock_out 的时间戳倒退了，违反题面自己“时间戳递增”的保证。",
+      "action": "fixed",
+      "change_zh": "Level 1：bob 的 clock_in 从 120 改为 160。Level 2：bob 改为 40 进、65 出，cy 改为 65 进、105 出，总时长仍是 40/25/40；clock_in(\"bob\", 100) 改为 110。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "confirmed python/py fences are identical in README.md and README.zh.md (text fences differ only in translated comments)",
+    "replayed the Level 1 example on the Level 1/2/3/4 classes, the Level 2 example on the Level 2/3/4 classes, the Level 3 example on the Level 3/4 classes, the Level 4 example on the final class; recomputed the Level 4 example's 2600 tick by tick by hand-written arithmetic",
+    "wrote an independent model from the statement (per-tick rate table, doubled ticks as a set, two-pass stable sort for the ranking) and compared it with each level's class: 1500 random 90-call sequences per level, return values and internal state (sessions, open flag, position/rate, stored double-pay periods) compared after every call; 405000 calculate_pay queries each for the Level 3 class, the final class without double pay, and the final class with double pay",
+    "random inputs included repeated timestamps, zero-length sessions, back-to-back sessions, unregistered ids, repeated clock_in/clock_out, promotions set while a session is open and replaced before use, empty/nested/touching/identical double-pay periods, periods extending past the last timestamp, empty pay windows",
+    "checked the stored double-pay periods stay sorted and disjoint and cover exactly the doubled ticks after every call",
+    "probe: a refused clock_in does not consume a pending promotion",
+    "counted _overlap calls in one calculate_pay for (n, p) = (10,10), (100,10), (10,100), (100,100), (200,200): always n*p",
+    "counted session tuples summed by one top_k_workers call with 3 workers and 6000 closed sessions: 6000",
+    "read the Chinese statement and solution prose against the English for meaning changes: none found",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "No code changed; two complexity sentences corrected. They describe cost, not behaviour, so no runnable check was added."
+  },
+  "env_evidence": [
+    "| 在线测评 · 4 关 | ★★☆☆☆ | 中等 | SWE · MLE | oop-design, interval-merge, timestamps, payroll, ranking | 4 关 / 90 分钟 | 在线测评（OA） |",
+    "按顺序实现下面四关：只有当前一关的检查全部通过，下一关的检查才会开始运行，且每一关都在同一个类上继续扩展，而不是另起炉灶。"
+  ],
+  "confidence": "high"
+}

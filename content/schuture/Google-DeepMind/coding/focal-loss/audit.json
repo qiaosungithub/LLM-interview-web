@@ -1,0 +1,43 @@
+{
+  "id": "Google-DeepMind/coding/focal-loss",
+  "verdict": "fixed",
+  "summary_zh": "梯度推导、代码和所有数字都对，只改了两处解读：Part 1 说 focal loss 对易样本梯度的抑制“至少和对损失值的抑制一样强”、梯度的对比“更为悬殊”，Part 3(b) 又说“比对损失值的抑制猛烈得多”，这都说反了——梯度的比值恰好是损失值比值的 1 + γ·p_t·(−ln p_t)/(1−p_t) 倍，永远大于 1，所以梯度被抑制得比损失值弱（p_t=0.9 时是 34.5 倍对 100 倍）。",
+  "issues": [
+    {
+      "where": "参考解答 Part 1（“两个比值”一段的解读）",
+      "problem_zh": "原文说梯度的比值比损失值的比值 (1−p_t)^γ“更为悬殊”，并说易样本的梯度“至少和它的损失值被抑制得一样强”。按页面自己算出的数：p_t=0.9 时梯度比值是 0.0290，损失值比值是 0.01；p_t=0.1 时是 1.2245 对 0.81。两处梯度比值都更大，也就是梯度被抑制得更弱；难易两个样本之间的差距，梯度是 42 倍，损失值是 81 倍，梯度反而没那么悬殊。一般地，梯度比值 = (1−p_t)^γ × [1 + γ·p_t·(−ln p_t)/(1−p_t)]，方括号里的数在 1 和 1+γ 之间。这正是题目 Part 1 最后要求评论的那一点，原来的答案方向反了。",
+      "action": "fixed",
+      "change_zh": "把这一段的后半改成：两个比值都比损失值的比值大；梯度比值恰好是 (1−p_t)^γ 的 1 + γ·p_t·(−ln p_t)/(1−p_t) 倍，这个倍数永远大于 1，p_t→1 时趋于 1+γ（易样本的梯度仍按 (1−p_t)^γ 衰减，只是比损失值少抑制约 3 倍：34.5 倍对 100 倍），p_t→0 时趋于 1。前面的推导和 0.0290、1.2245 两个数没有动。"
+    },
+    {
+      "where": "参考解答 Part 3(b)（最后一句的原因解释）",
+      "problem_zh": "原文说易样本占比低是“因为 (1−p_t)^γ 因子对每个易样本梯度的抑制，比它对损失值的抑制（Part 1）猛烈得多”，和上一条是同一个错误。",
+      "action": "fixed",
+      "change_zh": "改成：因为这个因子把每个易样本的梯度压低了几十倍到几千倍（p_t=0.9 时约 34.5 倍，p_t=0.99 时约 3300 倍），所以再多的易样本也压不过那约三十个难样本。结论和数字不变。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只验证了 0.0290、1.2245、0.01、0.81 这几个数，没有检查梯度比值和损失值比值谁大。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：在 p_t = 0.1、0.9、0.99 处，梯度比值除以 (1−p_t)^γ 等于 1 + γ·p_t·(−ln p_t)/(1−p_t)，并且落在 1 和 3 之间；另外确认 p_t=0.99 时约为 3300 倍。（参考代码没有改，这条检查只是让改过的那句话可以复现。）"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "re-derived dFL/dz by hand (chain rule through p_t = sigmoid(s z)) and the gamma = 0 reduction; closed_form_grad vs 80-digit mpmath: max abs error 2.9e-15",
+    "focal_loss_and_grad vs an mpmath reference written from the statement's formula on 4000 cases (|z| up to 100, gamma in {0, 0.3, 1, 2, 5, random}, random alpha), warnings as errors: max relative error 2.5e-14 (loss) and 2.6e-14 (grad)",
+    "batched gradient vs torch autograd (max abs diff 3.6e-15) and vs central finite differences",
+    "statement example: (0.233268, [-0.00036206, -0.13775235]) -> (0.2333, [-0.0004, -0.1378]); int labels and list inputs accepted",
+    "Part 1 ratios recomputed: 0.028965 and 1.2245 for the gradient, 0.01 and 0.81 for the loss value; ratio of the two = 1 + gamma p_t (-ln p_t)/(1 - p_t) (2.8965 at 0.9, 2.99 at 0.99, 1.5117 at 0.1)",
+    "Part 3(a) and 3(c) numbers recomputed by hand formulas: 0.1291, 0.01128, 99.66%, 0.0066%, 11.4x, 50%, 0.028%, 0.084%",
+    "Part 3(b) rerun from the page's code: 27/30 positives and 1 false positive under both losses, sklearn 28/30, easy share 50.0% -> 49.5% (CE) and 0.08% -> 3.4% (focal); the loss never increases over the 2000 steps of either run (lr = 2 and lr = 100)",
+    "read the follow-ups (softmax Jacobian, calibration, other imbalance remedies, average precision) for false statements; compared Chinese and English text; code blocks identical in both files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass (about 3 s each). No reference code was changed, so the added check cannot 'fail before'; it pins the corrected statement (factor between 1 and 1 + gamma)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

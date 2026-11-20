@@ -1,0 +1,20 @@
+{
+  "id": "OpenAI/coding/resumable-iterator",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages); code blocks identical in both files",
+    "replayed the three statement examples verbatim against the reference (1D, 2D, depth-3), plus the [[], []] and [[5, 7], [2]] / [[], [4]] canonical-tuple examples",
+    "own brute force written from the statement: 2150 random nested inputs (depth 1-4, many empty lists) x every iterator class; state before each next equals the index tuple, exhausted tuple after the end, StopIteration repeats",
+    "exhaustive set_state over all 314k index tuples in [-1, 4]^d from random current positions (including after StopIteration): accepted exactly when canonical, continues from the right item, a rejected state leaves the position unchanged, lists accepted like tuples",
+    "TypeError cases (wrong container, wrong length, bool, float, str, None) and TypeError-before-ValueError ordering",
+    "depth=1 / depth=2 nested iterator agrees with the list / 2D iterators, including items that are themselves lists",
+    "timed a full pass over 20k/40k/80k empty rows: linear, as the O(N + M) claim says",
+    "follow-up claims are asserted by the page's checks (text-mode tell() after next() raises OSError, generators cannot be deep-copied, NumPy arrays and tuples work)",
+    "compared Chinese and English text"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass."},
+  "env_evidence": [],
+  "confidence": "high"
+}

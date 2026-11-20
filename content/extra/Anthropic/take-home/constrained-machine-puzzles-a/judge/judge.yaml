@@ -1,0 +1,5 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+special: puzzle
+timeout: 95       # seconds for the whole run: 44 cases at 2 s each, plus 5 (in practice the run takes a few seconds)
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "用题目给的检查器（parse / run）运行 p1 … p5，除了它自带的 8 组测试，还按题目写明的输入范围做了穷举和随机测试；每道题的指令数显示在它的第一个样例下面。出错时会显示是哪个输入、输出了什么，比题目里的检查器给得多。"

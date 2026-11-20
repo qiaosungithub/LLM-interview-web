@@ -1,0 +1,44 @@
+{
+  "id": "Anthropic/coding/oa-dns-resolver",
+  "verdict": "relaxed",
+  "summary_zh": "五关的示例和参考代码都没问题，并发那一关也经得起折腾。只有第 2 关题目里一句话说过头了：它说“环总是会抛出 ResolutionCycleError”，但参考代码在链长超过上限的那一步就会先抛 ChainTooLongError，比上限更长的环根本走不到绕回来的那一步。已把这句话改成和代码一致的规则，并加了一条检查。",
+  "issues": [
+    {
+      "where": "题目 Level 2（环与链长上限谁先谁后）",
+      "problem_zh": "原文写“哪怕继续走下去也会超出链长上限，环也总是会先抛出 ResolutionCycleError”，又说 ChainTooLongError 是在“走到一个 ARecord 需要的链比上限还长”时抛出。参考代码其实是每走一步先查环、再查链长、最后才去查目标：4 个名称围成的环 r0→r1→r2→r3→r0，上限为 2 时抛的是 ChainTooLongError（上限为 3 才是 ResolutionCycleError）；默认上限 8 时，10 个名称的环也是 ChainTooLongError。同样，h0→h1→gone（gone 不存在）、上限为 1 时抛 ChainTooLongError 而不是 NameNotFoundError，所以第 3 关也不会去查备用区域。照原文字面去实现，在随机区域上约 6% 的查询结果和参考代码不一样。",
+      "action": "relaxed",
+      "change_zh": "把这两句改成：环的检查排在最前，所以某一步的目标已经走过、同时这一步又会超限时，抛 ResolutionCycleError；接下来才检查链长，只要这一步会让链长超过上限就立刻抛 ChainTooLongError，这时还没去查这一步的目标——不管目标是 ARecord、不存在，还是要再走几步才成环，都是 ChainTooLongError。参考代码没有动。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查里没有“环比上限长”或“超限的链后面是个不存在的名称”这两种情况；页面里用来交叉验证的独立模型和参考代码写法一样，所以也看不出题目文字和代码的出入。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：4 个名称的环在上限 3 时抛 ResolutionCycleError、上限 2 时抛 ChainTooLongError；h0→h1→gone 在上限 1 时抛 ChainTooLongError（备用区域有答案也不用），上限 2 时才回退到备用区域拿到答案。按原来那句话实现的解析器过不了这条检查。"
+    },
+    {
+      "where": "Resolver 签名之后的那一段",
+      "problem_zh": "原文说 max_chain_length 和 fallback_zone 都从 Level 3 起才起作用，但 Level 2 的规则和例子已经用到 max_chain_length。",
+      "action": "fixed",
+      "change_zh": "改为 max_chain_length 从 Level 2 起、fallback_zone 从 Level 3 起才起作用。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "every statement example for Levels 1-4 is asserted by the page's checks; re-derived each by hand (normalisation, cycle target name, chain length 3 vs limit 2, fallback only on NameNotFoundError, expiry 0 + min(60, 30, 60) = 30 with a hit at 29 and a miss at 30)",
+    "wrote two path-first models of my own (materialise the whole walk, then classify): one for the step rule the reference follows, one for the original Level 2 sentences read at face value; compared with the reference on 4,000 + 3,000 random zone pairs (0-8 names, missing names, un-normalised keys/targets/queries, empty and dots-only queries, limits 0/1/2/3/4/8, optional fallback): the reference matches the step-rule model on every query, and differs from the face-value reading on 1,753 of 29,993 queries (ChainTooLong vs Cycle 595, vs NameNotFound 997, vs a fallback answer 161)",
+    "for every successful random query: counted upstream resolutions around the independently computed expiry (start clock 0-5, hit one tick before, miss at expiry), checked returned lists are copies; for every failing query: checked it is re-resolved on the next call (never cached)",
+    "own concurrency probes (not the page's helper): another name and advance_clock are not blocked while a lookup is in flight; followers share one upstream lookup and each gets its own list; expiry counts from the clock at store time; on failure every waiter gets the same exception object, nothing is cached and the in-flight table is empty; 300 ungated 16-thread races always gave exactly one upstream lookup; an expired entry is refreshed once under concurrency",
+    "new check passes on the reference and fails (ResolutionCycleError escapes where ChainTooLongError is expected) on a resolver patched to behave as the old sentence read",
+    "compared Chinese and English prose section by section; code blocks identical in both files; section/details structure unchanged; meta.yaml untouched",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass. Only two statement sentences and one added check changed; the reference code is untouched."
+  },
+  "env_evidence": [
+    "按顺序实现下面五关：只有当前一关的测试全部通过，下一关的测试才会开始运行，且每一关都在同一个 `Resolver` 类上继续扩展，而不是另起炉灶。"
+  ],
+  "confidence": "high"
+}

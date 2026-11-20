@@ -1,0 +1,32 @@
+# Private workspace data and access credentials
+/answers/
+/reviews/
+/.access_key
+/.access_key.*
+/.env
+/.env.*
+*.pem
+*.key
+
+# Machine-local interpreters, environments and dependencies
+/.python/
+/.venv/
+/.venv_*/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Runtime logs, audit scratch output and interrupted build staging
+/logs/
+/tools/out/
+*.log
+/site/data.new/
+/site/data.old/
+/dist/
+/.DS_Store
+
+# Keep content/, judge tests, site/assets/, site/data/ and site/vendor/ tracked.
+# The generated pages and bundled browser libraries are the deployable snapshot.

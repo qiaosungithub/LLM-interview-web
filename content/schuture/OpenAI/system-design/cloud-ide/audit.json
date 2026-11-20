@@ -1,0 +1,28 @@
+{
+  "id": "OpenAI/system-design/cloud-ide",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md and README.md in full and compared them paragraph by paragraph; the two say the same thing",
+    "ran the page (both languages pass); the estimate-check block is identical in both files; folder is byte-identical to the original",
+    "recomputed every capacity number independently (tools/out/scratch/b19/t5_cloud_ide.py): W = 2,100 s, 17.1 starts/s, 20,600 active / 15,400 waiting, 48 sandboxes per host, 750 -> 900 hosts (43,200 slots), 120 replacements in flight -> 180 warm sandboxes (3.75 hosts), 7,200 streams = 4.3 MB/s = 35 Mb/s, 800,000 workspaces = 280 TB used vs 8.6 PB at full 10 GiB quota (31x), 1,030 sandboxes = 21 hosts per extra minute of idle timeout, 256 KB ring = 7.3 min at 600 B/s and 2.6 s at 100 KB/s",
+    "checked the numbers reused in later sections against the estimate section (15,400 waiting, 1,030 per minute, 350 MB average volume, 2 s / 7 s start targets, 150 ms output target)",
+    "checked factual claims: namespaces / cgroups / seccomp, gVisor as a user-space kernel, Firecracker microVMs on KVM with a small device model and ~100 ms guest boot, cgroup v2 cpu.max and memory.max, PTY vs pipe and isatty, a full PTY buffer blocking the writer, lease plus generation as a fencing token, forced detach as storage-side fencing, fsync on a network volume, thin provisioning",
+    "checked that status really has six states and that every transition in the prose has an owner; checked the mermaid edges against the walk-through (gateway dials the host directly, no database on the output path)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "one estimate-check block, 0.1 s"
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,52 @@
+{
+  "id": "Anthropic/system-design/design-doc-review",
+  "verdict": "fixed",
+  "summary_zh": "容量估算和排序里的数字都核对无误。改了两处与页面自带仿真/数字对不上的说法：8 卡 GPU 池那段写“小模型让池 90% 以上繁忙、大请求仍能在 200 秒内完成”，实际仿真里池只有约 80% 繁忙，而且 200 秒内一个大批次都没跑成；追问里说修正后的估算已经给批量流量配了“更少、负载更重”的服务器，实际批量服务器每台负载反而更轻。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 共享的 8 卡 GPU 池（仿真那一段）",
+      "problem_zh": "原文说小模型工作让整个池“90% 以上繁忙”，并说“每一个大模型请求仍然能在这次 200 秒的运行里完成”。按页面自己的仿真参数实测：小模型工作只占约 81% 的 GPU 时间；小请求持续到达的 200 秒内，217 个大请求没有一个被处理，全部是在小请求停止到达之后（200.2–215.8 秒）才跑完的。",
+      "action": "fixed",
+      "change_zh": "改为“约 80% 繁忙”，并写明这 200 秒里没有任何大批次被派发、大请求要等小请求不再到达才被处理，是字面意义上的饥饿。p99≈194 秒、小请求 0.12 秒等数字不变。"
+    },
+    {
+      "where": "参考解答 追问（最后一条）",
+      "problem_zh": "原文说延长批量队列的最长等待时间“与修正后的估算已经采取的方向一致：给批量流量分配数量更少、负载更重的服务器”。但修正后的估算给批量 4 台（每台 250 请求/秒，填充率 50%），给交互式 28 台（每台约 321 请求/秒），批量服务器反而负载更轻。",
+      "action": "fixed",
+      "change_zh": "改为：这样才能用更少、负载更重的服务器承载批量流量；修正后的估算还没有这样做，它对两类流量用的是同一个 80% 填充率目标和 20% 余量。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有覆盖上面两处说法。",
+      "action": "fixed",
+      "change_zh": "新增三行断言：小模型单独让池繁忙约 80%（0.78–0.84）、文档策略下没有大请求在 200 秒内完成、批量服务器单台负载低于交互式服务器。把旧说法写成断言（>90%、200 秒内完成、批量更重）都会失败。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    },
+    {
+      "where": "参考解答",
+      "problem_zh": "题干改成英文后，中文参考解答里引用的设计文档原句还是中文译文，和页面上的英文文档对不上。",
+      "action": "fixed",
+      "change_zh": "在每处引用的中文译文后面补上英文原句（“原文 …”），解答内容不变。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after edits",
+    "recomputed every number in the document and the review by hand/script: 6,500 rps, 13/15 servers, 38 s cache turnover, 0.002% hit rate, 25/30 servers, 333.3 rps and 66.7% fill, 23+3 raw -> 28+4 = 32 split, 7,500 rps / 300,000 backlog / 60 s drain, 500 rps duplicate work, 8-minute fleet crash interval",
+    "printed all simulation outputs quoted in prose (sticky p99 5.54 s -> 14.82 s, backlog-aware p99 0.199 s, large p99 194.0 s, small 0.12 s, reserve policy 0.87 s / 0.33 s, 8.05% / 3.14% / 2.38% GPU-seconds, 1.71 s) and compared with the text",
+    "measured small-only GPU busy fraction (0.808) and first large-batch completion time (200.21 s) under the document's policy; repeated over 5 seeds, 2 durations and small rates 300-600/s (never a large batch during traffic)",
+    "compared per-server load of bulk (250/s) vs interactive (321/s) servers in the split estimate",
+    "compared Chinese and English text paragraph by paragraph; code blocks identical in both files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. The added assertions encode the corrected claims; the old claims (>90% busy, large requests done within 200 s, bulk servers more heavily loaded) are false under the page's own simulation and numbers."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

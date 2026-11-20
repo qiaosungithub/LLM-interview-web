@@ -1,0 +1,40 @@
+{
+  "id": "Google-DeepMind/system-design/rag-agent-platform",
+  "verdict": "fixed",
+  "summary_zh": "所有容量估算、RRF 例子和 ACL 过滤模拟都核对无误。只做了三处小改：中文版把“副本追赶延迟”说成是 5 分钟新鲜度目标之外的预算（英文原意是必须算在 5 分钟之内），已改正；另有两处写着“索引布局深入话题会讨论量化的召回代价／索引分层”，但那一节并没有这些内容，改成了不再指向不存在的内容。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 深入话题 (a) 分片与复制，仅中文版",
+      "problem_zh": "中文写“副本追赶的延迟，是 5 分钟新鲜度目标之上还要预留的额外预算”，读起来像是延迟可以放在 5 分钟之外；英文原意是 5 分钟目标必须把这段延迟也包含进去。",
+      "action": "fixed",
+      "change_zh": "改为“副本追赶的延迟，同样必须算进 5 分钟的新鲜度目标之内，是在上面算出的嵌入吞吐量之外还要留出的一份预算”。英文版未改。"
+    },
+    {
+      "where": "参考解答 需求与规模（量化后索引大小）、数据模型 IndexEntry",
+      "problem_zh": "两处写着“索引布局这条深入话题会回过头来讨论量化在召回率上付出的代价”“用哪一层索引而定（深入话题 a）”，但深入话题 (a) 只讲租户布局、分片和复制，没有讨论量化的召回代价，也没有讲索引分层，读者按指引去找会找不到。",
+      "action": "fixed",
+      "change_zh": "第一处改为直接说明“代价是召回率会有所损失，因为 PQ 码只是原向量的近似”；第二处去掉对深入话题 (a) 的指向，改为“具体看服务这次查询的是哪一层索引（量化层还是原始向量层）”。中英文同步修改。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "recomputed in my own script: 11 chunks/doc (also brute-forced the chunk-count formula against laying chunks down one by one for ~3,400 (N, C, O) combinations), 2.2e9 chunks, 3.38 TB raw, 140.8 GB PQ, 24x, 1M edits/day, 127.3 -> 255 chunks/s, 6 hosts, 20 ms/chunk, 23.1 q/s, 4.3x peak ratio, 1,000 sub-queries/s, 440,000 chunks/tenant, 500 ms per tool step, 12 x 180,000 = 2,160,000",
+    "recomputed the RRF worked example with exact fractions (0.0325 / 0.0323 / 0.0318, order D2 > D7 > D1) and compared the page's reciprocal_rank_fusion and recall_at_k against my own implementations on 2,000 random inputs each",
+    "ACL post-filter claim: analytic expectation is k*p = 0.5 permitted chunks in the top 10, P(corpus has fewer than 10 permitted) = 1.7e-4; my own 20,000-trial simulation gives 0.50 vs 10.0",
+    "read the architecture diagram edge by edge against the API, data model and walk-through; read both language versions side by side",
+    "checked definitions of ANN, PQ (64 one-byte codes for 768 dims), BM25, RRF (k=60), cross-encoder, recall@k, SSE"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; code untouched (the edits are prose that no check on the page can assert)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

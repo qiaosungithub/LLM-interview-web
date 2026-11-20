@@ -1,0 +1,33 @@
+{
+  "id": "OpenAI/coding/durable-kv-store",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "Part 1",
+      "problem_zh": "测试要求新建的实例在 load() 之前是空的，题面没说；在构造函数里调用 load() 的写法会错 9 个测试。",
+      "action": "fixed",
+      "change_zh": "补一句：新建的实例在调用 load() 之前是空的。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages, also under PYTHONHASHSEED=0 and 1); page is byte-identical to the original and code blocks match across languages",
+    "Part 1: statement example, plus 3,000 random round trips with delimiter characters, newlines, NUL, emoji, U+10FFFF and lone surrogates",
+    "Part 2: 4,000 random save sequences (2-8 saves each, caps 32/33/40/48/64/65/100/1000/none, keys and values longer than the cap) with the process killed before a random fs call (reads and list included): 11,107 crashed saves, every load() returned exactly the old or the new mapping and never raised; after each of 8,756 completed saves fs held exactly the manifest plus the chunks it names and no file exceeded the cap",
+    "Part 2: exhaustive grid of crash points over three consecutive saves (1,152 scenarios) followed by a clean save: no mixture, no leftovers",
+    "Part 2: empty store with no cap; caps 0-31 raise ValueError and leave load() at the previous state",
+    "Part 3: 3,000 random put/delete/compact/restart sequences against a dict model with about 7,900 torn appends (prefix cut, tail zeroed, head zeroed, all zeroed, bytes flipped, random garbage, full record written then death): recovery always equals the state before the torn operation unless the whole record landed undamaged; later operations survive the next load()",
+    "Part 3: process killed before/after compact()'s write (2,277 times) and before/after load()'s truncating write (2,423 times): nothing lost",
+    "Part 3: total file size after compact() equals that of a fresh log holding only the live pairs",
+    "Part 3: load() time is linear in the record count (2.5 us/record from 5,000 to 80,000 records)",
+    "explanation claims rebuilt and confirmed: a CRC over the payload only lets 12 zero bytes through and raises IndexError; without load()'s truncation a put made after recovery is lost; overwriting chunk_i in place and dying midway yields a mixed store",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; no edits made."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

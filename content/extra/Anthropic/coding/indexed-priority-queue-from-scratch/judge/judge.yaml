@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 60       # seconds for the whole run: covers an answer that times out on every case (23 x 2 + 4 + 3, plus 7)
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "各部分的口头问题不评测，也不检查是否用了 heapq、sorted 或 bisect。复杂度通过比较次数、键的 __hash__/__eq__ 调用次数（上限都放宽了常数）和 2×10⁴ 规模的用时来检查。"

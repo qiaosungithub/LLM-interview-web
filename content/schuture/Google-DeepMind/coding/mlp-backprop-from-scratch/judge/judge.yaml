@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 80       # seconds for the whole run: 26 cases at 2 s plus the two training samples (12 s, 6 s) = 70, plus slack
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: Part 2 的非样例测试会把 forward_backward 临时换成一个损失精确、但某一项梯度故意写错的版本，再检查 grad_check 的返回值，所以 grad_check 要通过 forward_backward 拿到损失和解析梯度。

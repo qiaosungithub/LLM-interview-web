@@ -1,0 +1,46 @@
+{
+  "id": "Anthropic/take-home/open-research-superposition",
+  "verdict": "fixed",
+  "summary_zh": "题目适合做 72 小时 take-home；反向配对的推导、阈值表、预测的特征数和页面里的每个数字都独立核对过，结论在换种子以后也成立。改了两句话：一句把 Elhage 等人论文的设置说错了（说我们的规模更小，其实他们也是 20 个特征、5 维），一句追问的解释说“越稀疏干扰越频繁”，和前文“越稀疏越少同时出现”矛盾，改成了相对的说法。",
+  "issues": [
+    {
+      "where": "参考解答 Part 1 设置",
+      "problem_zh": "原文说“沿用 Elhage 等人 2022 年 Toy Models of Superposition 的设置，只是规模更小”。论文里第一组实验就是 n = 20、m = 5，和这里一样大，重要性是 0.7^i；真正不同的只有重要性衰减（这里是 0.8^i）。",
+      "action": "fixed",
+      "change_zh": "改为“沿用……里第一组基本实验的设置（他们也用 n = 20、m = 5），只是重要性衰减从 0.7^i 改成了 0.8^i”。论文后面还有更小的例子（5 个特征放进 2 维等），所以没有说“最小”。"
+    },
+    {
+      "where": "追问 “S = 0.98 时偏置为什么是负的？”",
+      "problem_zh": "原文说“特征越稀疏，干扰出现得越频繁、真值出现得越少”。按绝对频率，越稀疏，邻居特征出现、造成干扰的机会越少，这和 Part 2 的预测（越稀疏，同时出现的机会越少）正好相反。成立的是相对的说法：和这个特征自己出现的次数相比，干扰更多，而且越稀疏，挤进同一子空间的特征越多。",
+      "action": "fixed",
+      "change_zh": "改为“特征越稀疏，挤进同一子空间的特征越多；和这个特征自己真正出现的次数相比，干扰出现得越多，这笔交易越划算”。"
+    },
+    {
+      "where": "验证代码（多种子的定性检查）",
+      "problem_zh": "作者在 SEED = 0 到 4 上全部通过。我另跑了 SEED = 5 和 6，正文的结论都成立（线性对照始终 5 个，ReLU 随稀疏度上升，S ≥ 0.8 每个模型至少 9 个，S = 0.6 训练解比构造解差，S = 0.98 超过 10 个、损失低于构造解、偏置为负），但两条逐模型的检查各差一点没过：SEED = 5 有一个 S = 0 的线性模型损失比基线高 2% 多一点；SEED = 6 有一个 S = 0.9 的 ReLU 模型损失比构造解高 13%（这一档的平均是 1.04）。",
+      "action": "flag",
+      "change_zh": "没有改。正文的数字是 SEED = 0 的、而且说的是平均值，都对；只是这两条检查的容差偏紧，换更多种子可能偶尔不过。“SEED = 0 到 4 都通过”这句话本身属实。"
+    }
+  ],
+  "checked": [
+    "ran page plain and with --hash-seeds before and after the edits (PASS, about 45 s)",
+    "own numpy script: E[min(U1,U2)^2] = 1/6 exactly (integral) and by Monte Carlo; simulated a W=[e,-e] ReLU pair and a mean-predicted feature at p = 0.5/0.2/0.05 and matched p^2 (I_a+I_c)/6 and p/3 - p^2/4",
+    "re-derived p* = 4r/(2+5r) by hand and by bisection on the raw costs; the five thresholds 0.533/0.449/0.360/0.275/0.201 (S* 0.467/0.551/0.640/0.725/0.799) match",
+    "dynamic program over every assignment of the 20 features to alone / in an antipodal pair / dropped within 5 dims (no assumption about which features pair) gives predicted counts [5,5,6,7,8,10,10,10,10], the page's numbers; equal importance gives a jump from 5 to 10 at p = 4/7 as the follow-up says",
+    "ran trimmed copies of the page at SEED = 5 and 6 with soft asserts and extra diagnostics (per-model ratio to the constructed solution, counts at norm thresholds 0.3/0.5/0.7, R^2 vs norm counts, max norm); also read the author's SEED 1-4 logs",
+    "checked the Toy Models of Superposition text: n=20, m=5, I_i=0.7^i in the first experiment; x_i = 0 with probability S else U[0,1]; linear model learns the top-m features like PCA; antipodal pairs first, then other geometry; negative bias filters small positive interference; pentagons/tetrahedra; D_i formula matches the page",
+    "checked every number in the three tables and the prose against the printed output; no assertion depends on wall-clock time (times are only printed)",
+    "checked meta.yaml: origin matches the process notes (research loops: 4-hour exploratory ML take-home and, in some teams, a 72-hour research take-home whose content varies by team) and says the problem was written by us; no paths; frequency low",
+    "judged the task as a 72-hour take-home: one clear question, four parts, CPU only, deliverables (4-page write-up, reproducible code, review call) and grading criteria stated"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "PASS before and after, plain and PYTHONHASHSEED=0/1. Text-only edits, so no check was added. At SEED = 5 and 6 one tight per-model check each fails narrowly (see flag); the page itself fixes SEED = 0."
+  },
+  "env_evidence": [
+    "从拿到题目起，约 72 小时内交卷。一台普通笔记本的 CPU 就够用，不提供 GPU。",
+    "不能用 AI 编程助手，除非邀请信另有说明。"
+  ],
+  "confidence": "high"
+}

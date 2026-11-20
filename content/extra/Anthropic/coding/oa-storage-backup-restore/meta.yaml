@@ -1,0 +1,14 @@
+title: "Online Assessment: Cloud Storage with Delete, N Largest, Backup and Restore"
+title_zh: "在线测评：云存储（删除、最大文件、备份与恢复）"
+summary_zh: "云存储题的另一个流传版本，分四关：用字符串命令添加、查询、删除文件；按前缀取最大的 n 个文件；带容量上限的用户与合并；按用户备份和恢复，恢复时跳过已被别人占用的名字。"
+category: coding
+kind_zh: "在线测评 · 4 关"
+roles: [SWE, MLE, RE]
+topics: [oop-design, hash-map, storage-quotas, string-protocol, backup-restore]
+difficulty: medium
+frequency: low
+stage: [oa]
+format_zh: "4 关 / 90 分钟"
+order: 70
+added: true
+origin: "四关的操作和例子来自 LibreSignal（网上一个公开的 CodeSignal 风格在线测评练习集，存储那一套共四关）。它是通用练习集，没有标明属于哪家公司，也不是真实测评；把它和 Anthropic 联系起来的只有几处光有题名的线索（比如一个付费题库目录里的“Cloud Storage System”），都看不到题面。题面和解答是重新写的。来源有三处含糊，本页自己定了规则：第 4 关例子的最后一行在来源里答案是 1，但按来源写出的规则应当是 2，本页在例子里补了一行“admin 占用 /file3.mp4”使答案成为 1（这一行是推断，来源里没有）；第 2 关例子里有一行把 n 写成了文件名，本页改成了数字；MERGE_USER 的文字说明可以有两种读法，本页按例子的结果取“两人的容量上限相加”。"

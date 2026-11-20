@@ -1,0 +1,50 @@
+{
+  "id": "OpenAI/coding/guess-number-delayed",
+  "verdict": "fixed",
+  "summary_zh": "题目和三段参考代码都没问题（调用次数的上界全部实测成立）。只改了讲解里的两句话：一条追问说 Part 3 可以每局交两个三分点把轮数降到约 2⌈log3 n⌉，但 Part 3 的接口每局每轮只能交一个猜测，这样做不到，已加上“如果接口允许每局每轮交两个猜测”的前提；另一句“正好 2k 轮”改成了“不超过 2k 轮”。",
+  "issues": [
+    {
+      "where": "追问（第 4 条）",
+      "problem_zh": "原文说 Part 3 的“真实”一轮也可以给每一局提交 Part 2 的两个三分点，把轮数降到约 2⌈log3(max n)⌉。但 Part 3 的 check_round 规定每个编号每轮只能映射到一个猜测，两个三分点交不上去。按每局每轮一个猜测的规则，我算了最优解：n=27 至少要 7 轮（2⌈log3 27⌉=6），n=10^9 至少要 43 轮（2⌈log3 10^9⌉=38），所以这个轮数在题目给的接口下达不到。",
+      "action": "fixed",
+      "change_zh": "在这条追问前面加了前提：“如果 check_round 允许每一局每轮交两个猜测（题目里每局每轮只能交一个）”，后面的结论不变。"
+    },
+    {
+      "where": "参考解答 Part 3 讲解",
+      "problem_zh": "原文说 solve_games 花掉的“正好是这 2k 轮”。实际只是不超过 2k：页面自己的例子里最大的 n 约为 9.95 亿，2k=60，而实测（也是下一句写的数字）是 58 轮。",
+      "action": "fixed",
+      "change_zh": "把“要花 2k 次调用……正好是这 2k 轮”改成“最多要花 2k 次调用……也不超过这 2k 轮”，并在验证代码里加了一行断言（30 局那个例子的轮数小于 2k）。"
+    },
+    {
+      "where": "Part 2 规则（每次调用带几个猜测）和检查代码里的 BatchJudge.check_batch",
+      "problem_zh": "标题说每次调用猜两个数，但规则只写了“至少一个”，没有上限；页面自带的检查代码也接受一次三个猜测。",
+      "action": "fixed",
+      "change_zh": "规则改为“每次调用要带一个或两个猜测”，check_batch 的说明同步修改；检查代码里的 BatchJudge 加上“超过两个就拒绝”和对应的一条检查。英文版同样修改。"
+    },
+    {
+      "where": "题目 Part 1 第一句、Part 3 的上界",
+      "problem_zh": "测试用到 n = 10⁹，但题面没给 n 的范围，O(n) 的正确解法会被判超时而无从预料。",
+      "action": "fixed",
+      "change_zh": "补上 1 ≤ n ≤ 10⁹ 和 1 ≤ n[g] ≤ 10⁹。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "wrote my own strict judges (candidate set tracked explicitly) and ran find_secret and find_secret_batched on every secret for every n <= 300: always correct, never a protocol violation, never above 2*ceil(log2 n) / 2*ceil(log3 n) calls; Part 2 never needs more calls than Part 1",
+    "adaptive adversary (always keeps the largest remaining part) on 524 sizes up to 1e9, including powers of 2 and 3 plus or minus 2: bounds hold, answer is always the single remaining candidate",
+    "solve_games on 3000 random multi-game batches with my own judge (games of size 1, 2, 3 mixed with sizes up to 1e9): correct, rounds never above 2*ceil(log2 max n)",
+    "replayed the three statement transcripts against my own judges",
+    "computed by exhaustive search the exact optimum for one delayed guess per round (n <= 80, closed form checked against it): confirms the Fibonacci follow-up (about 1.44 log2 n, 43 rounds at n = 1e9) and shows 2*ceil(log3 n) rounds is not reachable with one guess per game per round",
+    "checked the lower-bound argument (ceil(log2(n+1)) rounds) and the quoted numbers 38 / 58 / 30 / 1694 against the page's own output",
+    "compared Chinese and English text; code blocks identical",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the edits. Added one assert (rounds < 2k for the 30-game example); asserting the old wording (rounds == 2k) fails with 58 != 60. The follow-up edit is prose only, nothing on the page implements it."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

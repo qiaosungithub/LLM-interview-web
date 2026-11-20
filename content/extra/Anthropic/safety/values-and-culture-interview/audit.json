@@ -1,0 +1,17 @@
+{
+  "id": "Anthropic/safety/values-and-culture-interview",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "verified all seven value names and every quoted sentence in the table against anthropic.com/company",
+    "confirmed Q6 and Q8 appear verbatim in the collected third-party interview guide, which cites other sites, as the page and origin line say",
+    "checked the origin line: it does not present the site-written questions as real interview questions",
+    "checked the frequency against the process page (the culture round appears in every reported loop and several candidates blamed it for rejections)",
+    "checked that the Q5 points (pause commitment dropped in RSP v3, reliance on self-reporting) match the corrected RSP page",
+    "ran build.py --check"
+  ],
+  "code_run": {"ran": false, "passed": null, "notes": "no runnable code on this page"},
+  "env_evidence": [],
+  "confidence": "high"
+}

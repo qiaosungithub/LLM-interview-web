@@ -1,0 +1,14 @@
+title: "Timed 3-hour research take-home: does context noise stabilise autoregressive rollouts?"
+title_zh: "限时 3 小时研究小课题：上下文加噪能不能稳住自回归滚动预测"
+summary_zh: "给定一维“视频”数据生成器和一个下一帧预测基线，三小时内实现滚动评估、做一次加噪训练的受控对比（多 seed、参照线、不确定性），交可复现的代码和一页报告。"
+category: take-home
+kind_zh: "限时 take-home · 小型实验 + 一页报告"
+roles: [RS, RE]
+topics: [experiment-design, autoregressive-rollout, exposure-bias, noise-augmentation, video-prediction, research-report]
+difficulty: hard
+frequency: rare
+stage: [take-home]
+format_zh: "3 个部分 / 3 小时计时 / 交代码和一页报告"
+order: 60
+added: true
+origin: "证据只有一句：一位研究科学家候选人说，约十轮的面试里有一轮是“带计时器的 take-home（3 小时）”，没有任何题目内容、平台或规则。本页的研究问题、数据、基线、计时规则和评分要点全部是我们补写的，真实题目很可能不同。"

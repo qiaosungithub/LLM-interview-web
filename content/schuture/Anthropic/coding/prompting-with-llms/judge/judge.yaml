@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 80       # seconds for the whole run: 28 cases x 2 s + 6 Part 3 cases x 3 s CPU, plus margin
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: 只评测 parse_reply、classify、score、evaluate、compare、paired_improvement 六个函数的返回值和调用方式；system prompt 与示例的写法、Part 2 的找 bug 说明、Part 3 的错误分析和书面判断都没有唯一答案，不评测。classify 的测试把 complete 换成按脚本回复的假模型（ref.ScriptedComplete），检查每次调用的参数；evaluate 和 compare 的测试把 classify 换成按脚本返回的假函数（ref.FakeClassify）。可以使用 scipy。

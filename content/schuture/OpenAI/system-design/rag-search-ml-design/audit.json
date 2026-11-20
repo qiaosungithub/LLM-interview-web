@@ -1,0 +1,37 @@
+{
+  "id": "OpenAI/system-design/rag-search-ml-design",
+  "verdict": "fixed",
+  "summary_zh": "公式、数字和对各项技术的说法都核对过，没有错。只改了一处措辞：检索流程第一句原来写“在同一批段落上并行跑 BM25”，读起来像是 BM25 只在稠密检索取回的那几百条里跑；实际意思是 BM25 在整个语料上独立检索，已改成“在同一份语料上”。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 (b) 检索流程 第一段",
+      "problem_zh": "原句“从近似最近邻索引里取出前几百个段落，同时在同一批段落上并行跑 BM25”，“同一批段落”紧跟在“前几百个段落”后面，容易读成 BM25 只给稠密检索取回的那几百条重新打分。这和后文不符：后文说两路检索各自独立跑、再合并两份列表，某个段落可以只出现在其中一份里。",
+      "action": "fixed",
+      "change_zh": "把“同一批段落”改成“同一份语料”，英文相应把 the same passages 改成 the same corpus；其余一字未动。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "recomputed the worked InfoNCE example in an independent script without torch: hardest-negative share 75.7% / 98.2% / ~100% at tau 0.20 / 0.07 / 0.02, gradient ratio exp(0.78/0.07) = 69,069, gradient formula (softmax - onehot)/tau by finite differences, flat-model loss log B and the log 2 step when B doubles",
+    "recomputed reciprocal rank fusion (2/70 vs 1/61 at k0 = 60, 0.2 vs 1 at k0 = 0), 40M x 300 = 1.2e10 token vectors, the latency split, the triplet-loss gradient, and that the exponential-gain nDCG gives 1 for the ideal ordering",
+    "checked factual claims against the papers they name: SimCSE (dropout positives, temperature 0.05, entailment positives and contradiction hard negatives, neutral unused), DPR (one BM25 hard negative per question shared across the batch), CLIP's learned temperature, RRF constant 60, HNSW efSearch and IVF nprobe, ColBERT MaxSim with 128-dimensional token vectors and ColBERTv2 compression, inverse-propensity correction for position bias, definitions of recall@k, MRR and nDCG",
+    "checked the statement's figures (40 million passages, 5 million queries/day, 20,000 judgments, 150 ms / 350 ms) against the ones the solution uses",
+    "compared README.zh.md with README.md paragraph by paragraph and by the set of numbers in the prose; python block identical in both"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "The only edit is one phrase of prose that no code can check, so no check was added."
+  },
+  "env_evidence": [
+    "这是一轮 60 分钟的口述“ML 设计”面试，面试官是搜索方向的专家。",
+    "不需要在白板上画架构图：所有问题都围绕同一个系统背后的机器学习展开——文本向量模型怎么训练、检索怎么搭起来、结果怎么排序，以及怎么知道这些环节真的起作用。"
+  ],
+  "confidence": "high"
+}

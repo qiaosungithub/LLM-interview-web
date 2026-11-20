@@ -1,0 +1,34 @@
+{
+  "id": "Anthropic/take-home/ml-take-home",
+  "verdict": "fixed",
+  "summary_zh": "题目、代码、两张表和结论都核对过，是对的；只改了一处：展示提纲第 3 条把 n=100 时的比较说反了（原文写“窄网络不输给宽网络”，而表 1 里 n=100 时三个噪声率下都是宽网络略高），已改成“宽网络不输给窄网络”。",
+  "issues": [
+    {
+      "where": "参考解答 十分钟展示的结构 第 3 条",
+      "problem_zh": "提纲写的是“n=100 时窄网络不输给宽网络”。但表 1 里 n=100 时宽网络在三个噪声率下都略高（0.879 对 0.869、0.749 对 0.736、0.594 对 0.542），Part 2 正文也说宽网络“反而还略微领先”。提纲这一句和表、和正文方向相反，照着背会把“容量交叉”在小数据这一端的方向记反。",
+      "action": "fixed",
+      "change_zh": "改为“n=100 时宽网络不输给窄网络，n=1600 时窄网络遥遥领先”（英文同步改），并在验证代码里加了一行检查：n=100 时每个噪声率下宽网络的准确率都不低于窄网络。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit; every number in Table 1, Table 2 and the prose (0.034, 0.119, 0.151, 0.052, 184, -0.004, 0.039, 0.076, 9.8, 64.4, 0.021, 0.027/0.031, 0.109) re-derived from the tables or asserted by the page's checks",
+    "backprop of the reference MLP (incl. the L2 term) against central finite differences: max relative error 3e-8",
+    "data generator: measured flip rates 0.190 / 0.404 for p = 0.2 / 0.4, flips spread evenly over the two other classes, val/test labels clean, classes balanced, deterministic per seed, same points and clean labels across noise rates for one (seed, n_train)",
+    "the memorization story behind the capacity crossover, measured directly: at n=1600, p=0.4 the wide net fits ~30% of the flipped training points to their wrong label, the narrow net ~9%; at n=100 both fit 80-100% of them",
+    "learning-rate confound the page hedges about: reran n=1600 over 5 seeds at lr 0.5/0.1/0.02/0.005 with 80/400/2000/8000 epochs. The narrow-beats-wide gap under noise persists at every setting (p=0.4: 0.875/0.862/0.864/0.865 narrow vs 0.724/0.713/0.733/0.750 wide; p=0.2: ~0.93 vs 0.87-0.89), so the page's conclusion is not an artifact of lr=0.5",
+    "same at n=100 and n=400 with lr 0.05 x 800 epochs: wide >= narrow at n=100 for every noise rate (direction of the crossover holds); noise-free runs are flat over the last 20 epochs at every size (the 'plateau' claim holds)",
+    "noted, not an error: at lr=0.5 the H=128 runs on these unnormalized features are not smooth (training loss sometimes rises between epochs; at n=1600 under noise the validation accuracy swings by ~0.1 over the last 10 epochs), so individual final-epoch numbers are noisier than with a smaller step; early stopping still helps the wide net under noise with a stable learning rate (p=0.4, lr=0.005: 0.810 vs 0.750)",
+    "Chinese vs English: python fences identical, tables and quoted numbers the same"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass (about 8-9 s each). The edit is to a line of the slide outline (a text block), so the added one-line check passes on the old code too; it asserts the corrected statement, which the old line contradicted. Own probes: tools/out/scratch/b08/ml_probe1.py, ml_probe2.py (8 min), ml_probe3.py."
+  },
+  "env_evidence": [
+    "你会在 4 小时窗口开始时收到以下材料，事先不能针对这道具体题目做准备。可以在自己的本地环境，或者某个托管 notebook 服务中工作，两者皆可，只要能运行装有 NumPy 和 scikit-learn 的 Python 即可。",
+    "查阅文档是允许且预期的行为，但不能使用 AI 编程助手，每一行代码、每一条结论都必须出自你自己之手。",
+    "4 小时结束时，做一次 10 分钟的展示——用幻灯片还是走读 notebook 都可以，只要结果呈现清楚——随后是 30 分钟的技术讨论，内容是这次实验背后的设计取舍、数据到底支持哪些结论，以及如果有更多时间你会怎么改。"
+  ],
+  "confidence": "high"
+}

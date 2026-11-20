@@ -1,0 +1,21 @@
+{
+  "id": "Google-DeepMind/quiz/code-comprehension",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "executed the eight snippets exactly as printed in the statement and compared with every traced value in the answers (Q1, Q2 traces; Q3 length 4; Q4 exception / nan inputs; Q5 stats([5.0]) and stats([]))",
+    "Q1-Q3: brute-forced multiplication count k(n-k+1), g's output length for all n<10,k<9, h's length formula over all n<15,k<5,p<4,s<4,d<4, receptive field 1+(k-1)(2^L-1) for k in {3,5,7}, L=1..5",
+    "Q5: recomputed the E[x^2]-E[x]^2 result on 1e9+[4,7,13,16] with plain running sums (-128.0) and the merge formula exactly with Fractions on 200 random chunk pairs",
+    "Q6: checked nonzero pattern, row sums, and what float16 does to -1e9 under the venv's NumPy 2.4",
+    "Q7: exact enumeration (Fractions) of inclusion and subset probabilities for the correct and the randrange(i) variant on five (n,k) pairs",
+    "Q8: compared with scipy cdist; np.sqrt of a negative returns nan with a warning",
+    "numbering 1..8 in questions and answers in both languages; code fences identical in both files; Chinese read against English answer by answer"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass; no edits made."},
+  "env_evidence": [
+    "下面八段代码，每一段都是一个完整的 Python 函数（Q2 的 `g` 调用了 Q1 的 `f`）；它们都不会被运行，任务是照原样读懂并解释每一段代码。"
+  ],
+  "confidence": "high"
+}

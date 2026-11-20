@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 47       # seconds for the whole run: 21 cases at 2 s each, plus 5
+case_cpu: 2       # CPU seconds per case
+note: "题目没规定一份代码怎样分别跑出三个部分的战斗，两种写法都接受：run_battle(a, b) 按你已实现的最新规则打；或像参考解答那样让 run_battle(a, b) 保持 Part 1 规则，Part 2 传 describe_hit=type_effect_tag，Part 3 再加 choose_attacker=smart_choose_attacker。Monster 需要元素参数时，Part 1 的测试给所有怪兽同一个元素 Ember（倍率都是 1x，命中记录带不带 (1x) 都算对）。"

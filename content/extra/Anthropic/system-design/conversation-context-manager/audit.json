@@ -1,0 +1,47 @@
+{
+  "id": "Anthropic/system-design/conversation-context-manager",
+  "verdict": "fixed",
+  "summary_zh": "题目和解答里的数字、引用的 Anthropic 公开文档都核对过，没有算错。改了两处说法：正文里把一位候选人的建议说成了“面试官不希望……”，改回候选人原话的意思；出处说明里“两处都没有细节”不准确，其中一份指南附了一行简短的答题要点，也补上了这一条注明的出处是另一个面试准备网站。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 开头“容易答偏的地方”一段",
+      "problem_zh": "原句是“那份面试指南也说，面试官不希望候选人纠结于内存限制，更想听架构上的取舍”。那份指南里这句话是一位刚面过的候选人说的建议（别担心内存限制，多关注有意思的架构问题），并不是面试官的表态。",
+      "action": "fixed",
+      "change_zh": "改成“那份提到同类题目的面试指南也引了一位候选人的话：别纠结内存限制，多讲架构上的取舍。”"
+    },
+    {
+      "where": "出处说明（origin）",
+      "problem_zh": "原来写两份指南“都没有细节”。实际上 Landed 那份在后文给了一行“好答案”的要点（滚动窗口加语义压缩、跨设备的对话线程、确定性的压缩、按需摘要），而且这道题在题单里注明的出处是另一个面试准备网站。",
+      "action": "fixed",
+      "change_zh": "补上这两点，改为“两处都没有题目细节”。其余说明（数字和解答都是补写的练习假设，不是真实面试原题）保持不变。"
+    },
+    {
+      "where": "参考解答 费用估算",
+      "problem_zh": "不用缓存和用缓存的费用都只按纯文字算（每轮 600 个 token），没有把题目里给的工具结果（15% 的轮次、每次 3,000）和附件（10% 的对话、20,000）算进历史。算上之后平均每个对话的输入大约是 30 万个 token，是页面数字的 1.7 倍左右。",
+      "action": "flag",
+      "change_zh": "没改：差距不到 2 倍，结论（输入是账单大头、缓存能省大部分、长对话占大头）不变；页面在“窗口够不够”一段也单独算了工具结果和附件的情况。复习时知道这个估算偏低即可。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md in full",
+    "ran run_page.py before and after the edits, plain and with --hash-seeds (seeds 0 and 1): all pass; no wall-clock upper-bound asserts in the page",
+    "recomputed every number independently with fractions in a scratch script: traffic, P(t) table and shares, hard-budget turns (307/176/274), uncached daily cost and input share, cached cost at hit rates 100/80/0%, $1.87M/day saving, +15.6% for 150 turns with no hits, turn-100 hit vs miss (10.6x), 71.7% miss share, TTL table and first turn where the 1-hour TTL wins (turn 8), attachment caching numbers and break-even, 150k-file example, storage, compaction worked example (61,150 -> 52,300 -> 35,650 -> 18,150) and the 29,650 alternative; all match",
+    "wrote my own prefix-cache simulator (5-minute TTL, 20-block lookback) and 300-turn stress test for none/window/compact with the same gap sequence: 302.2/1,197.4/163.9 warm and 1,004.4/1,257.6/422.4 mixed, compactions after turns 94/145/196/247/298, 206 window slides; all match; ordering compact < none < window held on 20 other random gap sequences",
+    "wrote my own concurrency harness: read-then-write forks, atomic append without a queue keeps every message but breaks user/assistant alternation and stale context, queue with dedupe has 0 problems, queue without dedupe always answers the resend twice; matches the page's table qualitatively (exact counts differ because the harness differs)",
+    "web-checked the Anthropic docs facts the page quotes (prompt caching prices/TTL/lookback, token counting, compaction, context editing, tool_result placement): confirmed",
+    "checked origin against the Landed and interviewing.io guides; frequency low is consistent with thin sources"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "One python block; passes plain and with hash seeds 0/1 (under 1 s). The edited README sentence is prose only, not checked by code."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

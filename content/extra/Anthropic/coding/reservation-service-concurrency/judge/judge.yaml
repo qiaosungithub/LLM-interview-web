@@ -1,0 +1,5 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+special: concurrency
+note: "Part 2、Part 3 的测试会从多个线程同时调用你的代码，并在检查冲突、查字典的地方插入暂停点，让竞态每次都能复现；死锁会表现为超时（TLE）。但并发测试只能发现问题，不能证明没有问题：全部通过不代表代码里没有竞态条件，仍要自己按题目的 6 条要求逐条检查加锁是否正确。"
+timeout: 66       # seconds for the whole run: the case limits add up to 61
+case_cpu: 2       # CPU seconds per case unless the case says otherwise

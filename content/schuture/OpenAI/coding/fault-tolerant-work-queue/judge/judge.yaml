@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 68       # seconds for the whole run: covers an answer that times out on every case
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "三个部分写在同一个 WorkQueue 类里。Part 1、Part 2 的测试会按你当前构造函数的参数个数来创建队列：已改成 Part 2 / Part 3 的形式时，Part 1 的测试传入停在 0 的时钟和 lease_duration = 10**9，Part 2 的测试传入 max_attempts = 10**9，所以租约不会过期、也到不了重试上限。测试用的时钟和题目给的 ManualClock 完全一样。"

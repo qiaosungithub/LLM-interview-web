@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 70       # seconds for the whole run: covers an answer that times out on every case
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "Part 4 只要求口头讨论，不评测。内存约束的检查方式：从 tracker 对象出发，找它还引用着哪些会话的 user_id / chat_id 字符串，不看具体数据结构。"

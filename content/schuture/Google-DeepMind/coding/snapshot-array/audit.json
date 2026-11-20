@@ -1,0 +1,62 @@
+{
+  "id": "Google-DeepMind/coding/snapshot-array",
+  "verdict": "relaxed",
+  "summary_zh": "参考解法的结果都对（和按题意写的暴力解比了 36 万次随机操作，完全一致）。有两处和题目对不上：一是题目要求 diff(a, b) 的时间只和这段区间里的 set 次数加输出规模成正比，但参考解法还要逐个翻看 a 到 b 之间的每个快照，所以把要求放宽为再加上 b − a 这一项；二是 Part 3 的例子写着“接续同一个例子”，可上一段刚执行过 release(2)，照这个顺序 diff(2, 4) 会报错而不是返回 {}，已注明这个例子发生在 release(2) 之前。",
+  "issues": [
+    {
+      "where": "题目 Part 3（diff 的时间要求）",
+      "problem_zh": "题目要求 diff(a, b) 的运行时间只与快照 a 之后到快照 b 为止记录的 set 次数、再加上输出规模成正比。参考解法要逐个翻看 a+1 到 b 每个快照的日志，哪怕中间一次 set 都没有：实测中间隔 1000 个空快照、结果为空时用 0.07 毫秒，隔 100 万个空快照时用 61 毫秒。也就是还有一项和 b − a 成正比的开销，题目原来的要求参考解法达不到。",
+      "action": "relaxed",
+      "change_zh": "时间要求里加上 b − a（中间隔了多少个快照）这一项；“绝不能与 length 成正比”保持不变，这一点参考解法确实做到了（length 为一千万时 diff 仍是微秒级）。"
+    },
+    {
+      "where": "参考解答 Part 3（diff 的代价分析）",
+      "problem_zh": "讲解里说“构建并集的代价是 O(D)”，D 是访问到的日志条目数，漏掉了循环本身要走过的 b − a 个日志槽位。",
+      "action": "fixed",
+      "change_zh": "改为 O((b − a) + D)，并说明空的日志槽位也要看一眼。代码没有改动。"
+    },
+    {
+      "where": "题目 Part 3（例子）",
+      "problem_zh": "例子开头写的是“接续同一个例子的追踪”，而紧挨着的上一段（Part 2 的例子）刚执行过 release(2)。照这个顺序往下做，arr.diff(2, 4) 不会返回 {}，而是抛出 ValueError（快照 2 已被释放），和 Part 3 自己定的规则矛盾。",
+      "action": "fixed",
+      "change_zh": "把这句改成“接续 Part 1 例子的追踪”，并注明这两次 diff 调用发生在 Part 2 的 release(2) 之前、释放之后 diff(2, 4) 会抛出 ValueError。例子里的两个结果本身是对的，没有改。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原来没有检查 release(2) 之后再调用 diff(2, 4) 的结果，也没有检查 diff 在一长串空快照上要做多少工作。",
+      "action": "fixed",
+      "change_zh": "新增两小段检查：release(2) 之后 diff(2, 4) 抛出 ValueError、diff(3, 5) 结果不变；1001 个空快照上 diff(0, 1000) 没有任何 set、结果为空，却读了 1000 个日志槽位。按原来的说法写这两条检查都会失败。"
+    },
+    {
+      "where": "参考解答 Part 2（惰性压缩的“有界”）",
+      "problem_zh": "页面说惰性（lazy）版本里失效条目多留的时间“是有界的”，但没说按什么算。实测：这个“有界”指的是再调用大约 length/4 次 release 之后一定清掉（或者那个下标再被 set 一次）；如果之后不再调用 release，旧条目会一直留着——length 为 1000 时，release 之后又做了 10 万次 set/snap/get，保存的条目数一点没降（49806，最小值是 1998）。",
+      "action": "fixed",
+      "change_zh": "已改：把“有界”说清楚——轮询每次 release 前进固定的 4 个下标，再调用约 length/4 次 release 一定扫到；如果之后不再调用 release，这些条目会一直留着。代码没有动。"
+    },
+    {
+      "where": "Part 1（length 的上限）",
+      "problem_zh": "length 没有给上限，测试却用了 10^6。",
+      "action": "fixed",
+      "change_zh": "补一句：length 最大可达 10^6。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "wrote a brute force from the statement alone (full copy per snapshot) and compared set / snap / get / release / diff / error behaviour with the final class on 3000 random workloads x 120 operations (lengths 0..12, out-of-range indices, untaken, negative and released ids, a >= b), with periodic full sweeps over every live snapshot: all agree",
+    "replayed the three worked examples in the order the statement gives them; Part 1 and Part 2 match, Part 3's diff(2, 4) raises ValueError when run after Part 2's release(2)",
+    "eager release: stored_entries() equals the invariant minimum after every release on 1500 random workloads",
+    "lazy release: answers always correct; every entry a release() makes dead is gone within ceil(length / 4) further release() calls (69698 checks on 400 random workloads); without further release() calls they stay (length 1000: 49806 entries still stored after 100000 more set/snap/get calls)",
+    "timed diff across 1000 / 100000 / 1000000 empty snapshots with no set and empty output (0.07 / 6.1 / 61 ms) and with length 10 vs 10^7 (no dependence on length)",
+    "checked snap O(1), get O(log s) and the per-index memory claims of Part 1 against the code",
+    "both new checks fail when written to follow the original text (run on scratch copies) and pass as added",
+    "compared formulas, inline code and numbers between README.md and README.zh.md; python blocks identical",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change; each added check fails when it follows the original wording."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

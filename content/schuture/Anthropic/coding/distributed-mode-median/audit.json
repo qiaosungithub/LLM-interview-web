@@ -1,0 +1,51 @@
+{
+  "id": "Anthropic/coding/distributed-mode-median",
+  "verdict": "relaxed",
+  "summary_zh": "原题要求每个 rank 接收量“任何情况下”都不超过 O(D/P+P)，但参考解法按 value % 10 分配，遇到同余的输入会全部压到一个 rank，达不到要求。已把要求放宽为“高概率”，参考解法改用所有 rank 共用的带种子哈希；另外改掉了一条错误的追问答案。",
+  "issues": [
+    {
+      "where": "题目 Part 1",
+      "problem_zh": "要求最坏情况下任何 rank 接收不超过 O(D/P+P)，而参考解法（以及任何事先固定的分配函数）都做不到。",
+      "action": "relaxed",
+      "change_zh": "改为“以高概率不超过 O(D/P+P)”，并说明可以约定一个共用哈希函数、假设它把取值近似均匀分散。"
+    },
+    {
+      "where": "参考解答 Part 1 的 _owner",
+      "problem_zh": "所有者函数是 value % 10，所有取值都是 10 的倍数时全部落到 rank 0（实测 rank 0 收 23,016 字节，其余各 45 字节）。",
+      "action": "fixed",
+      "change_zh": "改用带固定种子的 blake2b 哈希；同一输入下各 rank 收到 2,172–2,682 字节。说明段落里的实测数字同步更新（2,551 → 2,776 字节，九倍 → 八倍）。"
+    },
+    {
+      "where": "参考解答 追问",
+      "problem_zh": "原文称乘法哈希 (value * 2654435761) % 10 比 value % 10 更分散；实际上乘数模 10 余 1，两者是同一个函数。",
+      "action": "fixed",
+      "change_zh": "改写为：最坏情况保证需要让划分依赖数据（像 Part 3 那样抽样选分割点），并指出这个乘法哈希在 P=10 时无效。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只用均匀随机取值，测不出上面的问题。",
+      "action": "fixed",
+      "change_zh": "新增一组“全是 10 的倍数”的输入，检查结果正确且最忙 rank 的接收量不超过平均值的 1.5 倍（该检查在旧写法下会失败）。"
+    },
+    {
+      "where": "Part 1（哈希均匀假设那一句之后）",
+      "problem_zh": "题面允许直接假设哈希把取值均匀分散，测试却判 hash(v) % P 错（取值全是 10 的倍数时会全部落到一个 rank）。",
+      "action": "fixed",
+      "change_zh": "补一句：这条假设对有规律或分布不均的取值也必须站得住，例如 P = 10、取值全是 10 的倍数时，v % P 或内置 hash(v) % P 会把所有取值分给同一个 rank，不算满足。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages)",
+    "measured per-rank bytes on an all-multiples-of-10 input with the old and new owner function",
+    "verified (v*2654435761)%10 == v%10 on 101k integers",
+    "new check fails with the old owner function",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change; the added check fails with the old owner function."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

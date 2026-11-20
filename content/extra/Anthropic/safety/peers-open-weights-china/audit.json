@@ -1,0 +1,26 @@
+{
+  "id": "Anthropic/safety/peers-open-weights-china",
+  "verdict": "fixed",
+  "summary_zh": "引文和数字都对。只改了一处：解答里说“2026 年 9 月又通报七家实验室”在官网查不到，其实 Anthropic 2026 年 9 月的威胁情报报告里就有这句话，已经补进笔记。",
+  "issues": [
+    {
+      "where": "笔记·对中国实验室；参考解答·出处与核对情况",
+      "problem_zh": "解答说“2026 年 9 月又通报了七家实验室”只在科技媒体上见到、官网查不到，所以没写。实际上 Anthropic 2026 年 9 月的威胁情报报告写明：2 月首次通报以来，又发现并阻断了来自七家中国实验室的蒸馏攻击。",
+      "action": "fixed",
+      "change_zh": "在蒸馏通报那一条后补一句七家中国实验室的事，并把核对说明改成指向这份报告。"
+    }
+  ],
+  "checked": [
+    "verified the race-to-the-top quote on the company page",
+    "verified every open-weights quote, the July 27, 2026 date, Dario's authorship and the open-letter response in the open-weights post",
+    "verified the distillation post (2026-02-23): DeepSeek, Moonshot, MiniMax, about 24,000 accounts, over 16 million exchanges, the national-security quote",
+    "read the September 2026 threat intelligence report and the October 2026 distillation-defenses post",
+    "verified We Must Pace the Frontier (September 2026): both quotes, 'ongoing, employee-like access', the embedded evaluators, the democratic coordination, the RSI speed limit (one of the levels of a possible global agreement) and the chip controls",
+    "verified the Anthropic-OpenAI pilot cross-evaluation post (2025-08-27; evaluations agreed in early summer 2025)",
+    "verified 'within a few months … OpenAI and Google DeepMind adopted broadly similar frameworks' in the RSP v3 post; the page already marks causation as Anthropic's claim",
+    "ran build.py --check"
+  ],
+  "code_run": {"ran": false, "passed": null, "notes": "no runnable code on this page"},
+  "env_evidence": [],
+  "confidence": "high"
+}

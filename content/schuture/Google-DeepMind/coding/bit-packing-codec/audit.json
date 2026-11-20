@@ -1,0 +1,36 @@
+{
+  "id": "Google-DeepMind/coding/bit-packing-codec",
+  "verdict": "fixed",
+  "summary_zh": "三个部分的题目、例子和参考代码都对（和我按题面另写的实现逐字节一致）。改了两处小地方：追问里说“定宽打包的流里翻转一个比特，后面所有字段都会错位”，这是错的，实际只有那一个字段的值变了；题面没写 best_encoding 和 for_size 在块的跨度超过 32 比特时也会抛 ValueError，而参考代码和验证代码都是这么做的，补上了这句。",
+  "issues": [
+    {
+      "where": "参考解答 追问（错误检测那一条）",
+      "problem_zh": "原文说 pack 编码的流中一个比特翻转，会“把它之后的每个字段都错位”。定宽字段的位置是固定的，翻转一个比特不会移动任何字段。实测 20000 次随机翻转（k 取 1 到 32），每次都恰好只有被翻转比特所在的那一个字段的值变了，后面的字段全部不变。会让后面全部错位的是 varint 的延续位翻转（原文这半句是对的）。",
+      "action": "fixed",
+      "change_zh": "改为：一个比特翻转会悄无声息地改掉它所在那个字段的值（后面的字段不受影响）。并在验证代码里加了一条检查：翻转 pack 输出里的一个比特后只有一个字段不同；把 300 的 varint 的延续位翻转后会解出两个数 [44, 2]。"
+    },
+    {
+      "where": "题目 Part 3",
+      "problem_zh": "题面只说 best_encoding 在 values 为空时抛出 ValueError，没有说块的跨度需要超过 32 比特时怎么办。参考代码在这种情况下也抛 ValueError（例如 [0, 2**40]，for_size 同样如此），验证代码也断言了这一点；只看题面的人很可能会认为应该返回 \"varint\"。",
+      "action": "fixed",
+      "change_zh": "题面那句补成：和 encode_for 一样，在 values 为空或者 w 会超过 32 时抛出 ValueError（for_size 也是如此）。代码没有改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "Part 1: pack/unpack vs my own big-integer implementation, exhaustively for k <= 3 and n <= 4, plus 20,000 random cases over k = 1..32, n <= 40 with boundary values (0, 2^k - 1, 2^(k-1)); output length ceil(kn/8); padding bits zero; ValueError for k in {-3, 0, 33, 64}, value 2^k, negative value, data one byte short or one byte long for every k and n <= 11",
+    "Part 2: uvarint encode/decode vs my own divmod implementation for every v < 70000 and around every power of two up to 2^139; size formula; every prefix of 5000 random streams raises exactly when it ends inside a number; 20,000 random byte strings decode identically to my decoder (value or ValueError); zigzag against the statement's enumeration for |n| <= 2000, unzigzag inverse for z < 20000, the 64-bit bitwise identity on 20,000 values and the extremes; -1 as 64-bit costs 10 bytes",
+    "Part 3: encode_for byte-for-byte vs my own layout on 40,000 random blocks (negative m, w = 0, range exactly 2^32 - 1 and 2^32, up to 200 values); for_size == len(encode_for); decode_for round trip; every truncation and one trailing byte raise ValueError; best_encoding vs actual encoded lengths incl. 767 exact ties (returns 'for'); 200,000 random byte strings into decode_for give only a list or ValueError",
+    "statement examples and explanation numbers recomputed: b'\\xa7\\x80', b'\\xac\\x02', 6 vs 9 bytes, 7 vs 16 bytes, 22 vs 10 bytes",
+    "follow-up on corruption measured: one flipped bit in a packed stream changes exactly one field in 20,000/20,000 trials; a flipped varint continuation bit changes the number of decoded values or raises",
+    "English and Chinese text compared paragraph by paragraph; code blocks identical",
+    "not verified: the follow-up's remarks about how Parquet, Lucene and FastPFOR lay out their blocks (128-value blocks, LSB-first) were not checked against those projects' sources"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass before and after. The added check asserts the corrected sentence (exactly one field differs after a bit flip); the old sentence's reading (later fields change too) fails that assertion."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

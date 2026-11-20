@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 42       # 29 cases x 1 s CPU + 4 cases x 2 s, plus margin
+case_cpu: 1       # CPU seconds per case
+note: "Part 1 的树形和高度在接口上看不到，只评测异常和 2 万个点的建树时间；Part 2 的剪枝靠计时检查（2 万个点、1000 次查询），用 NumPy 向量化扫描全部点也可能通过；knn 和 count_in_box 只评测结果，不评测剪枝和复杂度。"

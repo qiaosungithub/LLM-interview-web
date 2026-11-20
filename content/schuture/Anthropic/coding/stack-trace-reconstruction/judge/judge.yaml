@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 67       # seconds for the whole run: 28 cases at 2 s and the long-input case at 4 s, plus 5
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "三个部分都评测。事件按 Event(kind, ts, name, depth) 逐个比较，同一时刻的事件按题目给的顺序：先 end（由内向外），再 start（由外向内）。Part 2 另有三项检查：samples 换成只能读一遍的迭代器；每个事件确定之后（最多再多读一个样本）就要 yield 出来；读 6000 和 18000 个样本时额外内存峰值的差不能超过 256 KB。Part 3 没有给出规模，逐条扫描所有追踪的做法也能通过。"

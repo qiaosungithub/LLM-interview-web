@@ -1,0 +1,5 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 50       # 21 cases at 2 s = 42 s, plus slack; the reference needs about 6 s in all
+case_cpu: 2       # CPU seconds per case
+special: debug
+note: 第 2 部分（预测症状）是文字题，不评测；第 1 部分会包装 make_dataset 和 loss_and_grads，记录 train 每一步的小批量和参数来检查洗牌与动量。第 3 部分把判题程序自己的流水线（修好的，或只留一个 bug 的）交给 sanity_checks，检查五项结果；不检查的项是题目没有确定结果的那些。

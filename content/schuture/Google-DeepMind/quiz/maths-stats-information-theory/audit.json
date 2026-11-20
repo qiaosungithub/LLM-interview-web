@@ -1,0 +1,32 @@
+{
+  "id": "Google-DeepMind/quiz/maths-stats-information-theory",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages): pass",
+    "Q1 recomputed the multiply-add counts (1.1e7 vs 2e4, ratio 550) and log2(7)",
+    "Q2 determinant of 0.1*I_100 in float32 (0.0) and float64 (1e-100), and of 0.1*I_400 in float64 (0.0)",
+    "Q3 counted flops with instrumented loops for LU, Cholesky and LU-based inversion at n=100 and n=400 (0.66 n^3, 0.33 n^3, 2.0 n^3); residual and forward error of LU-solve vs explicit inverse on Hilbert matrices of order 6-12",
+    "Q4 pseudo-inverse on a rank-3 6x8 matrix: agrees with lstsq, has the smallest norm among 1000 other minimisers, equals the ridge limit, equals gradient descent from zero; full-column-rank closed form",
+    "Q5 sympy: E[X^k]=k!/lambda^k, central moments 1/l^2, 2/l^3, 9/l^4, skewness 2, kurtosis 9; MGF derivatives; t_3 moments and tail exponent via scipy",
+    "Q6 simulated the IQR of the Cauchy sample mean (2.0 at n=10 and n=1000, KS test against Cauchy); exact equicorrelated variance from the covariance matrix; skewness of the mean of 20 exponentials (0.447 = 2/sqrt(20))",
+    "Q7 1-0.95^20; paired-variance identity by exact enumeration of a 2x2 joint table; simulated Bonferroni FWER and Benjamini-Hochberg FDR/FWER on 20 tests",
+    "Q8 chi-square 10.5, critical value 11.07, p 0.062 from scipy, plus a 400k-draw multinomial simulation of the null (0.062, 95th percentile 11.06); 10% critical value 9.24",
+    "Q9 both decision boundaries by root finding on the true densities (1.572, 2.223)",
+    "Q10 e^2; Q11 BSC mutual information by enumerating the joint (0.531 bits) and the InfoNCE bound log N - L <= I with the optimal critic on a random discrete joint for N=2, 8, 64",
+    "Q12 all five integrals in sympy",
+    "numbering Q1-Q12 lines up one to one in both languages; formulas and numbers compared question by question between English and Chinese; code blocks identical in both files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; nothing was changed."
+  },
+  "env_evidence": [
+    "Quiz · oral, with derivations",
+    "12 questions / 45–60 min",
+    "Confirm the convention for $\\log$ (natural, used throughout) and whether a named result (Strassen's algorithm, the Berry–Esseen theorem, McNemar's test) may be quoted or should be derived from first principles; the answers below quote them."
+  ],
+  "confidence": "high"
+}

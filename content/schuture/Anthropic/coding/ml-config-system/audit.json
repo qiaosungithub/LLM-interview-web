@@ -1,0 +1,37 @@
+{
+  "id": "Anthropic/coding/ml-config-system",
+  "verdict": "fixed",
+  "summary_zh": "题目 Part 3 说 validate_config 在 config 本身不是 dict 时会抛出异常，但参考解法并不抛出，而是返回一条路径为 \"<root>\" 的错误；已把题目这句话改成和参考解法一致。另外 Part 2 说明里“浮点数必须排在整数前面，否则会落到 int(...) 上报错”这句在这份代码里不成立，已改正。四个部分的代码和例子都实际跑过、试着找过反例，其余没有发现问题。",
+  "issues": [
+    {
+      "where": "题目 Part 3",
+      "problem_zh": "题目写的是“只有当 config 本身不是 dict 时才会抛出异常”。但参考解法遇到这种情况并不抛出异常：validate_config([], Schema) 返回的是 [FieldError(\"<root>\", \"expected a mapping, got list\")]，页面验证代码里另外写的那个对照校验器也是这样做的。照题目这句话去实现，结果会和参考解法对不上。",
+      "action": "fixed",
+      "change_zh": "把这句改为“config 本身不是 dict 时也一样（不抛出异常），只返回一条路径为 \"<root>\" 的错误”。参考解法没有动；验证代码里加了一条断言把这个行为固定下来。"
+    },
+    {
+      "where": "参考解答 Part 2 开头的说明",
+      "problem_zh": "原文说“浮点数必须排在整数前面，因为带小数点的值绝不能落到 int(...) 上，那样会直接报错”。在这份代码里并不是这样：两个模式都用 fullmatch 匹配整个 token，1.5 根本通不过整数模式，没有任何文本能同时满足两者；把这两个判断的先后对调，在 30 万个随机 token 上结果完全一样。",
+      "action": "fixed",
+      "change_zh": "改为：浮点数排在前面是个稳妥的习惯（如果用的是只匹配前缀的 match，1.5 会通过整数模式，int(\"1.5\") 就会报错），但这里用的是 fullmatch，顺序并不影响结果。验证代码里加了一条断言：没有 token 能同时满足这两个模式。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits; the Part 1-4 worked examples are asserted by the page's own checks",
+    "deep_merge against a literal re-implementation of the statement's four rules on 20,000 random nested inputs (DELETE at any depth, lists, dict over scalar, scalar over dict): 0 mismatches, no container shared with either input, inputs never mutated",
+    "resolve_bases: diamonds in both list orders, a cycle that does not pass through the start name (message 'b -> c -> b'), self-cycle, missing names, a base listed twice, 3,000 random stores (store never mutated, no DELETE or _base_ left in the result); single-parent chain timed at 2.7 / 10.8 / 43 ms for 100 / 200 / 400 links (quadratic, as the page says)",
+    "override grammar: 60 edge-case strings (signs, '1.', '.5', exponents, quotes inside quotes, '=' ',' and brackets inside strings, empty / trailing-comma / nested lists, whitespace in every position, non-ASCII digits, malformed paths) and 17 apply_overrides cases (with and without '+', non-dict segments, later override wins, input untouched) -- all behave as the statement specifies",
+    "interpolation: 23 cases (self, 2-cycle, cycles through dict-valued references and nested paths, missing paths, embedding list / dict / None, bool-float-int-str text, whole-value type preservation, references inside lists, chains); input never mutated; cost grows linearly on 2k-8k references",
+    "validate_config: non-dict root, bool against int / float fields, nested value that is not a dict, list element paths, undeclared keys deep inside list[X]",
+    "freeze_config: assignment and deletion at every level raise TypeError, later mutation of the source is not visible; config_hash: 2 vs 2.0, 0.0 vs -0.0, True vs 1, key order, NaN and +-inf raise ValueError",
+    "swapped the float / int test order in _parse_scalar: identical results on 300,000 random tokens",
+    "python and py code fences are byte-identical between README.md and README.zh.md; numbers per section identical; read the Chinese prose against the English sentence by sentence"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. The reference code itself was not changed, so the two added assertions pin the corrected sentences rather than catch a code bug; each fails on a variant that behaves the way the old sentence described (a validate_config that raises on a non-dict root; an int pattern that also accepts 1.5)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

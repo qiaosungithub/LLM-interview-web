@@ -1,0 +1,46 @@
+{
+  "id": "Anthropic/take-home/llm-eval-and-synthetic-data",
+  "verdict": "fixed",
+  "summary_zh": "页面上引用的数字都和代码跑出来的一致，区间覆盖率在 200 个种子上也复现了。改了三处小地方：列表卡片上的简介原来直接点出了埋的几个陷阱，改成只说“埋了几个常见的坑”；Part 4 原来说“两种提示词下”都比了相对只用 dev 的提升，其实“只用 dev”只用原提示词跑过，改成照实说，并写进局限；时间表里 Part 4 写死 200 次调用，但题目说试探也算预算，改成“剩下的，约 200”。",
+  "issues": [
+    {
+      "where": "列表卡片简介",
+      "problem_zh": "卡片上的简介写着“题里埋了标签噪声、分布偏移、与测试集重叠等陷阱”。做题前就能看到，等于把 Part 2、Part 3 要自己发现的东西提前说了。",
+      "action": "fixed",
+      "change_zh": "改成“题里埋了几个做评估时常见的坑。”其余不变。"
+    },
+    {
+      "where": "参考解答 Part 4",
+      "problem_zh": "思路和结论都说“相对只用 dev 的提升在两种提示词下都还在 / 都是 +0.115”。但代码里“只用 dev”只用原来的写法跑过，新提示词那一行是“新写法 + 打乱的清洗示例”减去“原写法下的只用 dev”，并没有在新写法下重跑“只用 dev”。",
+      "action": "fixed",
+      "change_zh": "思路里说明两边都和原提示词下的“只用 dev”比；结论改成“相对原提示词下的只用 dev，两种提示词的提升都是 +0.115”，并在局限里加一句：新写法对“只用 dev”本身有没有影响，这里看不出来。数字没变。"
+    },
+    {
+      "where": "参考解答 先定时间和预算（时间表）",
+      "problem_zh": "表里 600 + 400 + 1,800 + 200 正好是 3,000，同时第一行又安排了“手动试探几十次”。题目说试探也算进预算，照表做到 Part 4 会超预算。",
+      "action": "fixed",
+      "change_zh": "Part 4 那一格改成“剩下的，约 200（试探用掉的从这里扣）”。代码本来就是用“剩下多少用多少”，不受影响。"
+    }
+  ],
+  "checked": [
+    "ran page normally and with --hash-seeds (PYTHONHASHSEED 0 and 1), 2 threads, before and after edits: all PASS",
+    "re-executed every python block and diffed printed output against each following text block: all match, before and after edits",
+    "compared every number quoted in prose and tables (Part 1-4, planted-value table, coverage line) with printed output",
+    "own recursive-descent bracket checker agrees with the page's checker on all 1,398,101 strings up to length 10; 40 balanced strings of length 6",
+    "data facts recomputed: dev 12, test 300 distinct and disjoint from dev, lengths 5-14, kinds 115/55/130, colleague file 300 lines",
+    "Part 1 recomputed from the raw call log with my own parser and scipy Wilson/t intervals: 201/300 [0.615,0.721], 260/300 [0.824,0.901], paired +0.197 [+0.137,+0.256]; exact McNemar on 76 vs 17 discordant pairs agrees; own stratified Agresti-Caffo length-control intervals match",
+    "Part 2 audit redone from raw generated text: 360 lines, 17 rejected, 194 distinct, 23 wrong labels (22 order kind), 26 test overlaps all length <= 8; colleague file 182 distinct, 9 wrong, 103 test overlaps, all 66 strings longer than 8 are test strings",
+    "Part 3 effects and 95%/99% intervals and the leaked / not-leaked split recomputed with scipy: match",
+    "planted expected accuracies (_p_says) checked against Monte Carlo of the simulator over 300 seeds: agree within error",
+    "coverage re-simulated over 200 seeds (blocks 1-6 plus the check-block intervals): mean 0.963, min 0.92, matching the page; 40-seed side claims (as-is effect, leak effect range, 0.55 share of significant leak splits) also reproduced",
+    "statement checked for self-containedness: budget (3,000 calls incl. probes), API, data, deliverables (notebook + 10-minute talk) given; planted findings not stated in the statement",
+    "SDK snippet (anthropic.Anthropic, messages.create, stop_reason max_tokens, joining text blocks) and the prompt-caching follow-up checked against current Anthropic SDK docs: correct",
+    "origin line read against the two cited sources: accurate, says the page is our own write-up; frequency low"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "Prose-only edits; code and printed text unchanged, so no new check was added. The page's own checks never assert on wall-clock time."},
+  "env_evidence": [
+    "这里的模型是研究对象，只能通过 client 调用。写代码时能不能用 AI 助手，以邀请信为准；没写就当作不能。",
+    "交付一个可以从头跑到尾的 notebook，和一次 10 分钟的讲解（讲完是问答）。"
+  ],
+  "confidence": "high"
+}

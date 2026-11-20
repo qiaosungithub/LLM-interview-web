@@ -1,0 +1,34 @@
+{
+  "id": "Google-DeepMind/quiz/llm-fundamentals",
+  "verdict": "fixed",
+  "summary_zh": "十二道题的答案和数字都重算过，全部正确。只改了 Q5 题目里的一处记号：题目把 N 说成“一个块的参数量”，答案里用的却是全部 L 个块的参数量，现在题目和答案统一了。",
+  "issues": [
+    {
+      "where": "Q5",
+      "problem_zh": "题目先把 N 定义成“一个解码器块的参数量”（也就是 12d²），接着要求推导训练每个 token 约 6N 次运算；但答案里的 N 是全部 L 个块的参数量 12Ld²。照题目的定义去算，6N 会少 L 倍，题目和答案对不上。",
+      "action": "fixed",
+      "change_zh": "题目改成：先数一个块的参数量（不再叫它 N），然后“把全部 L 个块的参数量（即不含嵌入的部分）记作 N”。答案没有动，12d²、12Ld²+Vd、训练 6N、推理 2N 都是对的。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "Q1: Monte Carlo Var(q.k) for Rademacher / uniform / Laplace components (not only Gaussian) and exact enumeration for d_h=3; softmax Jacobian formula against finite differences and its decay as scores spread",
+    "Q2: recounted FLOPs from loop sizes (8Td^2 + 4T^2 d, crossover T=2d via sympy); running-softmax merge formula against the full softmax on 200 random block pairs",
+    "Q3: KV-cache bytes from real torch bf16 tensor shapes (2^32 = 4 GiB; MQA 0.5 GiB; h_kv=32 gives 16 GiB)",
+    "Q4: sympy proof that the rotated dot product equals q^T R(-(m-n)w) k and is shift invariant; numeric counter-example for additive sinusoidal positions; four-term expansion",
+    "Q5: parameter count of a real bias-free torch attention + MLP block (12 d^2); size of the dropped attention term 4Td vs 24d^2",
+    "Q6: torch LayerNorm vs RMSNorm on zero-mean and generic inputs; the scalar pre/post-norm argument was read as the heuristic the question asks for, plus a quick gradient-norm measurement on random-init stacks up to depth 800",
+    "Q7: cross-entropy 0.978006 nats, perplexity 2.659148, 1.410964 bits, product exactly 1/50",
+    "Q8: my own BPE implementation with the stated tie rule: (e,s), (es,t), (est,_), all count 9, with the tied candidates at each step",
+    "Q9: N = 2.887e10, D = 5.774e11, 6ND = 1e23",
+    "Q10: numerically maximised the KL-regularised objective on 20 random problems and compared with the closed-form optimum (max diff 6e-8); beta -> infinity and beta -> 0 limits",
+    "Q11: exact-fraction top-p on the example ({a, b}); temperature vs entropy",
+    "Q12: total 1.65e10, active 4.5e9, 27.3%; balance loss E*sum(f*P) equals 1 at uniform and is larger elsewhere when f = P",
+    "numbering 1..12 in questions and answers in both languages; the code fence is identical in both files; Chinese read against English answer by answer, including the follow-ups"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass. No code changed; the existing Q5 check already uses N = 12*L*d^2."},
+  "env_evidence": [
+    "共十二个问题，按主题分组；每题都要口头作答，多数还需要一段简短推导。"
+  ],
+  "confidence": "high"
+}

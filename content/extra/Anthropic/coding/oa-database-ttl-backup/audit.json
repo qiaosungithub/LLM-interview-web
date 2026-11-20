@@ -1,0 +1,41 @@
+{
+  "id": "Anthropic/coding/oa-database-ttl-backup",
+  "verdict": "fixed",
+  "summary_zh": "题面、例子和参考解答都没有问题：照题面独立写一遍，在所有例子和上万组随机操作上结果和参考解答完全一致。只改了来源说明里几处不准的地方：Fellowship Trainer 的返回值类型和本页不一样，规则只是“基本相同”；“历史读取”除了那份整理清单，另一个题库目录里也有题名；去掉了一个用户看不懂的文件编号。",
+  "issues": [
+    {
+      "where": "来源说明（origin）",
+      "problem_zh": "原文说 Fellowship Trainer 的 mock-imdb-4 和 LibreSignal “规则相同”，但它的 get 找不到时返回 None、delete 返回布尔值、backup 返回整数，不是本页要求的字符串；“mock-imdb-4”是那个练习集里的文件编号，用户看不懂。",
+      "action": "fixed",
+      "change_zh": "改成“Fellowship Trainer 里的内存数据库四关模拟题规则基本相同（只是返回值用 None、布尔值和整数，不是字符串）”。来源性质也写得更具体：两者都自称练习用的模拟题；Fellowship Trainer 说这一套按公开练习仓库和候选人的回忆改编，并引用了一篇第三方整理的“Anthropic 在线测评：内存数据库”，但都不是经过确认的 Anthropic 原题。"
+    },
+    {
+      "where": "来源说明（origin）",
+      "problem_zh": "原文说条件写入和历史读取“只在网上一份整理清单 里以一行题名出现”。那份清单里它们是一个“记录存储”条目下的两行要点，不是题名；另外一个题库目录里还列着“内存数据库历史查询”这个题名（没有题面）。原句里还多了一个空格，像是删掉了链接。",
+      "action": "fixed",
+      "change_zh": "改成“都没有找到题面：网上一份整理清单里各只有一行要点，一个题库目录里另有‘内存数据库历史查询’这个题名”。"
+    }
+  ],
+  "checked": [
+    "ran page and with --hash-seeds (PYTHONHASHSEED 0 and 1) before and after the edit: all pass; checks use fixed seeds and no wall-clock asserts",
+    "wrote my own implementation from the statement only (get_when answered by replaying the timestamped call log into a fresh instance); it and the page reference both reproduce every statement example (Levels 1-4, 72 calls)",
+    "random comparison mine vs reference: 3,000 untimed sequences and 6,000 timed sequences (half with keyword timestamp=/ttl=/prefix=), with backups, restores to exact backup times and in-between times, get_when near writes/expiries/restores, and plain reads interleaved after timestamped writes: all agree",
+    "dense-boundary run (step 1, ttl 1-3): 4,000 sequences, about 170,000 calls, all agree; the intermediate Level 1, Level 2 and Level 3 classes shown on the page also agree with mine on their own levels",
+    "confirmed the random tests have teeth: 7 plausible misreadings (inclusive expiry, CAS keeping old TTL, restore keeping absolute expiry, counting expired records in backup, plain reads hiding expired fields, get_when ignoring a call exactly at at_timestamp, delete_at purging an expired field) are each caught within a few hundred sequences",
+    "hand-checked every remaining-lifetime and expiry number in the Level 3 and Level 4 example comments",
+    "checked the explanation's counts and claims (nine _at methods, seven forwards, expiry >= 2 so time-0 forwarding ignores expiry, bisect_right with key since Python 3.10, 750/1000 and 800/1000 on the process page)",
+    "read LibreSignal's in-memory database levels 1-4, its solution (restore uses bisect_right, i.e. <=) and tests (three Level 3 tests do call plain reads after timestamped writes; Level 3-4 tables write timestamps as strings, tests use ints), and Fellowship Trainer's mock-imdb-4 (same TTL/backup/restore rules, returns None/bool/int); LibreSignal never mentions Anthropic",
+    "found the online list (an interview-prep gist: 'Conditional writes (compare-and-set/delete)' and 'Historical queries (get value at past timestamp)' as bullets under 'Record Store') and the question-bank catalog title 'In-Memory Database Historical Lookup'",
+    "second reviewer: replaced the file id 'mock-imdb-4' with a plain description; corrected a first-pass draft that said neither practice set mentions Anthropic (Fellowship Trainer's source list cites a third-party 'Anthropic OA: In-Memory DB' write-up for this mock and says it is adapted from public repos and candidate write-ups)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both before and after the edit, also under PYTHONHASHSEED 0 and 1. Only meta.yaml changed; README.zh.md untouched."
+  },
+  "env_evidence": [
+    "90 分钟四关，分量前轻后重。",
+    "写完一个方法就跑一次平台的测试，不要攒着。"
+  ],
+  "confidence": "high"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "OpenAI/coding/time-based-kv-store",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "read README.zh.md in full and the English prose and examples; topic folder is byte-identical to the original; code blocks identical in both languages",
+    "ran the page with tools/run_page.py four times in a row (both languages pass every time, 13 blocks; the forced-race check reported 20/20 broken for the two unlocked variants and 0/20 for the two locked classes)",
+    "replayed every statement example of Parts 1-4 literally against the Part 1, Part 2, Part 3, per-key-lock and global-lock classes (Part 4 example 300 times per strategy: always timestamps [1040.0, 1041.0])",
+    "brute-force compare (a list of every set call, scanned linearly) for the Part 1, Part 2, Part 3 and both locked classes: 459,021 random operations with int/float mixes, negatives, duplicates, 0 vs None timestamps, late arrivals, clock moving backward, several keys; for Part 3+ also checked returned timestamps, strict increase, and stored pairs",
+    "Part 3 explanation simulated: after a 10 s step back with 5 writes/s, a 1-second unit leaves the key 90 s ahead after 20 s and 810 s ahead after 200 s (every write nudged, get() without timestamp returns a stale value); with nanosecond units only the first 50 writes are nudged and the clock catches up",
+    "Part 4: own thread hammer (16 threads, 4 keys, explicit and clock timestamps, a clock another thread keeps moving back and forth, 1 microsecond switch interval, with and without yielding dicts) - both locked classes clean in 24 runs; the same harness catches the unlocked Part 3 class in 6 of 6 runs",
+    "Part 4 notes confirmed by negative variants: per-key lock with an unlocked get raises IndexError (6 of 6 runs); reading the clock before taking the lock nudged 933 of 2400 writes under a clock that only moves forward, the reference and the global-lock class nudged 0",
+    "Part 4: 8 threads touching 200 new keys create exactly one lock per key and record 8 strictly increasing timestamps each"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Not acted on: with an infinite timestamp last + 1 == last, so Part 3's strict increase cannot hold there (float limit, not something the page is about)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 57       # seconds for the whole run: 26 cases at 2 s, plus 5
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "三个部分都评测。registry 是 ref.Registry：数据集 name 的样本依次是 \"name-0\"、\"name-1\"、…，读完回绕；自定义运行里可以 from ref import Registry。Part 1、2 的 batch 逐个样本比较。Part 2 的状态都先经过 json.dumps / json.loads 再传给 load_state_dict（新对象和同一个对象都测）；恢复后不能从已经产出过的位置重新读起；状态的 JSON 长度不能随 batch 数增长。Part 3 确定性分配的规则可以自己定：检查每个数据集内部按顺序取，以及每一次选择之后都有 |count_k(n) − n·w_k/W| ≤ K + W（与 batch_size 无关；参考解答的规则可证明不超过 1 + K），保存恢复后结果不变。随机分配不比对具体抽到的序列，只检查同一 seed 可复现、保存后精确续接，以及各数据集被选中的比例（卡方检验）。"

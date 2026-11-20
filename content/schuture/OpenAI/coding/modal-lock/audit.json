@@ -1,0 +1,22 @@
+{
+  "id": "OpenAI/coding/modal-lock",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages) 6 times each, all pass (4-7 s per run)",
+    "confirmed code blocks are identical in README.md and README.zh.md; page is unchanged from the original",
+    "replayed all five statement scenarios (Part 1 six-step example, the three table rows, the three-mode example) step by step under my own controlled scheduler and compared the holder set after every step",
+    "systematic interleaving exploration: replaced the lock's Condition with a controlled one so real threads run the page's code while the order of critical sections is enumerated; 10 small programs (3-4 threads, up to 2 rounds, 2-3 modes), about 40000 schedules per lock (9 programs exhaustive, 1 capped at 30000), plus 12000 random schedules of 6-10 thread programs per lock; every run checked against an oracle written from the statement (immediate grant vs queueing, never two modes held, grants only from the head batch, no hang)",
+    "real-thread runs with my own driver and oracle (not the page's Rig): 12000 events per lock incl. bogus release() calls and the exact waiting_count() value after every event",
+    "checked the explanation's claims as mutants: FairModalLock with notify() hangs exactly when a batch reaches the head with 2 or more parked members (holds in all 14712 schedules); popping the head batch on active == 0 alone strands a woken member (it is never granted); ModalLock with `if` instead of `while` lets two modes hold at once; ModalLock with notify() never hangs but leaves same-mode parked callers asleep",
+    "read Rig._parked and confirmed the ordering argument in its comment"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; no edits made."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

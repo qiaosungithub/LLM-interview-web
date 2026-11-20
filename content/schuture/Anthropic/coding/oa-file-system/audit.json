@@ -1,0 +1,21 @@
+{
+  "id": "Anthropic/coding/oa-file-system",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages); code blocks are identical in README.md and README.zh.md",
+    "replayed every line of the four statement examples programmatically against the reference (43 commented values, both languages)",
+    "wrote an independent model from the statement text alone and fuzzed it against the reference: 3000 random sequences x 400 calls (1.2M calls) with invalid paths, '/', doubled and trailing slashes, unregistered owners, snapshots; compared return values and the complete tree + user table after every call",
+    "in the same fuzz: every call that returned its failure value left the state unchanged; every user's used total equals the recomputed sum of owned file sizes and never exceeds capacity",
+    "fuzzed the Level-1/2-only class (before the Level 3 overrides) the same way, 600k calls",
+    "confirmed the Level 2 prose claim: with the 'dst is an ancestor of src' check removed, mv('/p/q','/p') leaves used=0 while 10 bytes still exist",
+    "confirmed update_capacity breaks size ties by plain string order of the full path ('/a.b' before '/a/b')",
+    "read Chinese and English statement and solution prose side by side; no difference in meaning found"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass; no edits made."},
+  "env_evidence": [
+    "只有当前一关的测试全部通过，下一关的测试才会开始运行，且每一关都在同一个类上继续添加方法，而不是重新实现。"
+  ],
+  "confidence": "high"
+}

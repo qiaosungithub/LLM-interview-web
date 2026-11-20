@@ -1,0 +1,19 @@
+{
+  "id": "Anthropic/coding/oa-worker-mode-tracker",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page, and with --hash-seeds (PYTHONHASHSEED 0 and 1): all pass",
+    "worked the four chained example blocks by hand (counts after each step, the 3/5 tie, removal back to 0, merge 4 + 3 = 7) and replayed exactly the statement's calls, with no extra ones, on my own model and both page classes: same values and same types (True/False, 0 versus None)",
+    "my own model (a dict keyed by (worker, value) plus a registered set, mode and top-k by repeated minimum) against ModeTracker and FastModeTracker on 1,500 random histories with values up to +-1e9, negatives, 0, re-used ids, removals and merges: identical answers after every call",
+    "checked the lazy-heap bound after every call: heap size <= 2 * live values + SLACK always held",
+    "checked the amortised rebuild claim by reasoning (between two rebuilds there are more than V' + SLACK count changes, V' the live count at the rebuild) and by counting: rebuild work per count change at most 0.32 on random runs, 5,000 per 16,998 on a large live set with churn, 3,616 per 8,003 when one worker holding most values is removed",
+    "checked the follow-up claims: a Counter lookup of a missing key returns 0 without inserting it; Counter.update adds counts; the bucket walk-down is bounded by earlier +1 raises; Count-Min sketches are linear, so subtracting one worker's table is exact for the remaining data; Misra-Gries summaries merge but do not support deletion in standard form",
+    "both internal links resolve to existing pages",
+    "checked the origin line against the third-party prep list: under 'CodeSignal OA Questions', item 10 'Worker Mode Tracker' has exactly the three quoted bullets and nothing else; the list is a promo page for a paid course; level 4 has no source, as the page says"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "Page passes as written, also under PYTHONHASHSEED 0 and 1. No edits. Minor, not changed: Level 2 says the worst case over all calls is 'about 10^7'; that counts items touched, and with the sort's log factor it is about 10^8 comparisons. This is a loose estimate, and the conclusion that it is fast enough still holds."},
+  "env_evidence": [],
+  "confidence": "high"
+}

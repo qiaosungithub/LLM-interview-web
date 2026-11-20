@@ -1,0 +1,30 @@
+{
+  "id": "OpenAI/system-design/nearby-poi",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages)",
+    "recomputed every capacity number in an independent script: 194 and 252 bytes per record, 47 GiB, 27-byte index entry and 6.0 GiB per copy, 10,000 and 40,000 QPS, 20 nodes and 121 GiB, 30,000 cache keys of about 8 KB and 240 MiB, 1,000,000 changes/day, 11.57 writes/s, 231 apply operations/s, 69 changes in flight, 5 s bulk edit, 7,000 overlay changes per 10 minutes, 60 s lag + 30 s TTL inside the 2-minute target",
+    "recomputed the geohash facts: bit split between longitude and latitude, precision-6 cell of 0.61 km x 1.22 km at the equator and 0.61 km wide at latitude 60, the two known test vectors, precision picked for 300 m and 5 km at latitude 41 and 300 m at latitude 80, shard-rim shares 124/1,024 and 5/8, the 3.4 km meridian-vs-parallel gap",
+    "derived the precision rule and the k-NN safety margin by hand (disc longitude half-span, distance to a meridian and to a parallel) and confirmed the loop's termination argument",
+    "fuzzed radius_search and knn_search against a full scan on 2,520 extra checks in regions the page does not test (whole globe, both poles, equator, antimeridian, radii from 1 m to 15,000 km, k up to 500): no mismatch",
+    "confirmed the quoted experiment figures (600 queries, 33 cases beyond the first block) are what the code produces",
+    "checked the mermaid diagram against the walk-through",
+    "compared README.zh.md with README.md paragraph by paragraph and by the set of numbers in the prose; python block identical in both"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

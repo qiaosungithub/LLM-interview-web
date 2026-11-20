@@ -1,0 +1,49 @@
+{
+  "id": "Google-DeepMind/coding/em-gaussian-mixture",
+  "verdict": "fixed",
+  "summary_zh": "题目、推导和代码都没问题，只改了讲解里三处小地方：每多一个分量多出的参数个数少算了 1（应为 1 + d + d(d+1)/2）；log-sum-exp 那句把“防下溢”说成了“防溢出”；补了一句说明加了 reg 之后“对数似然永不下降”只是近似成立，reg 取大时会看到最后一步略微下降。",
+  "issues": [
+    {
+      "where": "参考解答 Part 3(b)",
+      "problem_zh": "原文说每多一个分量多出 d + d(d+1)/2 个参数，漏了权重那 1 个。按题目自己的 p 公式，K 每加 1，p 增加 1 + d + d(d+1)/2（本页 d = 2 时是 6 个，不是 5 个；BIC 表里 K=3→4 的差 30.2 也只和 6 个参数对得上）。",
+      "action": "fixed",
+      "change_zh": "改成 1 + d + d(d+1)/2。"
+    },
+    {
+      "where": "参考解答 Part 2（log-sum-exp 的解释）",
+      "problem_zh": "原文说减去最大值后“即使 log 密度非常负，np.exp 也不会溢出”。非常负的数取指数本来就不会溢出，真正的危险是全部下溢成 0、再取 log 得到 -inf；这句话没讲到减最大值为什么能防住它。",
+      "action": "fixed",
+      "change_zh": "改成：减去最大值后每个指数都 ≤ 0（不会上溢），而且最大的一项恰好是 e^0 = 1，所以求和至少是 1，不会下溢成 0。"
+    },
+    {
+      "where": "参考解答 追问（奇异似然）",
+      "problem_zh": "页面处处强调“一次 EM 迭代永不让对数似然下降”，但代码按题目要求在每次 M 步后给协方差加 reg，这样的 M 步已经不是 Q 的精确极大值点，单调性只是近似成立。实测：在本页的 600 个点上取 K=4、reg=0.5，最后一步对数似然下降 0.047（同一步若用不加 reg 的 M 步会上升 68）；默认 reg=1e-6 时，3000 组随机小数据里有 23 组在某个分量几乎坍缩时最后一步下降，最大 0.003。",
+      "action": "fixed",
+      "change_zh": "在这条追问末尾补了两句：加 reg 后单调性严格说只对 reg=0 成立，reg 相对协方差特征值不算小时对数似然可能略微下降，停止规则会把它当作收敛而停下；默认 reg 在本页数据上看不出来。题目和代码没有改。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只在默认 reg、K=3 上验证单调，看不到上面这一点。",
+      "action": "fixed",
+      "change_zh": "新增一组检查：同一份数据 K=4，reg=0 时对数似然全程不下降；reg=0.5 时最后一步下降约 0.05。（代码没改，这条检查只是让新加的那句话可以复现。）"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "recomputed the statement's worked example (densities, p(x), ell, gamma, pi/mu/Sigma update, ell_new) with scipy.stats.norm, independently of the page's code",
+    "E-step compared with scipy multivariate_normal + logsumexp on 200 random (n, d, K) problems",
+    "M-step confirmed to maximise Q numerically: 6000 random perturbations of (pi, mu, Sigma) never beat it (reg=0)",
+    "lower bound F(theta, q) <= ell for random q, with equality at q = gamma, on 200 random problems",
+    "fit_gmm log-likelihood monotonicity on 600 random datasets for reg in {1e-6, 0, 1e-2} and 3000 more at the default reg; traced every dip to the reg term by replaying the step with an exact M-step",
+    "returned parameters reproduce log_likelihoods[-1] on every run",
+    "recomputed the BIC table (K=1..6), the BIC worked example and the small-variance table by hand formulas",
+    "k-means++ init returns K distinct rows on data with duplicate rows (200 seeds)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass. No reference code was changed, so the added check cannot 'fail before'; it reproduces the new sentence (last-step dip = 0.0472 at K=4, reg=0.5)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

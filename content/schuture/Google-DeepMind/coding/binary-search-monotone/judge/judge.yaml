@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 45       # 37 cases x 1 s CPU, plus margin
+case_cpu: 1       # CPU seconds per case
+note: "Part 3(a) 的下界证明和 (b) 中求值次数的推导是书面部分，不评测。Part 1 的 O(log n) 按对元素的比较次数检查。"

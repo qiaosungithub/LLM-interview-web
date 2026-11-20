@@ -1,0 +1,38 @@
+{
+  "id": "Anthropic/coding/image-processing-pipeline",
+  "verdict": "fixed",
+  "summary_zh": "题目和三部分的参考解答都没问题（顺序版、多进程版、前缀共享版的输出逐像素一致）。只改了 Part 3 例子里的一句：原文逐项列出“独立执行”的次数时漏了 p2 的 blur(radius=2)，列出来的加起来是 10 次，却写着“共 11 次”；已补上这一项，总数 11 和共享后的 6 次本来就是对的。",
+  "issues": [
+    {
+      "where": "题目 Part 3（例子）",
+      "problem_zh": "原文说独立执行时 grayscale、scale 各三次，rotate 两次，flip_horizontal 和 blur(radius=2) 各为 p4 执行一次，“共 11 次”。但这样列出来是 3+3+2+1+1=10 次，漏掉了 p2 末尾的 blur(radius=2)；照着数的人会对不上 11。",
+      "action": "fixed",
+      "change_zh": "在这句里补上“blur(radius=2) 为 p2 执行一次”，逐项相加正好是 11。总数 11 和共享后的 6 次没有改动。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只断言了总数 11 和共享后的 6，没有覆盖“blur 出现两次（p2 和 p4 各一次）”这一点。",
+      "action": "fixed",
+      "change_zh": "新增一条断言：例子里的 4 条流水线中 blur 步骤一共出现 2 次（按原文漏项的说法写成 1 次会失败）。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "checked the statement's rules against Pillow directly: flip directions, rotate is counter-clockwise with expand and black fill (RGB and L), scale rounding incl. the clamp to 1 pixel (5*0.5->2, 3*0.5->2, 7*0.5->4, 5*0.1->1), grayscale -> mode L",
+    "confirmed no step mutates or aliases its input (incl. scale 1.0, blur 0, rotate 0/360), which the shared-prefix walk relies on",
+    "counted Image.open and apply_step calls with wrappers: 3 images x 11 steps -> 3 decodes / 33 applications sequential and per-image worker; 3 decodes / 18 applications with prefix sharing (6 per image for the Part 3 example)",
+    "wide trie (12 pipelines, 25 distinct prefixes, depth 3): 25 applications, at most 3 intermediates alive at once (matches the 'one image per depth' claim)",
+    "12 extra randomized trials (1-4 images, up to 10 pipelines with shared prefixes, duplicates, empty pipelines, shuffled JSON key order, odd angles and factors): brute force vs sequential vs parallel vs shared-prefix outputs pixel-identical, application count equals the number of distinct prefixes",
+    "empty image directory and empty transformation directory for all three entry points",
+    "timed Pillow decode / resize / GaussianBlur / rotate on 2 threads vs serial: ~1.8-2.0x speed-up, pure-Python loop 1.0x (supports the GIL-release claim in Part 2)",
+    "pickle of a decoded 2000x1500 RGB image is ~9.0 MB, i.e. the full pixel buffer (supports the 'pass the path, not the Image' claim)",
+    "read the English page in full against the Chinese one; code blocks identical in both"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. The reference code was not changed; the added assertion (blur appears twice in the example) holds, while the count implied by the old sentence (once) does not."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

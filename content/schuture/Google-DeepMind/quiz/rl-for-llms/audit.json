@@ -1,0 +1,47 @@
+{
+  "id": "Google-DeepMind/quiz/rl-for-llms",
+  "verdict": "fixed",
+  "summary_zh": "9 道题的答案逐一重算、核对过，推导和数字都对。只改了两处小地方：参考解答开头把 KL(π_θ‖π_ref) 叫成“正向 KL”，而文献里通常管这个方向叫“反向 KL”，已改正；Q5 表格里说 GRPO 的方差“随 1/√G 下降”，实际上方差随 1/G 下降，随 1/√G 下降的是标准误差，已改正。",
+  "issues": [
+    {
+      "where": "参考解答 开头说明（Q1 之前）",
+      "problem_zh": "原文写“下文所有 KL 项都是正向的 KL(π_θ‖π_ref)”。方向本身（期望取在 π_θ 上、逐 token 惩罚估计的就是它）没错，但名字叫反了：文献里（例如推广 DPO 的 f-DPO 论文《Beyond Reverse KL》）把 KL(π_θ‖π_ref) 叫反向 KL，把 KL(π_ref‖π_θ) 叫正向 KL。面试时照着说“正向 KL”会被纠正。",
+      "action": "fixed",
+      "change_zh": "去掉“正向的”，改为“KL(π_θ‖π_ref)，期望取在正在训练的策略 π_θ 上（文献里通常把这个方向叫作反向 KL）……而不是 KL(π_ref‖π_θ)”。"
+    },
+    {
+      "where": "Q5 answer",
+      "problem_zh": "PPO/GRPO 对比表的“方差”一行写 GRPO 的方差“随 1/√G 下降”。实际上 G 个样本的组均值方差是 σ²/G：G 变成 4 倍，方差变成 1/4，标准误差才是减半。模拟梯度估计量的方差随 G 的变化，对数斜率也约为 -1，而不是 -0.5。",
+      "action": "fixed",
+      "change_zh": "改为“随 1/G 下降（噪声本身，即标准误差，随 1/√G）”。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有覆盖 Q5 里方差随 G 怎么变这条说法。",
+      "action": "fixed",
+      "change_zh": "新增一小段：对 0/1 奖励精确枚举出 G=4、16、64 时组均值的方差，断言 G 每变成 4 倍方差就变成 1/4（按原来 1/√G 的说法应是 1/2，该断言不成立）。"
+    }
+  ],
+  "checked": [
+    "ran page before and after the edits (README.md and README.zh.md both pass)",
+    "numbering: 9 **QN.** questions and 9 **QN.** answers in each language, same ### headings in statement and reference, code blocks byte-identical across languages",
+    "read every Chinese answer against the English one: same formulas and numbers",
+    "Q1: torch autograd on an exactly enumerated 3-token autoregressive policy with parameters shared across positions: score-function gradient equals autograd gradient of J, E[score]=0, baselines 0/E[r]/-5/10 leave the mean unchanged, b=E[r] cuts total variance 14.8 -> 3.2",
+    "Q2: closed-form table (value and d/d rho) compared with torch autograd on 20000 random (rho, A, eps); the four numeric values 2.4, 1.0, -3.0, -1.6 recomputed",
+    "Q3: exact gradient of E[r] - beta*KL(pi_theta||pi_ref) by autograd vs the GAE-weighted score estimator enumerated with the page's indexing: lambda=1 matches for an arbitrary V, lambda=0 and 0.5 match only with the true V, flipping the sign of the KL term breaks it; E_pi_theta[sum_t log pi_theta/pi_ref] equals KL(pi_theta||pi_ref), not KL(pi_ref||pi_theta); telescoped lambda=1 form asserted per sample",
+    "Q4: advantages recomputed with statistics.stdev and torch.std for (1,0,1,0) and (1,1,1,1); std and gap numbers for 50%/10%/90%/2% of 100 (0.5025/0.3015/0.1407; 1.99/3.32/7.11; ratio 3.57)",
+    "Q5: simulated variance of the group-baseline policy-gradient estimate for G=4..128 (log-log slope -0.94 unnormalised, -1.11 std-normalised; variance of the group mean -1.00) and exact binomial variance of the group mean",
+    "Q6: E[u]=1 in exact rationals and E[k1]=E[k3]=KL on 300 random pairs, k3>=0 per sample, exact Var(k1)/Var(k3) near and far from the reference (ratio 7000x at tiny KL, k3 worse only at KL~0.76), fraction of 64-sample batches with negative k1 mean, the u=1.01 numbers",
+    "Q7: BFGS maximiser of E[r]-beta*KL over the simplex vs the closed form (diff 8e-8), optimum value = beta*log Z, r = beta*log(pi*/pi_ref)+beta*log Z; minimising the population DPO loss with Bradley-Terry labels from the true reward recovers pi* (diff 3e-9)",
+    "Q9: Var_mu(W) = (1+chi2)^T - 1 in exact rationals for 20 random (pi, mu), T=1..5; IS unbiased when mu=0 only where pi*r=0 and biased otherwise; capped weight mean <1 and variance <= c^2 by enumeration at T=10; KL/chi2 -> 1/2 near pi=mu in both KL directions",
+    "Q8 and the non-numeric parts of Q3/Q4/Q5/Q9 (critic cost, the two GRPO biases, reward-hacking symptoms and mitigations, sources of unintended off-policy data) checked by reading against the DPO, GRPO and Dr. GRPO papers as I know them; not runnable",
+    "web search to confirm the literature calls the RLHF/DPO regulariser KL(pi||pi_ref) the reverse KL (f-DPO, arXiv 2309.16240)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change; the added Q5 check asserts a variance ratio of 4 when G quadruples, and the same assertion written for the old 1/sqrt(G) claim (ratio 2) fails."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

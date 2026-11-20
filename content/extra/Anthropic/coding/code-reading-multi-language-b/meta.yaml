@@ -1,0 +1,14 @@
+title: "Code reading in several languages (B): C++, Python, Bash"
+title_zh: "读代码：三段代码，三种语言（B 卷：C++ / Python / Bash）"
+summary_zh: "不写代码，只读代码：一段 C++、一段 Python、一段 Bash，各约 30 行。讲清楚每段想做什么、实际输出什么、哪里有错、怎么改、想问作者什么。"
+category: coding
+kind_zh: "读代码 · 多种语言"
+roles: [SWE, MLE, RE]
+topics: [code-reading, cpp, python, bash, iterator-invalidation, aliasing, closures, shell-quoting]
+difficulty: medium
+frequency: low
+stage: [hm-screen]
+format_zh: "3 段代码 / 30 分钟"
+order: 65
+added: true
+origin: "证据只有一份第三方材料（interviewing.io 的 Anthropic 面试指南）：它说用人经理电话有时会让候选人读几种不同语言的代码示例，说出代码在做什么并找出问题；材料没有给出任何具体代码。这一页的三段代码和全部问题都是我们补写的，真实面试不一定问这些。"

@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 80       # 33 cases x 2 + 1 x 8, plus 6
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: 各部分的口头问题不评测，也不检查是否用了 dict/set。没有删除过键时按题目的布局规则检查遍历顺序；Part 2 的要求 2（容量不超过 max(8, 4k)）通过反复增删之后 HashMap 对象占用的内存来检查。

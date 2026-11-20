@@ -1,0 +1,6 @@
+timeout: 70
+case_cpu: 2
+note: >-
+  评测在 Linux 上默认用 fork 方式启动工作进程；指定 spawn 或 forkserver 也可以（新启动的工作进程会重新导入你的答案）。
+  Part 2、3 统计的是工作进程里真实的图片解码次数、convert/transpose/resize/filter/rotate 的调用次数、同时工作的进程数，
+  以及主进程与工作进程之间 pickle 传递的消息；“共享前缀的图片用完要及时释放”这一条不评测。

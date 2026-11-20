@@ -1,0 +1,4 @@
+timeout: 41
+case_cpu: 2
+special: debug
+note: 树是随机生长的，所以不比对具体的树，而是逐个节点检查是否符合 docstring 的规则；Part 2 的证明题不评测。

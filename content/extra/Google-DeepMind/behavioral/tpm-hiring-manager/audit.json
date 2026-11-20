@@ -1,0 +1,21 @@
+{
+  "id": "Google-DeepMind/behavioral/tpm-hiring-manager",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page normally and with --hash-seeds (no code blocks)",
+    "origin, README evidence paragraph and stage [hm-screen] compared with the TPM sentence of the process page (Chinese and English): short recruiter screen, then a hiring-manager round on technical depth and stakeholder management, evidence for program roles is thin; the README's quoted sentence is a faithful translation of the English wording",
+    "frequency is rare; page says all 12 questions were written for the site and does not present them as real questions; counted 6 + 6 = 12 questions",
+    "internal links #/deepmind/process, #/deepmind/behavioral/team-lead-rounds and #/deepmind/behavioral/pm-ai-product-sense resolve to existing pages (build.py maps 'deepmind' to Google-DeepMind)",
+    "each question and hint read for fit with a TPM working with ML research and engineering teams; technical statements checked as general knowledge (eval noise vs gate margin, contamination invalidating the gate, post-training quantization usually needs no retraining, distillation needs a new training run and full re-evaluation, output-length caps change product behaviour)",
+    "example answers are labelled as invented; the page warns against making up DeepMind internal processes"
+  ],
+  "code_run": {
+    "ran": false,
+    "passed": true,
+    "notes": "no python blocks"
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "OpenAI/coding/monster-battle",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "hand-traced the three statement examples against the rules; all three are also asserted by the page's checks",
+    "rebuilt the type chart from the prose cycle (Ember>Bramble>Tide>Spark>Ember) and compared it with the statement table and the reference TYPE_CHART, all 16 pairs",
+    "independent brute-force simulator (integer arithmetic, own tie-break loop) vs run_battle on 6000 random battles across Parts 1-3, teams of 1-5, attack down to 1 to hit the min-1 clamp",
+    "re-ran the page's full game-tree search on 900 more random positions: greedy attacker choice equals the minimax value for both sides",
+    "simulated the follow-up counter-example (Tide hp7/atk2 vs Bramble hp1/atk6 + Ember hp2/atk3): hitting Ember first loses, Bramble first wins",
+    "timed the follow-up claim: Enum-tuple dict lookup ~370 ns vs 2D int table ~77 ns (4.8x), and a 3600-entry dict costs the same as the 8-entry one",
+    "compared code blocks between README.md and README.zh.md (identical) and read the English prose against the Chinese"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; nothing was edited."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

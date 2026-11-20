@@ -1,0 +1,25 @@
+{
+  "id": "Google-DeepMind/coding/skip-list-order-statistics",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page normally and with --hash-seeds, before and after the audit (no edits made)",
+    "statement examples reproduced for SkipList and IndexedSkipList (duplicates, remove of a missing key, keys_between with empty and reversed ranges, kth / rank incl. IndexError on out-of-range k)",
+    "300 random operation sequences (102,960 operations; p in {0.5, 0.25, 0.1, 0.75}; key ranges from 3 to 1e9, so many duplicates) compared after every step with a sorted-list model: add, remove return value, contains, keys_between, rank, kth, len and iteration",
+    "seed independence: the same 3000-operation sequence gives identical outputs for 6 seeds and two values of p",
+    "cost claims: Pugh bound L/p + 1/(1-p) + 1 recomputed for n = 8192 (29.00 for p = 1/2, 28.33 for p = 1/4); measured mean search cost over 16 fresh seeds is 25.8 and 24.3, below the bound",
+    "tail claims: exact P(max height of 1024 keys > 14) = 0.0606 vs the 2^-4 = 6.25% bound; P(any of 2e5 heights reaches 32) <= 9.3e-5",
+    "memory per key measured with sys.getsizeof: about 120 bytes plain, 200 bytes with spans, matching the page",
+    "timing at 20k / 60k / 200k keys printed only (no assertion): skip list vs bisect.insort and indexed vs plain ratios follow the page's description; at 200k the indexed list and insort are about even (ratio 0.97), within machine noise of the page's wording",
+    "general facts re-read: Redis sorted sets use a skip list with p = 1/4 and spans; Java's ConcurrentSkipListMap is a skip list",
+    "origin and frequency compared with the coding paragraph of the process page; frequency low, origin says the problem was written for the site"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

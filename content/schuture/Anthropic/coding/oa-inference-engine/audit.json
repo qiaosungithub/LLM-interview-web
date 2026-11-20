@@ -1,0 +1,93 @@
+{
+  "id": "Anthropic/coding/oa-inference-engine",
+  "verdict": "fixed",
+  "summary_zh": "参考代码和五关示例里的数值都没问题，代码没有改动。问题出在文字上：题目有几条规则没写出来或写得和参考代码不一致（解码的先后顺序、被抢占的序列重新准入时预算和缓存怎么算、序列把自己抢占掉时怎么办），照原文做会得到和示例不同的结果，现已在题目里补全；另外第 5 关示例里有一句注释的数字写错了（6 个 token 应为 8 个），讲解里有两句话说得不对，也一并改正。",
+  "issues": [
+    {
+      "where": "题目 Level 2（step 的第 1 步）",
+      "problem_zh": "原文只说给每个 RUNNING 序列多解码一个 token，没说按什么顺序。顺序会影响每个序列拿到哪几个块：第 3 关示例里 C 的块是 [2, 1]，按准入先后顺序解码才是这个结果，倒过来解码就会变成 [2, 3]；随机测试里倒序解码有将近一半的用例结果不同。",
+      "action": "fixed",
+      "change_zh": "在这一条里补上“按准入的先后顺序”，和参考代码一致。"
+    },
+    {
+      "where": "题目 Level 5（重新准入时的预算和缓存）",
+      "problem_zh": "第 2 关写的是每准入一个请求计入 len(prompt_token_ids)，第 4 关写的是查找“提示的满块”。但被抢占的序列重新准入时，参考代码用的是它当前完整的 token_ids（提示加上已生成的部分）。照原文只算提示长度的话，本页第 5 关的示例就对不上：第三次 step 之后 Q 会是 FINISHED 而不是示例写的 WAITING。随机测试里按原文算预算有 530/4000 个用例结果不同，只查提示的满块有 163/3000 个不同。",
+      "action": "fixed",
+      "change_zh": "在第 5 关补了一段说明：重新准入的序列，凡是前面说“提示”的地方都换成它当前完整的 token_ids，预算计入 len(token_ids)，缓存查找覆盖 token_ids 的全部满块。"
+    },
+    {
+      "where": "题目 Level 5（这一步里被抢占的序列算不算预算）",
+      "problem_zh": "第 2 关写的是“每解码一个序列记一个 token”。一个序列在这一步开始时是 RUNNING，但轮到它之前就被别的序列抢占了，它这一步其实没有解码，参考代码却照样给它记一个 token。原文没有交代这一点，按字面理解在 83/4000 个随机用例里结果不同。",
+      "action": "fixed",
+      "change_zh": "在同一段说明里写明：这一步开始时处于 RUNNING 的序列，即使在解码阶段被抢占、没有得到 token，也照样记一个 token。"
+    },
+    {
+      "where": "题目 Level 5（被抢占的正是要块的序列自己）",
+      "problem_zh": "准入时间最晚的运行中序列自己需要一个新块、而池子里又没有可用块时，它会把自己抢占掉。原文没说这之后怎么办。参考代码仍然把这次分配做完（可能驱逐一个缓存块），再把拿到的块还回去；如果干脆不分配，缓存里留下的内容不一样，201/4000 个随机用例的后续结果不同。",
+      "action": "fixed",
+      "change_zh": "在同一段说明里写明：这次预留仍会在能够成功时照常完成（必要时驱逐一个缓存块），拿到的块随即归还，该序列这次解码不会得到 token。"
+    },
+    {
+      "where": "题目 Level 5 示例的注释",
+      "problem_zh": "第四次 step 的注释说 Q“当前的 6 个 token 被重新预填充”，实际是 8 个（4 个提示加 4 个已生成）。第三次 step 的注释只说 P“借助腾出的空间运行到完成”，没提这一步的准入阶段里 Q、P、Q、P 轮流被重新准入、互相抢占，光看注释推不出示例里的结果。",
+      "action": "fixed",
+      "change_zh": "把 6 改成 8；第三次 step 加了两行注释，写出 Q、P、Q、P 依次被重新准入、预算 2+6+5+7+6 = 26、再轮到 Q 时 26+8 > 30 放不下。验证代码里加了一行断言，检查此时 Q 的 token_ids 长度是 8。"
+    },
+    {
+      "where": "参考解答 Level 2 的说明",
+      "problem_zh": "原文说“在解码循环之后再用 len(self.running) 统计”这种写法要到第 5 关才出错。其实第 3 关就错了：序列在解码时结束也会从 running 里消失。例如预算为 4，A 在这一步解码后结束，队首 B 的提示有 4 个 token：按题意 1 + 4 > 4，B 要等；循环后再统计却会把 B 准入。随机测试里第 3 关有 129/4000 个用例结果不同。",
+      "action": "fixed",
+      "change_zh": "改成：一旦序列可以在循环中途从 running 里消失，这种做法就不再正确——从第 3 关起是因为停止，到第 5 关还可能是因为被抢占。"
+    },
+    {
+      "where": "参考解答 Level 5 的说明",
+      "problem_zh": "原文说序列把自己抢占掉之后，跳过追加、把多出来的块还回去“不会留下任何痕迹”。实际上为了凑出那个块，分配器往往已经驱逐了一个缓存块（统计的 1298 次自我抢占里有 1234 次），被驱逐的正是这个序列自己刚释放的块，它下次重新准入时在这个块上就命中不了缓存（这 1234 次全部如此）。",
+      "action": "fixed",
+      "change_zh": "改成：序列自己和其他被抢占的序列没有两样，但分配器里可能留下一点痕迹——可能已经驱逐了一个缓存块，而且正是这个序列自己刚刚释放的块。"
+    },
+    {
+      "where": "题目（Engine 构造与公开方法那一段）",
+      "problem_zh": "测试要查看每个请求的 Sequence 和分配器，但题面从没说它们放在哪个属性里。",
+      "action": "fixed",
+      "change_zh": "补一句：引擎把 BlockAllocator 放在属性 allocator 里，把每个请求的 Sequence 放在 sequences[request_id] 里（结束的请求也保留）。参考解答本来就是这样。英文版同样修改。"
+    },
+    {
+      "where": "题目（预留与释放那一段）",
+      "problem_zh": "没说一次预留缺的块是一次 allocate(count) 拿到还是逐个拿，也没说释放块的顺序；测试两者都要求。",
+      "action": "fixed",
+      "change_zh": "补一句：一次预留所缺的全新块用一次 allocate(count) 调用拿到，按返回顺序接到 block_ids 末尾；释放时按 block_ids 的顺序一次交给 free。英文版同样修改。"
+    },
+    {
+      "where": "Level 5（被抢占的对象那一句）",
+      "problem_zh": "“它自己也可能成为被抢占的对象”读起来像正在预填充的序列也会被自己的预留抢占。",
+      "action": "fixed",
+      "change_zh": "加括号说明：这只会发生在解码时；正在预填充的序列要等预填充完成才进入 RUNNING，不会被它自己的预留抢占。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits; python and py code blocks are identical in README.md and README.zh.md; headings, details/summary and fence counts unchanged against the original",
+    "replayed every value quoted in the five statement examples programmatically, on the Engine class as it stands after each level (upto=2..6) and on the final class: 138 assertions per language",
+    "wrote an independent model of all five levels from the statement text, with switches for each alternative reading, and compared it with the reference after every step (status, block_ids, token_ids, queue order, full allocator state): 4000 random tight workloads per level, zero differences under the readings now written in the statement (4137 preemptions, 255 self-preemptions at Level 5)",
+    "measured each alternative reading against the reference at Level 5: charge len(prompt) on re-admission 530/4000 differ; count only sequences actually decoded 83/4000; recount running after the decode loop 259/4000 (129/4000 already at Level 3, 123/4000 at Level 4); decode in request-id order 16/4000 (0 at Levels 3-4); reverse order 1482/4000 (1873/4000 at Level 3); no allocation on self-preemption 201/4000; cache lookup over prompt blocks only 163/3000",
+    "re-ran the Level 5 example under the literal 'len(prompt_token_ids)' reading: Q is FINISHED after the 3rd step instead of WAITING; traced the 3rd step of the reference: preempt Q, then Q, P, Q, P re-admitted in turn, budget 2+6+5+7+6 = 26, Q (8 tokens) does not fit in 30",
+    "built the concrete Level 3 counterexample for the after-loop recount (budget 4, A finishes while decoding, B has a 4-token prompt): reference keeps B WAITING, the recount variant admits it",
+    "self-preemption statistics on the final class (20000 workloads): 1298 self-preemptions, 1234 evicted exactly one cache entry, always one of the sequence's own just-released blocks, never an additional victim afterwards; in all 1234 the sequence's next prefill missed on exactly that block's hash",
+    "stress of the final class on 20000 random tight workloads (minimum pools and budgets, identical and block-aligned prompts, late arrivals): no exception, every run terminates with each request's output equal to a solo run of the same prompt, every step makes progress; after every step: block count per running sequence, ref_count == number of holders, hashed blocks hold the content their hash names, partial blocks unshared and unhashed, free + cached + live == num_blocks, running <= max_seqs, queue == the WAITING sequences",
+    "brute-forced block_hash over all 17^4 first blocks: no collisions, so the 'equal hash iff equal prefix' sentence was left alone",
+    "read Chinese and English statement and solution prose side by side; no difference in meaning found",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass (8 blocks each). No reference code changed. One assertion added to the Level 5 part of the checks: len(Q.token_ids) == 8 before the 4th step; the old comment's value (6) fails it."
+  },
+  "env_evidence": [
+    "下面这段代码已经存在，不能改动；它的注释很稀少，读懂它——每个调用做什么、返回什么、已经假定发生了什么——本身就是任务的一部分。",
+    "按顺序实现随后的五个关卡，全部作为同一个 `Engine` 类的方法：只有当前一关自己的测试通过后，下一关的测试才会开始运行，且前面每一关声明过的规则在之后每一关都继续成立，再加上那一关新增的规则。",
+    "5 关 / 90 分钟"
+  ],
+  "confidence": "medium"
+}

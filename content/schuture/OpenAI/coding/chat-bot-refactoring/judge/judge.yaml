@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 70       # seconds for the whole run: 32 cases at 2 s each, plus 5 (the reference needs under 1 s)
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "只评测行为：Part 2 的聊天室要逐行复现旧代码 handle_message 的日志，Part 3 加上“3 票结束”的新规则；Part 1 的问答、Part 4 的测试代码，以及设计本身（类怎么拆、机器人是否只经总线通信）都不评分。测试按 FocusBot、CheerBot、PollBot 的顺序注册机器人（Part 3 是 FocusBot、DecisivePollBot、RewardedCheerBot），每次 send 之后立刻检查它返回的整个日志；有几项测试不经过 ChatRoom，按 can_handle → handle 单独驱动一个机器人。失败时显示的“调用”是建好聊天室并依次 send 的代码，可以粘贴到“自定义运行”重现（步数太多时会省略前面的步骤）。"

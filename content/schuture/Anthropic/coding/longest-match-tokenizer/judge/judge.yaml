@@ -1,0 +1,3 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 40       # seconds for the whole run
+case_cpu: 2       # CPU seconds per case unless the case says otherwise

@@ -1,0 +1,66 @@
+{
+  "id": "Anthropic/coding/stack-trace-reconstruction",
+  "verdict": "fixed",
+  "summary_zh": "三个部分的参考解答和所有例子都是对的。改了 Part 2 的两处文字：题目里“位置变为空缺并保持空缺 k 个样本”的说法容易被理解成“这个位置必须真的空着”，而参考解答（和题目自己的 k=1 例子）是“这一帧离开后再过 k 个样本就发 end，不管位置有没有被别的帧占上”；解答说明里还有一句“深度被别的候选者占据后，这次关闭就被放弃”，代码里根本没有这回事。两处都改成了和代码一致的说法，并加了一条检查。",
+  "issues": [
+    {
+      "where": "参考解答 Part 2 说明（closing 字典那一段）",
+      "problem_zh": "原文说：已确认的帧离开后进入 closing 计数，“或者，按上面那条边界情形，一旦它的深度被另一个候选者占据，就被放弃”。代码从不放弃一条 closing 记录：帧离开后的第 k 个样本一定会发出它的 end。实测 [a],[a],[a,f],[a,f],[a,g],[a]（k=2）仍然在样本 6 发出 f 的 end；在 12000 次随机运行里，没有任何一条待关闭记录被覆盖或丢弃。前文也没有所谓“上面那条边界情形”。照原文去实现（真的放弃）会少发 end 事件。",
+      "action": "fixed",
+      "change_zh": "把这半句改成“离开了链的帧不会再回来，所以不管这期间这个深度被谁占据，这个计数都会一直数到 k”，并把后面“早已经有了结果”改成“已经数满，它的 end 事件也已经发出”。"
+    },
+    {
+      "where": "题目 Part 2 去抖规则",
+      "problem_zh": "原文写“如果这一帧所在的位置之后变为空缺，并连续 k 个样本保持空缺”。按字面理解（位置必须真的空着 k 个样本）写出来的程序，和参考解答在约 43% 的随机输入上结果不同，而且和题目自己的第二个 k=1 例子矛盾（validate 所在的深度 1 一直有帧，它的 end 仍然发出）。参考解答和页面自带的暴力对照实际用的规则是：这一帧离开之后的第 k 个样本发 end，不管这个位置是空着还是被别的帧占了。",
+      "action": "fixed",
+      "change_zh": "改成“如果这一帧之后离开了它的位置——不管这个位置是空了出来，还是被另一帧占了——并且接下来连续 k 个样本里都没有它，它的 end 事件就打上这 k 个样本中第 k 个的时间戳”；后一句里的“它的空缺”相应改成“它离开之后”。题目难度和例子都没变。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有的手写例子没有覆盖“已确认的帧离开后，它的深度马上被另一帧占上”这种情况（只有随机对照间接覆盖）。",
+      "action": "fixed",
+      "change_zh": "加了一条检查：[a],[a],[a,f],[a,f],[a,g],[a]，k=2，期望 f 在样本 6 结束。按“放弃关闭”或“位置必须空着”的理解去实现都通不过这条检查，参考解答通过。"
+    },
+    {
+      "where": "参考解答 Part 3（TraceIndex）",
+      "problem_zh": "字典树用字符串 `\"$\"` 作为存放 `trace_id` 列表的键。如果某一帧的名字恰好就是 `\"$\"`（例如 JavaScript 里叫 `$` 的函数），构造函数会直接报 AttributeError。题目没有限制帧名。这是个很窄的边角情况，没有改代码。",
+      "action": "flag",
+      "change_zh": "未改动。面试时可以主动说一句：用字符串做哨兵键时默认帧名不会等于它，稳妥的做法是用 None 或单独的对象做键。"
+    },
+    {
+      "where": "Part 2（同一样本上的事件顺序）",
+      "problem_zh": "k>1 时同一个样本上的事件按什么顺序输出没说，测试要求先 end 后 start。",
+      "action": "fixed",
+      "change_zh": "补一句：打上同一个样本时间戳的事件沿用 Part 1 的顺序（end 由内向外，然后 start 由外向内）。英文版同样修改。"
+    },
+    {
+      "where": "Part 3 参考解答（trie 的键）",
+      "problem_zh": "参考解答用字符串 \"$\" 作 trie 里存 id 列表的键，帧名恰好是 \"$\" 时会出错。",
+      "action": "fixed",
+      "change_zh": "参考解答改为用 None 作这个键（README 中英文和 judge/solution.py 一致），并新增帧名为 \"$\" 的测试。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "Part 1: compared convert_samples_to_events with my own implementation written from the statement on 6000 random inputs (call/return walks and arbitrary unrelated stacks, empty stacks, 1-8 distinct names): 0 mismatches",
+    "Part 2: compared stream_debounced_events with my own brute force (frames = maximal runs along the LCP chain; start at run_start+k-1, end at leave+k-1 if that sample exists; ends innermost-first before starts) on 30000 (input, k) pairs with k in 1,2,3,4,7: 0 mismatches",
+    "Part 2: built the literal reading of the old statement sentence (end only after k consecutive samples with the position empty): differs from the reference on 12991 of 30000 pairs and contradicts the statement's own second k=1 example",
+    "Part 2: instrumented the reference: over 12000 random runs no live closing entry is ever overwritten or dropped without its end being emitted; closing never exceeds the max depth",
+    "Part 2: negative control - a variant that abandons a pending closure when another frame occupies the depth passes all three statement examples but fails the added check",
+    "Part 2: k=1 equals Part 1 minus the end_time closings (6000 inputs); k > n yields nothing; empty stacks in the middle; generator is lazy (first event yielded before the source is exhausted); peak traced memory stays flat (5-9 KiB) from 20k to 200k samples",
+    "Part 3: compared TraceIndex.match_suffix with a direct scan on 30000 random queries (duplicate frame lists, repeated names, empty-string frame names, queries longer than every trace, ids that sort as strings): 0 mismatches; returned list is a copy; empty index returns UNKNOWN",
+    "Part 3: probed a frame literally named \"$\": constructor raises AttributeError (recorded as a flag, not edited)",
+    "all worked examples in the statement are asserted by the page and reproduced by my implementations",
+    "re-derived the time/memory claims (total work linear in the sum of stack sizes; O(D) state)",
+    "diffed both files against the originals: only the two reworded passages and the one added check; python/py fences identical in README.md and README.zh.md; meta.yaml untouched",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass before and after. No reference code was changed. The added check passes with the reference and fails with an implementation of either wrong reading (abandon-the-closure, or position-must-be-empty)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

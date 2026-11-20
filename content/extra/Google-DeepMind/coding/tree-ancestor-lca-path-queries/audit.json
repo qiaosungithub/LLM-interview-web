@@ -1,0 +1,24 @@
+{
+  "id": "Google-DeepMind/coding/tree-ancestor-lca-path-queries",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page normally and with --hash-seeds, before and after the audit (no edits made)",
+    "validation: exhaustive over every parent array with entries in -2..n for n = 0..4; RootedTree raises ValueError exactly on the arrays my own checker calls invalid (no root / two roots / out-of-range parent / cycle) and builds on all others",
+    "600 random trees (paths, near-paths, random attachment; n up to 30; shuffled labels; small and +-1e9 weights): depth, kth_ancestor for every k up to n+2 and k = 1e18, lca, distance and path_max for all ordered pairs, with and without weights, against an independent ancestor-list brute force",
+    "statement examples for kth_ancestor, lca, distance and path_max reproduced by hand-check and by the code; IndexError / ValueError cases in the statement checked",
+    "GrowingTree: 60 random growth sequences (up to 141 nodes) compared with brute force for lca, path_max, kth_ancestor; root_prefix_sums + path_sum compared with brute-force path sums",
+    "200,000-node chain with shuffled labels: builds without recursion, LOG = 18, 2000 random lca / kth_ancestor queries correct",
+    "follow-up numbers recomputed: LOG = max(1, (n-1).bit_length()) values, the memory figures (29 MB, 14.4 MB), sqrt-jump block B = 448 and at most 893 steps for n = 2e5",
+    "explanations (root clamping, path max with the root slot at -inf, prefix-sum path sums, amortized add_leaf) re-read for correctness",
+    "origin and frequency compared with the coding paragraph of the process page ('obscure data structure and trees questions'); frequency low, origin says the problem was written for the site"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Minor: RootedTree built without weights raises ValueError (no weights) rather than IndexError when path_max also gets an out-of-range node; the statement does not fix which check comes first, so not treated as an error."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

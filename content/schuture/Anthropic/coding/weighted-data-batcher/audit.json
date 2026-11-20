@@ -1,0 +1,81 @@
+{
+  "id": "Anthropic/coding/weighted-data-batcher",
+  "verdict": "fixed",
+  "summary_zh": "题目、例子、参考代码和 1+K 的证明都是对的：采样比例、偏差上界、断点续跑逐字节一致都实测通过，代码一行没改。改的是解答说明里 5 处讲错的话：浮点除法会把相等的比值算成不相等（不会）；偏差“不到 2、与 K 无关”（其实会随 K 线性增长）；随机方案的抽取“相互依赖”（应为相互独立）；换权重后只有“短暂追赶”且上界照样成立（实际追赶长度和已跑的历史一样长，期间上界不成立）；多 rank 分片的区间公式和它后面说的代价对不上。",
+  "issues": [
+    {
+      "where": "参考解答 Part 3「确定性做法」第一段",
+      "problem_zh": "原文说用浮点除法“仍可能把两个数学上相等的比值舍入到两个不同的相邻浮点数，从而把平局判错”。浮点除法是正确舍入的，数学上相等的两个比值一定得到同一个浮点数（实测 41.8 万组 a/b 与 (a·m)/(b·m)，没有一组不同）。真正会出错的是别的写法：先算 1/w 再乘（49 * (1/49) != 1.0），以及计数超过 2^53 时不同的比值被舍入成同一个数。",
+      "action": "fixed",
+      "change_zh": "改成：交叉相乘是整数运算、不会舍入；并用括号说明浮点除法本身不会把相等的比值算错，坑在“乘以预先算好的 1/w”和超大计数上。"
+    },
+    {
+      "where": "参考解答 Part 3，推论证明之后的一句",
+      "problem_zh": "原文说这个界在实践中很宽松，观察到的最大偏差“都不到 2，与 K 无关”。这只是页面那次随机抽样的结果，不是规律：取 K-1 个权重 1 的数据集加一个权重 K-1、名字排最后的数据集，前 K-1 次选择全给了轻的，重的那个落后 (K-1)/2（K=9 时是 4，K=41 时是 20）；在页面自己的抽样范围内（K=8、权重 1×7 加一个 7）偏差就有 3.5。所以上界里对 K 的线性依赖是真实的。",
+      "action": "fixed",
+      "change_zh": "把“与 K 无关”删掉，改成“对一般的权重相当宽松”，并补上上面这个偏差为 (K-1)/2 的例子。"
+    },
+    {
+      "where": "参考解答 Part 3，两种分配方式的取舍那一段",
+      "problem_zh": "原文说随机方案的计数是“n 次相互依赖的随机抽取之和”。每次抽取是相互独立的（实测相邻两次抽取的相关系数约 0.0005；400 次抽取的计数方差 98.3，与二项分布的 100 吻合），正因为独立才有这么大的方差。中英文两版都写反了。",
+      "action": "fixed",
+      "change_zh": "“相互依赖”改成“相互独立”（英文 dependent 改成 independent）。"
+    },
+    {
+      "where": "追问「训练中途权重发生变化」",
+      "problem_zh": "原文说把旧状态加载进新权重的 batcher 后，权重调高的数据集只会有“一段短暂的追赶”，而且推论的上界“依然成立，只是 n=0 锚定在权重变化的那一刻”。实测不是这样：确定性规则用的是从头累计的计数，按 1:1 抽 600 次后改成 3:1，接下来连续 601 次全抽第一个数据集（历史 3000 次就连抽 3001 次）；从变化那一刻算起，偏差达到 150，而上界是 3。",
+      "action": "fixed",
+      "change_zh": "改成如实描述：追赶的长度与此前全部历史成正比，期间上界不成立；如果想让新权重只对之后生效，分配规则要用单独的一套计数，在新 batcher 里从零开始并存进 state_dict()，这样上界才以变化时刻为起点成立。"
+    },
+    {
+      "where": "追问「在多个 rank 之间分片」",
+      "problem_zh": "原文给的区间是 [r·⌊L/R⌋, (r+1)·⌊L/R⌋)，接着说代价是 R 不能整除 L 时各 rank 回到起点所经过的样本数略有不同。按这个公式每段长度都一样（L=10、R=3 时都是 3），各 rank 的周期完全相同，真正的后果是末尾 L mod R 个样本谁也读不到。公式和后面说的代价对不上。",
+      "action": "fixed",
+      "change_zh": "把区间改成 [⌊rL/R⌋, ⌊(r+1)L/R⌋)：各段恰好铺满整个数据集、长度最多差 1，后面那句“代价”就是对的了。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "上面 5 处说法原先都没有对应的检查。",
+      "action": "fixed",
+      "change_zh": "在验证代码末尾加了一小段“write-up claims”，每处一条：相等比值的浮点除法结果相等、49*(1/49)!=1.0；K=9 的例子里重数据集前 8 次一次都没被选中；随机方案计数的均值和方差符合二项分布；1:1 改 3:1 后连续 600 次只抽 a；新的分片区间恰好铺满 [0, L)。"
+    },
+    {
+      "where": "Part 2（state_dict 的内容）",
+      "problem_zh": "题面说状态只含整数和字符串，参考解答却存了 list 和 None。",
+      "action": "fixed",
+      "change_zh": "改为：由 JSON 值（int、字符串、None 以及由它们组成的 list 和 dict）组成的 dict。英文版同样修改。"
+    },
+    {
+      "where": "Part 3（常数 C）",
+      "problem_zh": "只说 C 不依赖 n；按整个 batch 结束时的目标算亏欠的规则误差随 batch_size 增长，测试的界却与 batch_size 无关。",
+      "action": "fixed",
+      "change_zh": "写明常数 C 既不依赖 n，也不依赖 batch_size。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "statement examples reproduced with exact example strings (the page's own check only compares dataset names for the Part 3 example)",
+    "compared the reference with an independent model written from the statement (Fraction-based min count/weight with alphabetical tie-break; random.Random(seed).randrange(W) with a linear cumulative scan; Part 1 block rule) on 1500 random configurations incl. datasets of length 1, unusual names whose sort order matters, batch_size smaller than K, divisible and non-divisible sizes: 0 mismatches",
+    "resume guarantee: paused after every batch of 600 random runs (4020 pause points, both allocations), state round-tripped through json, loaded into a fresh object on a fresh registry with a different seed: json.dumps of the remaining batches identical in every case; resumed batcher pulled 0 examples beyond those it returned; load_state_dict made 0 registry calls; every iterator reopened exactly once at the saved offset; rewinding the same object also reproduces the run",
+    "state size: deterministic state is offsets only (29 -> 35 bytes of JSON after 2000 batches); stochastic adds the 625-word Mersenne Twister state (about 7.4 KB, constant)",
+    "sampling distribution, stochastic: 200000 draws at weights 5:3:2 give 0.4996 / 0.3000 / 0.2004, chi-square 0.27 on 2 dof; lag-1 autocorrelation 0.0005; variance of count over 3000 seeds 98.3 vs binomial 100",
+    "sampling distribution, deterministic: Lemma |p_i - p_j| <= max(1/w_i, 1/w_j) and Corollary (in its sharper form 1 + K w_k / W) asserted at every slot, exhaustively for all coprime weight vectors up to 7 for K = 2..4 and up to 5 for K = 5, plus 400 random weight sets with K up to 12; worst observed deviation/bound ratio 0.977, so the proof's bound is essentially tight in its sharper form",
+    "found the family K-1 weights of 1 plus one weight K-1 with deviation (K-1)/2 (K = 4, 8, 9, 16, 41), also 3.5 inside the page's own sweep ranges",
+    "re-derived the Lemma and Corollary proofs by hand",
+    "float claim: a/b == (a m)/(b m) for 418000 pairs (exhaustive small range + random up to 2^40); 49 * (1/49) != 1.0; (2**53 + 1)/1 == 2**53/1",
+    "weight-change follow-up: catch-up run of 31 / 301 / 601 / 3001 picks after 30 / 300 / 600 / 3000 picks of history; worst deviation counted from the change 150 vs bound 3; lifetime totals land exactly on the new proportions",
+    "sharding follow-up: printed formula gives equal slices covering 9 of 10, 96 of 97, 98 of 100; floor(rL/R) slices cover everything with lengths differing by at most 1",
+    "generators cannot be copied, deep-copied, pickled or json-dumped (TypeError each)",
+    "negative controls for the added checks: old slice formula fails the tiling check; an allocator with counts reset at the weight change fails the 600-picks check; the deterministic allocator (variance 0) fails the independence variance window",
+    "diffed both files against the originals: only the five prose corrections and the one added check section; python/py fences identical in README.md and README.zh.md; meta.yaml untouched",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass before and after. No reference code was changed, so the added checks pass on the unchanged code; each one encodes a fact that the old sentence contradicted, and three of them were confirmed to fail on an implementation or formula matching the old wording."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

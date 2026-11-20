@@ -1,0 +1,31 @@
+{
+  "id": "Anthropic/coding/hash-map-from-scratch",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "Part 2（删除之后的扩容规则）",
+      "problem_zh": "Part 2 允许调整扩容规则，但 Part 3、4 在没有删除时检查确切的槽位顺序，两者冲突。",
+      "action": "fixed",
+      "change_zh": "改为：扩容规则可以按需要调整，只要满足上面三条，并且一个键都没删过时仍和 Part 1 的规则一致。"
+    }
+  ],
+  "checked": [
+    "ran page, and with --hash-seeds (PYTHONHASHSEED 0 and 1): all pass",
+    "re-derived every statement example by hand from the layout rules (slot positions, growth before the 6th key, the 9/1/2/3/4/5 iteration order) and confirmed the reference returns them",
+    "my own random operation sequences against dict for TombstoneMap, ShiftDeleteMap and HashMap, including variants whose hash has only 1 or 3 distinct values (long collision runs, wrap-around), 150 runs x 600 ops each: answers match dict, no empty slot inside any probe path, capacity always <= max(8, 4 * peak live keys)",
+    "checked iteration: adding, deleting, or delete-then-re-add during iteration raises RuntimeError on the next step; overwriting a value does not",
+    "counted hash_fn calls over 5,000 mixed operations with rebuilds and tombstone cleanups: exactly one per public call",
+    "recomputed Knuth's numbers (2 and 5 at load 2/3, 50.5 at 0.9) and the amortisation bounds (9n for growth, floor(2C/3) - C/2 >= C/8 hence 24 slots per insert)",
+    "measured mean hit probes for keys i << 40: 1000.5 with hash(), 1.49 with mix64 (page says about 1.5)",
+    "checked the origin line against the interviewing.io page: its coding section says the style is first-principles and build-from-scratch, with data structures implemented from scratch after a standard-library solution; the from-scratch sentence names no data structure",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Page passes as written, also under PYTHONHASHSEED 0 and 1. No edits."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

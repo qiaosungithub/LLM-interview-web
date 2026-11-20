@@ -1,0 +1,3 @@
+timeout: 43
+case_cpu: 1
+note: 五关的测试一次全部运行（原 OA 要前一关全部通过才解锁下一关）；每关的测试只用到这一关及之前各关的规则。第 1 关的测试只传 num_blocks，如果 Engine 要求 token_budget、max_seqs，就各传 10**9。

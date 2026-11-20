@@ -1,0 +1,46 @@
+{
+  "id": "Anthropic/coding/matmul-performance-modeling",
+  "verdict": "fixed",
+  "summary_zh": "四个部分里的所有数字、单位和表格都重新算过，全部正确。只改了四句话：一句中文把设备 A、B 写混了；一句“通信量翻倍”没说清是所有设备合计；追问里把“变成计算受限”的时机说成“逼近上限”（应为越过拐点）；fp8 那条说“强度不变”（实际是强度和拐点一起翻倍）。",
+  "issues": [
+    {
+      "where": "参考解答 Part 3 权衡（仅中文）",
+      "problem_zh": "中文写的是“设备 B 可以在算完输入 1 的后半段的同时，就开始算输入 2 的前半段”。设备 B 只有第 37—72 层，算不了前半段；英文原意是 B 算输入 1 后半段时，A 已经在算输入 2 的前半段。",
+      "action": "fixed",
+      "change_zh": "改为“设备 B 还在算输入 1 的后半段时，设备 A 就已经可以开始算输入 2 的前半段”。英文版本来就是对的，没有动。"
+    },
+    {
+      "where": "参考解答 Part 4 张量切分表格后的说明",
+      "problem_zh": "原文说 p 从 32 到 64“通信量也大致翻倍”。但表格里每块设备的通信量只从 65.01 MB 变成 66.06 MB（多 1.6%），通信时间从 0.16 ms 变成 0.17 ms；翻倍的是所有设备加起来的总量（约 2,080 MB 到 4,228 MB）。",
+      "action": "fixed",
+      "change_zh": "改为“全部设备合计的通信量也大致翻倍”，并在验证代码里加了一行断言：每设备通信量几乎不变，合计约为 2.03 倍。"
+    },
+    {
+      "where": "追问：批大小与 decode",
+      "problem_zh": "原文说吞吐随批大小近乎线性提高，“直到逼近上限、这一步变成计算受限为止”。变成计算受限的条件是强度越过拐点 208，不是逼近上限：以形状 A（k=n=4,096）为例，m=232 时就已经越过拐点，这时强度只有上限 2,048 的 10% 左右。",
+      "action": "fixed",
+      "change_zh": "改为“直到强度越过拐点 I*、这一步变成计算受限为止”，并在验证代码里加了一条对应的断言（m=232 处越过拐点）。"
+    },
+    {
+      "where": "追问：更低的精度（fp8）",
+      "problem_zh": "原文说存储也量化到每元素 1 字节后“字节数跟着算力一起减半，强度和瓶颈类型都不变”。算力是翻倍不是减半；字节数减半后强度（FLOPs/字节）翻倍，只是拐点也翻倍，所以瓶颈类型不变。页面自己的验证代码断言的也是强度翻倍。",
+      "action": "fixed",
+      "change_zh": "改为“算力翻倍的同时字节数减半，强度和拐点一起翻倍，瓶颈类型不变”；验证代码里对应的那句注释也一并改正。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "recomputed every quoted number independently with exact rational arithmetic (own script, no page code): ridge point; Part 1 FLOPs/bytes/intensity/regime/time for shapes A-D and the 2,048 ceiling; Part 2 per-layer and 72-layer times, weight/activation bytes, 40.33 GB total, 0.33 GB overflow; Part 3 pipeline and tensor-parallel latency, memory and interconnect bytes (incl. the 90x ratio and 53.0%); Part 4 tensor-sharding table for p=1..64, token-sharding times and the 0.72 ms floor, the 25 GB/s table, the p=43 crossover, the 28% and 7% figures -- 84 rounded figures plus the exact integer FLOP/byte counts, all match",
+    "checked units (GB = 1e9 bytes, ms, us, MB) and that every shard stays compute-bound where the page says so",
+    "checked monotonicity of intensity in each of m, k, n and the ceiling 2xy/(s(x+y)) on a grid with exact fractions",
+    "follow-ups: computed where a shape-A-like step crosses the ridge (m=232 for k=n=4096, m=215 for 8192x32768) and that 1-byte storage doubles intensity",
+    "compared numbers and math spans section by section between README.md and README.zh.md (identical), and read the Chinese prose against the English sentence by sentence"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. Only prose and one code comment were corrected, so the two added assertions pin the corrected statements rather than catch a code bug (they also hold on the original code)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,6 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 65       # case limits add up to 50 s; loading the tests (torch, the statement's 40-epoch run) takes ~8 s
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+load_cpu: 20      # tests.py has already imported torch; slack for answers that train at import time
+memory_gb: 6
+note: 只评测 evaluate、train、修好的 train_colleague、linear_grad、fd_grad、gd_linear 的返回值；画图、“画之前回答”的问题、找错误的测量和追问不评测。训练结果和参考解答比较，相对误差允许 1e-4。

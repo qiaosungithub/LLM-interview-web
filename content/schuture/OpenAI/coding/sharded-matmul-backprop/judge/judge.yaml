@@ -1,0 +1,5 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 40       # 15 cases at 2 s add up to 30 s; the reference answer needs well under 1 s in total
+case_cpu: 2       # CPU seconds per case
+special: debug
+note: Part 1 的手推不评测；Part 2 的 all_gather、all_reduce 就是 Part 3 文件里的同名函数，答案里只定义一次。Part 3 除了运行 check_gradients()，还会用别的输入单独调用文件里的每个函数，和不分片的 float64 计算对照。

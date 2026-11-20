@@ -1,0 +1,20 @@
+{
+  "id": "OpenAI/coding/cauchy-lighthouse",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "recomputed the four example rows (tan values and landing points)",
+    "Part 1: re-derived F and f, checked f = F' numerically, quartiles/median on 2e6 simulated flashes, the tail formula (1/pi)arctan(d/(x-x0)) ~ d/(pi(x-x0)), and the grazing-beam numbers 2*eps/pi and d*cot(eps)",
+    "Part 2: re-derived the divergent E|X-x0|, the truncation limit x0 + (d/pi) ln c, the Laplace/Fourier-inversion route to exp(-|t|) (quadrature), P(|mean-x0| > 10d) = 6.35%, and simulated sample means at n = 1, 10, 1000 (same Cauchy law, median absolute error d); checked P(|X-x0| > nd) ~ 2/(pi n)",
+    "Part 3: recomputed I = 1/(2d^2) (integral pi/8), v_med = pi^2 d^2/4, v_mle = 2d^2, efficiency 8/pi^2 = 0.81 (23% more flashes); verified the Hoeffding bound against exact binomial tails, the 1/d Lipschitz constant, E ln(1+Z^2) = 2 ln 2, the KL limit ln(1 + delta^2/(4d^2)) by simulation, the far-out inequality on random samples (threshold is sqrt(15) d, so the page's 8d is safe), and simulated the variance of sqrt(n)(T - x0) for the median and the MLE at n = 101 and 2001",
+    "counted local maxima of the n=25 log-likelihood with a grid refined around every data point (4000 samples): 28% have two or more, matching 'about a quarter'",
+    "Part 4: Kolmogorov mean 0.8687 and 95% point 1.358 from scipy; sup distance for a 30% scale error; MSE of the sample mean grows with R and is dominated by one repetition while the median absolute error stays at d; constants 1.06 and 0.954",
+    "follow-ups: quartile estimators, empirical characteristic function (d consistent at every t; x0 only while |t x0| < pi, breaks at t = 1.2), N1/N2 is Cauchy, two-parameter information matrix = I/(2d^2) by quadrature",
+    "compared Chinese and English prose; the runnable block is identical in both files"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": ""},
+  "env_evidence": [],
+  "confidence": "high"
+}

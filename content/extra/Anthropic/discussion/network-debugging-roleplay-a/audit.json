@@ -1,0 +1,34 @@
+{
+  "id": "Anthropic/discussion/network-debugging-roleplay-a",
+  "verdict": "fixed",
+  "summary_zh": "Q7 的“长期原则”把三层超时排成一条链，还要求中间设备的空闲超时小于服务器的 keep-alive 超时。这后一半没有必要：服务器先关连接会发 FIN，客户端能发现，Q2 里 nginx 默认 75 秒就是这种情况。现在改成：客户端连接池的空闲上限要小于服务器的超时，也要小于所有中间设备的超时。其余数字、抓包和库的行为都核对过，没有问题。",
+  "issues": [
+    {
+      "where": "参考解答 Q7 第一段",
+      "problem_zh": "原文写“客户端连接池的空闲上限 < 路径上所有中间设备的空闲超时 < 服务器的 keep-alive 超时”，等于要求中间设备的超时比服务器短。这不是必要条件。服务器的 keep-alive 比 NAT 短（比如 nginx 默认 75 秒，NAT 网关 350 秒）完全没问题，因为服务器关连接时会发 FIN，客户端复用前就能发现。这和 Q2 自己的分析也矛盾。",
+      "action": "fixed",
+      "change_zh": "改成“客户端连接池的空闲上限要小于服务器的 keep-alive 超时，也要小于路径上所有中间设备的空闲超时；后一条做不到，就让 keepalive 的间隔小于路径上最短的那个空闲超时”。只改了这一句。"
+    }
+  ],
+  "checked": [
+    "ran page normally and with --hash-seeds (PYTHONHASHSEED=0,1): PASS before and after the edit",
+    "rebuilt the Q3 capture as a pcap and printed it with local tcpdump 4.99.1: output byte-identical to the page, including the absolute seq on the bare RST and relative seq elsewhere",
+    "independent script recomputed the Q2 table (1,269,600 requests, 3,800 failures, 0.30%, 1,265,800 under 350 s), RTT 38.156 ms, idle 413.081 s vs TS delta 413081, RST delay 0.416 ms, RST seq = server ISN + 5162",
+    "RFC 9293 section 3.5.2: the reset for an incoming segment with ACK set is <SEQ=SEG.ACK><CTL=RST>, as the page says",
+    "AWS docs: NAT gateway idle timeout 350 s, RST and no FIN on continued use, keepalive under 350 s as the fix, IdleTimeoutCount definition, 55,000 simultaneous connections per IPv4 address per unique destination; NLB TCP idle timeout default 350 s, range 60-6000 s, RST after timeout",
+    "Azure LB idle timeout default 4 min, 4-100 min for LB and inbound NAT rules, 4-120 min for outbound rules, silent drop unless TCP reset is enabled; GCP Cloud NAT TCP established idle timeout 1200 s; RFC 5382 REQ-5 (2 h 4 min); Go DefaultTransport KeepAlive 30 s, IdleConnTimeout 90 s",
+    "tcp(7) and ip-sysctl.rst: keepalive defaults 7200/75/9 apply only to sockets with SO_KEEPALIVE; tcp_retries2=15 gives 924.6 s and is a lower bound; Linux v5.19 tcp_set_state counts TcpEstabResets",
+    "ss -tno on a loopback socket: timer:(keepalive,1min59sec,0) only on the socket with SO_KEEPALIVE; column layout matches the page",
+    "read urllib3 2.8.0 and requests 2.34.2 wheels as text: is_connection_dropped is a zero-timeout wait_for_read; default_socket_options is only TCP_NODELAY; Retry.DEFAULT_ALLOWED_METHODS has no POST; a reset becomes ProtocolError('Connection aborted.') and counts as a read error; requests default is Retry(0, read=False)",
+    "ran the Q6 adapter and retry behaviour with system requests 2.29.0 / urllib3 1.26.5 against a loopback server that resets the second request on a connection: the error string equals the Q1 error; KeepAliveAdapter puts SO_KEEPALIVE=1, TCP_KEEPIDLE=120 and TCP_NODELAY on pooled sockets; Retry retried the GET and the POST raised",
+    "read each step: every question is answerable from what was revealed before it, and no step gives away a later answer",
+    "origin line checked against the process page (network-debugging role play for performance and infrastructure roles; listed in a performance engineering candidate's portal): accurate, does not claim a real question, no paths; frequency low kept"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "PASS normally and with --hash-seeds. The edit is one prose sentence that no code can check, so no check was added."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

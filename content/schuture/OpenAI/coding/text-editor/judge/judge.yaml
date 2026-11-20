@@ -1,0 +1,2 @@
+timeout: 75        # 35 cases x 2 s, plus a margin
+case_cpu: 2

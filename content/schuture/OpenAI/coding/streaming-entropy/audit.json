@@ -1,0 +1,32 @@
+{
+  "id": "OpenAI/coding/streaming-entropy",
+  "verdict": "fixed",
+  "summary_zh": "推导和四个例子的数值都对（用 60 位精度重算核对过）。只改了一处：Part 3 要求不能分配任何与 N 有关的数组，但参考代码一上来就把整个输入转成 float64，输入是 float32（模型输出的 logits 通常就是）时会多复制出一整份长度为 N 的数组。已改成逐块转换，并加了一条检查。",
+  "issues": [
+    {
+      "where": "参考解答 Part 3（softmax_entropy_blockwise）",
+      "problem_zh": "题目规定“额外空间 O(1)”即不能分配大小依赖 N 的数组，但参考代码第一行 np.asarray(logits, dtype=np.float64) 在输入不是 float64 时会复制整个数组。实测 N = 200 万的 float32 输入，额外内存峰值 16,026,352 字节（正好 8N）；float64 输入时只有 26,256 字节。而这页自己在解答开头和最后一条追问里都专门讨论了 float32 的 logits。",
+      "action": "fixed",
+      "change_zh": "改为在 _chunks 里逐块转成 float64（整个数组只做 np.asarray(logits)，不改 dtype），并在代码注释里说明原因。同样的 float32 输入现在峰值约 34 KB，结果不变。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只比较数值，没有检查 Part 3 的内存要求。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：对 20 万个 float32 logits 运行 Part 3，用 tracemalloc 确认内存峰值远小于一个长度为 N 的数组，且结果与 scipy 一致（旧写法峰值 1,626,368 字节，检查失败；新写法 34,640 字节，通过）。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "statement examples recomputed at 60 digits with mpmath: 0.47609, 0.44106, 0.81676 (page: 0.4761, 0.4411, 0.8168); Part 1 gives nan on [1000,1002,998] and on [0,-800,-900] with exactly the warnings quoted in the code comments",
+    "re-derived H = log s - u/s, log Z = m + log s, sum p_i x_i = m + u/s and the Part 4 merge rule for s and u; each identity confirmed in 60-digit arithmetic on 200 random inputs and random splits",
+    "compared stable / blockwise / online against the 60-digit definition on 3000 random inputs (scales 1e-3..1e15, shifts up to 1e300, sorted ascending/descending, all-equal, block sizes 1,2,3,7,N,N+3, ragged chunks from a one-shot iterator), with NumPy warnings turned into errors: worst absolute error 1.8e-15; reran after the edit on both language pages",
+    "Part 1 agrees with Part 2 whenever Part 1 returns a finite value",
+    "tracemalloc peak of Part 3 and Part 4 for float64 and float32 inputs, before and after the edit",
+    "negative control: the new check fails when the original Part 3 code is put back",
+    "not acted on: inputs whose spread exceeds the float64 maximum (e.g. [1e308, -1e308]) give nan because x - max itself overflows; treated as float-limit trivia"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "README.md and README.zh.md both pass after the change; the added check fails with the original Part 3 code (peak 1,626,368 bytes vs. the 200,000-byte threshold)."},
+  "env_evidence": [],
+  "confidence": "high"
+}

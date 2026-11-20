@@ -1,0 +1,24 @@
+{
+  "id": "OpenAI/coding/poker-hands",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "hand-traced the three statement examples, including the Part 3 deal log (player 0 folds on 3S/QC, 2D goes to player 1, 6H completes player 2's flush, 7C undealt); all three are also asserted by the page",
+    "recounted the hand-type totals by hand: 52 three of a kind, 1144 flushes, 3744 pairs, 17160 high card out of C(52,3) = 22100; 13 + 286 + 156 + 286 = 741 classes",
+    "own rule-by-rule comparator (no key tuples) vs the reference: Part 1 code loaded alone on all 13^3 rank triples plus 400k random pairs; Part 2 hand_type on all 52^3 ordered hands (repeated cards included) plus 400k random pairs with forced same-suit hands",
+    "rank_players vs an all-pairs definition on 30,000 random groups for both the Part 1 and Part 2 rules; N = 1e5 runs in 0.26 s",
+    "own Part 3 simulator (pop from the deck, own fold rules, own winner search) vs play_round on 40,000 random rounds, full and 12-card pools, decks longer than 3N: 35169 single winners, 709 ties, 4122 all-fold rounds, all identical",
+    "read the follow-up claims against the code (a fold consumes no card, so 3N cards always suffice)",
+    "compared code blocks between README.md and README.zh.md (identical; the only differing text blocks are the translated example captions) and read the English prose against the Chinese",
+    "noted, not reported: N <= 1e5 in the header only makes sense for Parts 1-2 (cards repeat across players); Part 3's deck of distinct cards implies N <= 17 with a 52-card deck"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; nothing was edited."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

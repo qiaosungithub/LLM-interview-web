@@ -1,0 +1,39 @@
+{
+  "id": "Google-DeepMind/quiz/classic-rl",
+  "verdict": "fixed",
+  "summary_zh": "13 问的答案和数字全部重算过，都对。改了两处：Q8 说衰减 ε 的常数取小了“遗憾又变回线性”，说过头了，实际是不再是对数级、在实际步数内可能接近线性；来源说明原来说“没有任何一份面经留下具体的强化学习题目”，但面经里记过“PPO 和 GRPO 有什么区别”，已改成“没有留下经典强化学习的具体题目”。",
+  "issues": [
+    {
+      "where": "参考解答 Q8 (c)",
+      "problem_zh": "原文说 ε_t = min(1, cK/(d²t)) 里 c/d² 取小了，“遗憾又变回线性”。按 1/t 衰减时，好臂靠探索被拉的次数仍按 ln t 无限增长，卡在坏臂上的概率随时间趋于 0，所以遗憾是次线性的（大约按 T 的某个小于 1 的幂次增长），只是不再是 log T 级别；常数很小时在实际步数内看起来接近线性。",
+      "action": "fixed",
+      "change_zh": "改成“遗憾就不再是对数级的，在实际的步数内可能接近线性”。"
+    },
+    {
+      "where": "来源说明（origin）",
+      "problem_zh": "原文说“没有任何一份面经留下具体的强化学习题目”，但流程页记过“PPO 和 GRPO 有什么区别”这样具体的（大模型）强化学习问题；另外“本科考试的难度”在流程页里说的是大约 2022 年以前的小测验整体，不是专指那一场 2022 年的面试。",
+      "action": "fixed",
+      "change_zh": "改成：大约 2022 年以前的小测验大多是本科考试的难度，其中一场 2022 年研究科学家小测验的第二位面试官问了强化学习；面经里没有留下 MDP、时序差分、老虎机这类经典强化学习的具体题目（提到过的“PPO 和 GRPO 有什么区别”属于大模型强化学习）。"
+    },
+    {
+      "where": "参考解答 Q8 (b)",
+      "problem_zh": "“模拟结果是 T = 10^4 时约 102，T = 2×10^4 时约 202”来自一个在开头两臂都没拉过、估计打平时总是选好臂的模拟。平局随机打破，或者先把两臂各拉一次，我自己模拟（2000 次）得到的是约 107 和 207。",
+      "action": "flag",
+      "change_zh": "没有改：结论（遗憾约为 0.01T 加一个小常数，按线性增长）不受影响，差别只有几个点。自己动手模拟时得到 105 上下也是对的。"
+    }
+  ],
+  "checked": [
+    "ran page and with --hash-seeds (PYTHONHASHSEED 0 and 1) before and after the edits: all pass",
+    "ran the page's checks with SEED 1..40 in place of 0: all 40 pass (simulation tolerances are not seed-lucky); no wall-clock asserts",
+    "recomputed Q1, Q2, Q13 by exact rational solving (sympy) for all four policies, with and without both shaping schemes; value iteration in Fractions for Q3 (V1-V3, distances 19/12/9.6/7.68, 33 sweeps needed, bounds 37 and 34, 1111 for gamma 0.99)",
+    "Q4 numbers (0.634, 459 steps, 0.0043); Q5 three targets and the eps-greedy SARSA fixed point solved exactly (269/25, 309/25, 459/25, 419/25 = Q* - 0.64)",
+    "Q6 batch MC and certainty-equivalence TD; Q7 exact means/variances; Q10 P(theta2 > theta1) = 0.2 by numerical double integral; Q11 WIS mean/MSE exactly for n = 1, 2, 10 by binomial enumeration; Q12 1.08^10 and 0.648^10",
+    "own vectorised simulation (2000 runs) of eps-greedy and UCB1 on arms 0.6/0.4: UCB1 regret 61.5 at 1e4 and 73.2 at 2e4 (matches '60 出头' and '+十来点'); eps-greedy 101.9/201.9 with ties to the better arm, 106.8/206.7 with random ties or one initial pull per arm",
+    "checked UCB1 Theorem 1 bound arithmetic (369.3, 1842 pulls), KL(0.4||0.6) = 0.0811 and 2.47 ln T, Hoeffding exponent n^-4",
+    "theory claims checked against standard results: contraction/Banach, policy improvement, Watkins-Dayan conditions, GLIE (Singh et al. 2000), TD convergence, Tsitsiklis-Van Roy bound, deadly triad w-2w example, Ng-Harada-Russell shaping and its converse, Lai-Robbins; WebFetch of arXiv 1111.1797 and 1209.3353: Agrawal-Goyal's optimal-constant Thompson sampling result first appeared as a 2012 preprint (their COLT 2012 paper proves only O(log T)), so the 2012 citation was left",
+    "checked the origin line against the DeepMind process page (internship one-hour screen 2020-2021; 2022 RS quiz second interviewer covered RL; 'PPO vs GRPO' is the only specific RL question recorded)"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "Passes before and after the edits, also under PYTHONHASHSEED 0 and 1 and with SEED 1-40. The edits are prose only (one theory sentence and meta.yaml); no code changed, so no check was added."},
+  "env_evidence": ["下面 13 个问题按 DeepMind 早期“小测验”的方式来：每问很短，口头回答，要用的式子写在纸上，答案是确定的。"],
+  "confidence": "high"
+}

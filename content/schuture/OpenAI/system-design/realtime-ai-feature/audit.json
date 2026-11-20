@@ -1,0 +1,28 @@
+{
+  "id": "OpenAI/system-design/realtime-ai-feature",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md and README.md in full and compared them paragraph by paragraph (same numbers in every paragraph, code block identical, mermaid diagram same structure)",
+    "ran page (1 block, both languages pass)",
+    "recomputed every estimate in my own script (tools/out/scratch/b21/t1_realtime.py): 1.2M requests/day, 13.9 and 69.4 requests/s, W = 5.54 s (5.14 s of it decode), 385 concurrent streams, 19.2 -> 23.1 -> 24 replicas, 86.6 requests/s drain rate, 80% utilization, 1.35 MB/s = 10.8 Mbps egress, 264M / 216M tokens, $13,200 + $32,400 = $45,600/day, $0.038/request, $0.071 hold, 10x: 694/s, 3,849 streams, 231 replicas, 134,700 appends/s, $456,000/day, $166M/year; queue: 173 -> 150 cap, 1.7 s drain, surge 13.4/s growth, 1,608 queued after 2 min, 18.6 s wait",
+    "measured the sample SSE event at 54 bytes (page says about 55)",
+    "checked factual claims: EventSource is GET-only, cannot set headers, auto-reconnects with Last-Event-ID and keeps reconnecting unless closed; six connections per host under HTTP/1.1 shared across tabs, multiplexed under HTTP/2; KV prefix cache needs an exact token-for-token prefix match and saves prefill only",
+    "checked the mermaid diagram against the request walk-through (edge -> admission -> store/orchestrator -> pool/buffer -> SSE gateway -> client)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

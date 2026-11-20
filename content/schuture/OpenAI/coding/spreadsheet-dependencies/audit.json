@@ -1,0 +1,43 @@
+{
+  "id": "OpenAI/coding/spreadsheet-dependencies",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "题目 公式语法（整数字面量）",
+      "problem_zh": "没说数字字面量可以用哪些字符、最长多少位。",
+      "action": "fixed",
+      "change_zh": "写明字面量只由数字 0–9 组成，不超过 18 位。英文版同样修改。"
+    },
+    {
+      "where": "题目 FormulaError 规则",
+      "problem_zh": "没说非法值抛 FormulaError 还是 CycleError 优先，也没说失败的 set 之后单元格是什么状态。",
+      "action": "fixed",
+      "change_zh": "写明非法值一律抛 FormulaError、不会是 CycleError，并且抛出 FormulaError 的 set 不存入任何东西。英文版同样修改。"
+    },
+    {
+      "where": "题目 Part 1（get 的求值次数）",
+      "problem_zh": "测试 p1_diamond_chain 和 lazy_no_memo 要求同一次 get 里共享的单元格只求值一次，题面没要求。",
+      "action": "fixed",
+      "change_zh": "补一句：一次 get 里，经多条引用路径读到的同一个单元格只应求值一次。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages); printed timings match the prose (get ~450 ns on 2 vs 20002 cells, set ~4.7 us per cell of a 2000-cell chain)",
+    "replayed the statement examples on both LazySpreadsheet and Spreadsheet (35 -> 19, U1/U2 cycle stored vs rejected)",
+    "fuzzed parse_formula against an independent hand-written tokenizer on 300k random strings (33k valid) plus boundary cases (18 vs 19 digits, tabs, newlines, full-width digits, leading/trailing/double operators)",
+    "brute-force compare of both spreadsheets over 400 random runs x 150 sets (60k sets; 14.7k eager rejections, 254k lazy CycleErrors): values, CycleError exactly on cells that need a cycle, rejected set leaves contents/cache/both edge tables unchanged, edge tables equal the graph of current contents, each set recomputes exactly the transitive readers once",
+    "measured the lazy recursion limit: first failing chain length is 333 cells (page says about 330); 200-cell chain with 2^199 paths evaluates instantly thanks to the per-call memo",
+    "eager 5000-cell chain updates and rejects a cycle without recursion",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

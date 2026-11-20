@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 45       # 16 cases: 14 at 2 s, one at 6 s and one at 4 s add up to 38 s; the reference needs about 1 s in total
+case_cpu: 2       # CPU seconds per case
+note: Part 2 (a) 的证明和“说明形状”的书面部分不评测。坐标是小整数的用例要求并列取最小下标（这时运算精确）；其他用例接受距离在 float64 舍入误差以内的任一并列点。W、b 不唯一，只检查形状和 X_query @ W + b 的 argmax；若你的 W、b 本身带舍入（例如缩放 1/3），整数坐标下精确并列的点任选其一都算对。probs 要等于用你自己的 affine_layer 算出的 softmax。“不用循环”用 n = m = 2000 的用例计时，并读取 predict_1nn 及它调用的函数的源代码。

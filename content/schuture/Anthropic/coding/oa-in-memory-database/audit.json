@@ -1,0 +1,44 @@
+{
+  "id": "Anthropic/coding/oa-in-memory-database",
+  "verdict": "fixed",
+  "summary_zh": "题目、四关的示例和参考代码都没问题，只改了讲解里两句说错的话：一句把“备份存绝对过期时间”的后果说反了，一句线程安全的例子举错了方法。代码没有改动。",
+  "issues": [
+    {
+      "where": "参考解答 Level 4 的说明",
+      "problem_zh": "原文说如果备份里存的是绝对过期时间，一个备份时还剩 6 个 tick 的字段恢复后“可能已经过期，也可能剩下远不止 6 个 tick”。后半句不对：恢复的时间戳不会早于备份的时间戳，所以剩余时间只会变少。实测恢复后剩 0 到 6 个 tick，从不超过 6。",
+      "action": "fixed",
+      "change_zh": "改成“可能已经过期，也可能只剩不到 6 个 tick”。"
+    },
+    {
+      "where": "参考解答 追问（线程安全）",
+      "problem_zh": "原文举的例子是两个线程同时调用 set_at_with_ttl 会“都先读到旧的条目”，但参考代码里 set_at_with_ttl 根本不读旧条目，直接覆盖写入，这个例子说明不了问题。",
+      "action": "fixed",
+      "change_zh": "例子换成 delete_at：两个线程可能都先判断出字段还在，然后各自去删，后删的那个不会返回 \"false\"，而是抛出 KeyError（已用强制交错的两个线程实际跑出这个结果）。"
+    },
+    {
+      "where": "Level 3 开头（_at 方法那一句）",
+      "problem_zh": "普通的 set 会清除 TTL 只是暗示，测试却要求。",
+      "action": "fixed",
+      "change_zh": "补充：除此之外和对应的普通方法完全一样（所以普通的 set 也和 set_at 一样会清除 TTL）。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits; code blocks are identical in README.md and README.zh.md",
+    "replayed every commented value of the four statement examples programmatically, on the class as it stands after each level and on the final class (60 assertions per language)",
+    "wrote an independent eager-purge model from the statement text and fuzzed the final class against it: 5000 sequences x 200 calls (1M calls) mixing plain and explicit-timestamp calls, equal timestamps, varied prefixes (including '' and non-matching), same-timestamp backups, restores to arbitrary timestamp_to_restore; compared every return value and the internal clock",
+    "built a variant that stores absolute expiry in backups and measured ticks left after restore for gaps 0..39: always 0..6, never more than 6",
+    "forced the interleaving 'both threads pass the liveness check before either deletes' on delete_at with a barrier: results were one \"true\" and one KeyError",
+    "read Chinese and English statement and solution prose side by side; no difference in meaning found",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass. Only two prose sentences changed, no code and no claim the page's own code exercises, so no check was added."
+  },
+  "env_evidence": [
+    "按顺序实现下面四关：只有当前一关的测试全部通过，下一关的测试才会开始运行，且每一关都在同一个类上继续扩展，而不是另起炉灶。",
+    "分关解锁的评测机制会在解锁新一关之后继续跑之前几关的测试"
+  ],
+  "confidence": "high"
+}

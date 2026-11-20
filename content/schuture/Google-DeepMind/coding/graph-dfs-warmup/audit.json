@@ -1,0 +1,24 @@
+{
+  "id": "Google-DeepMind/coding/graph-dfs-warmup",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages); files are unchanged from the originals",
+    "Part 1: own loop-based brute force on 5000 random arrays (duplicates, negatives, empty array, empty threshold list); input not mutated; n = q = 100k/200k/400k runs in 0.07/0.19/0.53 s",
+    "Part 2: build_graph, dfs_order and dfs_order_recursive against my own adjacency + 'always step to the smallest unvisited neighbour' DFS written from the statement, on 6000 random edge lists (duplicates, reversed duplicates, self-loops, multi-character and empty node names, start not in the graph); empty edge list; input not mutated",
+    "Part 3: components against my own definition-based version; has_cycle against brute-force enumeration of cycles of >= 3 distinct nodes on the same 6000 graphs (1310 cyclic, 4690 acyclic); E > V - C criterion agrees on all of them",
+    "statement examples (above_threshold, build_graph, DFS order A B D E F C, components, both has_cycle cases) and the NOTE's mark-on-push counter-example re-traced by hand",
+    "100,000-node path: iterative succeeds, recursive raises RecursionError (first fails at 1000 nodes with the default limit, Python 3.11); chain n = 100k/200k/400k and complete graphs up to 2M edges scale linearly",
+    "re-read the has_cycle spanning-tree argument and the E >= V - C argument step by step",
+    "follow-ups: DFS-tree recovery with (neighbour, node) pairs (non-tree edges always join a node to an ancestor; C comes from D in the NOTE example) and white/grey/black directed cycle detection + topological order against brute force on 3000 random graphs",
+    "compared Chinese and English text section by section; code blocks identical in both files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass (0.7 s each). Nothing edited."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

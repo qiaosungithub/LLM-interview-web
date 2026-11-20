@@ -1,0 +1,50 @@
+{
+  "id": "Anthropic/coding/oa-cloud-storage",
+  "verdict": "fixed",
+  "summary_zh": "参考代码有一个真 bug：用户被合并掉以后备份没删，之后用同一个 ID 重新 add_user，新账户居然能 restore 出旧账户的备份，和题目写的规则相反。已在第 4 关给 merge_user 补上“顺手删掉 source 的备份”，并改了一条检查。另外改掉了一条说不通的追问答案（用压缩后大小的奇偶来存丢掉的那一位）。",
+  "issues": [
+    {
+      "where": "参考解答 Level 4（merge_user 与备份）",
+      "problem_zh": "题目写明：把用户合并掉、或之后用 add_user 把空出来的 ID 给新账户，restore_user 都应该找不到任何东西。但参考代码的 merge_user 没有清掉 source 的备份。例如 x（容量 10）建文件 old(4) 后 backup，被合并进 w，w 把 old 压缩掉，再 add_user(\"x\", 20)：restore_user(\"x\") 应返回 None，实际返回 6，凭空重建了 old，还把新账户的容量从 20 改回 10。",
+      "action": "fixed",
+      "change_zh": "在第 4 关的代码里给 merge_user 包了一层：合并成功后执行 self._backups.pop(source, None)。说明文字里加了一句解释这一步。题目没有动。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "页面里用来交叉验证的“独立模型”SlowCloudStorage 犯了同样的遗漏，所以 12 万次随机调用也没测出来；原有的边界检查里 x 在被合并前从没备份过，同样碰不到这个情况。",
+      "action": "fixed",
+      "change_zh": "把原有那条检查改成 x 先 backup_user 再被合并、再重新 add_user，要求 restore_user(\"x\") 返回 None（旧代码下这条会失败，返回 10）；SlowCloudStorage.merge_user 也补上删除备份的一行。"
+    },
+    {
+      "where": "参考解答 追问（解压为什么不能精确还原）",
+      "problem_zh": "原文说要无损可以把丢掉的那一位“存在压缩后文件大小的奇偶性上”。这做不到：25 和 26 压缩后都是 13，压缩后的大小（包括它的奇偶）本身分不出原来是哪个。",
+      "action": "fixed",
+      "change_zh": "改成：这一位信息要另外存下来，比如在压缩后的文件旁边记下原始大小；并补了 25 和 26 都压成 13 这个例子。"
+    },
+    {
+      "where": "题目 第 4 关 restore_user / 参考解答 Level 3 说明",
+      "problem_zh": "按题目规则，restore_user 之后剩余容量可能是负数：容量 20，建 a(2)、b(18) 后备份；压缩 b、压缩 a，再新建 a(10)；restore 会删掉两个 .cmp、重建 b(18)、保留现在的 a(10)，已用 28，返回 -8。之后把这个用户合并给别人，merge_user 也会返回负数（例子里是 -3），和 Level 3 说明里“合并结果不可能让剩余容量变成负数”那句话对不上。",
+      "action": "fixed",
+      "change_zh": "已改：在 Level 3 那句“合并结果不可能让剩余容量变成负数”后面补了一句——这只对前三关成立，Level 4 的 restore_user 按题面规则不检查容量，恢复后可以是负数（重新跑过：例子里 restore 返回 -8，之后 merge 返回 -3）。题目规则和参考代码没有动。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "all four level examples are asserted by the page's checks; re-derived the outputs by hand (ASCII order of '.' vs '_', ceil/double sizes, capacity arithmetic)",
+    "wrote my own literal model of the statement in which a backup is stored on the account object, and compared with the reference on 3,000 random sequences x 250 calls over 9 file names / 3 user ids: 1,749 sequences diverged before the fix, all first divergences at restore_user after merge + add_user; 0 of 4,000 diverge after the fix (both languages)",
+    "reproduced the stale-backup bug with a 7-call sequence on the original code",
+    "adjusted check fails on the original solution blocks (restore_user returns 10 instead of None) and passes on the fixed ones; the page's original SlowCloudStorage disagrees with the fixed solution on its own seed 0, confirming it shared the omission",
+    "checked compress(25) == compress(26) == 13 for the follow-up bullet",
+    "reproduced restore_user returning -8 and a following merge_user returning -3 (flag only)",
+    "code blocks are identical in README.md and README.zh.md; section/details structure unchanged; meta.yaml untouched"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. The adjusted check fails with the original merge_user."
+  },
+  "env_evidence": [
+    "这个类分四关搭建，按顺序进行；每一关的测试必须先通过，才会用到下一关的方法；并且每一关都是在前面几关定义的同一个 `CloudStorage` 类上添加方法，绝不会另起一个新类。"
+  ],
+  "confidence": "high"
+}

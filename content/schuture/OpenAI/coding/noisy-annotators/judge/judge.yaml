@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 45       # 20 cases at 2 s = 40 s, plus slack; the reference needs about 2 s in all
+case_cpu: 2       # CPU seconds per case
+note: 第 3 部分的权重公式要自己推导，这里只检查题目给出的例子（约 [0.29, 0.69, 0.29, 0.0]）和题目要求的性质：权重非负、越可靠权重不越低、在题目数据上给不可靠的标注者更低的权重且不丢弃任何样本。第 2 部分的准确率允许和参考相差 3 个测试点，两种 flag 用的标准差（总体或样本）都接受。

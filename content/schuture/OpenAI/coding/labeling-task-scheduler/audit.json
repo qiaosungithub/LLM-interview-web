@@ -1,0 +1,43 @@
+{
+  "id": "OpenAI/coding/labeling-task-scheduler",
+  "verdict": "fixed",
+  "summary_zh": "题目和三个参考解法都没问题，反例 (t=2, m=3, h=6, k=2) 也成立。只是 Part 3 的讲解里说“无论怎么打破并列都救不了标注员 4”，这句话不对：同一条贪心规则，只要在更早的一次并列时换个选法，就能得到两个维度都均衡的调度。已改成正确的说法，并删掉了一句站不住脚的“用最小堆降到 O(hk log m)”。",
+  "issues": [
+    {
+      "where": "参考解答 Part 3（反例后面的讲解）",
+      "problem_zh": "原文说标注员 4 的两步“都没有并列可打破，所以无论用什么样的打破并列的规则，都没法让它换一个模型”，并称失败“不只是打破并列的方式不好”。实际上那两步的计数取决于更早的并列怎么选：在 t=2, m=3, h=6, k=2 上，同一条规则（先看任务计数、再看标注员计数）在下标并列时共有 324 种选法，其中 144 种得到的调度按标注员也均衡；页面验证代码里那个“两边都均衡”的调度本身就是其中之一，它和参考解法的输出前 8 个分配完全一样，只是第 9 个分配（标注员 2 做任务 1，模型 0 和 2 完全打平）选了模型 2。",
+      "action": "fixed",
+      "change_zh": "删掉“不只是打破并列的方式不好”和“无论用什么规则都没法换模型”这两处说法，改为：这两步没有并列，标注员自己的计数（只在并列时才用）不起作用；并补一句说明那个均衡的调度也符合同一条规则、只在更早的一次并列上选法不同，只看当前计数的贪心无从知道该选哪个。反例本身和结论“这条贪心规则不保证按标注员均衡”不变。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只确认了标注员 4 那两步没有并列，没有检查“换一种并列选法能否避免失败”，所以测不出上面那句话是错的。",
+      "action": "fixed",
+      "change_zh": "新增一段检查：那个两边都均衡的调度每一步选的模型都是（任务计数，标注员计数）最小的，前 8 个分配与参考输出相同，第 9 个分配不同，标注员 4 的两个模型是 2 和 0。把原来那句话写成断言（所有选法下标注员 4 两次都落在同一个模型）会失败。"
+    },
+    {
+      "where": "参考解答 追问（复杂度那一条）",
+      "problem_zh": "原文说 Part 3 用“按任务、按标注员各建一个最小堆”可以降到 O(hk log m)。但 Part 3 的规则是先比任务计数、并列时再比标注员计数，两个各自排序的堆的堆顶并不能直接给出这个组合规则下的最小者（实测参考解法有的步骤选中的模型既不是任务堆的堆顶也不是标注员堆的堆顶），并列的模型仍要逐个看。",
+      "action": "removed",
+      "change_zh": "删掉“用最小堆可以降到 O(hk log m)”这半句，只保留 Part 3 的时间是 O(hkm)。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "confirmed code blocks are identical in README.md and README.zh.md",
+    "all three statement examples are exactly what the reference builders return, and satisfy the stated rules under an independent prefix-by-prefix verifier",
+    "swept t in -1..6, m in -1..5, h in -1..7, k in 0..7 (2205 feasible builder/parameter cases): None / [] contract, length h*k, coverage, uniqueness, task balance at every prefix",
+    "searched the same range for failures of balance by human in Part 3's greedy: (2,3,6,2) is the smallest (first failing prefix has length 11), as the page says",
+    "enumerated every way of breaking the remaining ties of Part 3's rule on (2,3,6,2): 324 reachable schedules, 144 balanced by human; human 4 gets two different models in 216 of them",
+    "verified the page's `both` schedule is a run of the page's own rule and diverges from the reference output only from the 9th assignment",
+    "checked the swapped-priority follow-up: human balance always holds, task balance fails on the same parameter sets",
+    "checked the heap claim: in runs of the reference over small parameters the chosen model is the top of neither a per-task nor a per-human heap in 95 of 55440 steps"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the change. No solution code changed; the added check asserts the corrected claim, and the old sentence written as an assertion (human 4 lands on one model twice under every tie-break) fails."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

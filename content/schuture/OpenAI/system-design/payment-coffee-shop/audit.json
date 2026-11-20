@@ -1,0 +1,29 @@
+{
+  "id": "OpenAI/system-design/payment-coffee-shop",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages)",
+    "recomputed every capacity number in an independent script: 800,000 orders/day, 9.3 average and 44.4 peak QPS, 58 rounded to 60 with the 1.3x margin, 776,000 captures and 1,552,000 ledger rows per day, 54 + 63 GiB/year (about 120), 155,200 rows and 14.8 MiB per settlement file, and the follow-up's 864,000,000/day, 15.6 GiB and about 1,700 parts",
+    "checked the latency budget (1.5 s p99 minus the PSP's 1.2 s, a 1.3 s timeout inside the 1% tail) and the tip example against the 120% ceiling",
+    "walked the state-machine table against the prose rules for capture, void, expiry, batch claim and reconciliation, and checked the ledger postings balance (capture, payout with fees, refund)",
+    "checked factual claims: hold / capture / void semantics, only the acquiring PSP can capture or void its own authorization, tokenization keeping card numbers and BINs out of the system, conditional UPDATE and INSERT ... ON CONFLICT as idempotency tools, circuit breaker behaviour",
+    "checked the mermaid diagram against the walk-through",
+    "compared README.zh.md with README.md paragraph by paragraph and by the set of numbers in the prose; python block identical in both"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

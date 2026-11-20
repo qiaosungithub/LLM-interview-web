@@ -1,0 +1,7 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 60       # case limits add up to 48 s; the reference answer needs about 6 s
+case_cpu: 3       # CPU seconds per case unless the case says otherwise
+load_cpu: 20      # tests.py has already imported torch; slack for answers that train at import time
+memory_gb: 6
+special: debug
+note: 只评测修好之后的文件；说明每个 bug 对梯度和训练做了什么的书面部分和追问不评测。第一个样例照 python gridworld_pg.py 训练 120 轮，要几秒钟。

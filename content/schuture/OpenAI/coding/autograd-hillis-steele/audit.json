@@ -1,0 +1,31 @@
+{
+  "id": "OpenAI/coding/autograd-hillis-steele",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "题目 Part 4 (a)(b)",
+      "problem_zh": "(a) 说 scan_forward(W) 返回 P，但参考解答返回 (P, tape)；(b) 没给 scan_backward 的签名，照题面写的测试连参考解答都过不了。",
+      "action": "fixed",
+      "change_zh": "(a) 改为返回 (P, tape)，tape 保存反向要用的中间结果、内容自定；(b) 写明 scan_backward(tape, G)；并补上两个函数的签名块。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages)",
+    "recomputed the N=3, D=2 worked example (P_0, P_1, P_2) by hand and from all three forward functions",
+    "ran the exact Part 1(b) snippet on the installed torch (2.15, CPU): it raises the quoted RuntimeError; confirmed a view shares its base's version counter and that an indexed write bumps it",
+    "confirmed the claim that the in-place loop's gradient would have been right (cloning each saved row gives the same gradient as Part 2)",
+    "re-derived the Part 3 recurrence and the Part 4 per-round backward formula; compared prefix_products_backward and scan_backward with autograd for N=1..20, 33, 64, 65 and D=1,2,3,5 (float64), with finite differences for small sizes, and with autograd run through scan_forward itself",
+    "checked the induction claim (entry i holds the last min(i+1, 2s) matrices) round by round for N=11, the round count ceil(log2 N), and the work counts (scan about N log N matmuls vs N-1)",
+    "checked the affine-recurrence follow-up numerically (composition on (A, b) pairs is associative and reproduces the loop)",
+    "compared Chinese and English prose; code fences are identical in both files",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

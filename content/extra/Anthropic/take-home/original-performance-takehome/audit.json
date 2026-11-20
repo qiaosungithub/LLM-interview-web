@@ -1,0 +1,45 @@
+{
+  "id": "Anthropic/take-home/original-performance-takehome",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "参考解答 阶段 8",
+      "problem_zh": "“20 块放在第一趟是 1085”这个数不是在阶段 8 的配置下测的：按阶段 8 的配置（gather 之后的异或仍用向量）把 20 块放在第一趟，实测是 1091；1085 是在阶段 9 的配置下测出来的。差别很小，“放在第二趟更好”的结论不变（1064 对 1091，阶段 9 配置下是 1040 对 1085）。",
+      "action": "flag",
+      "change_zh": "没有改：差 6 个周期，不影响任何结论。读的时候把这里的 1085 当成 1091 即可。"
+    },
+    {
+      "where": "题目 和站内其他页面的关系",
+      "problem_zh": "“现在用的限时 take-home”这条链接指向的页面目前还不存在，点了会找不到。",
+      "action": "flag",
+      "change_zh": "没有改：这一页大概还在写，写好后链接就能用；如果最后不写，就要删掉这条链接。"
+    }
+  ],
+  "checked": [
+    "ran page (normal and --hash-seeds PYTHONHASHSEED=0/1): pass",
+    "diff -r of materials/ copy against the original download: identical",
+    "history and rules vs the blog (local copy and live WebFetch) and Readme.md: design Nov 2023, used since early 2024, 1000+ candidates, TPU-like machine, AI explicitly allowed, v1 4h serial start with multicore warm-up and planted bug, May 2025 Opus 4, v2 2h from 18532 with multicore removed, Opus 4.5 bandwidth-bottleneck story, released version = v1 start with v2 ISA and single core, new puzzle-style take-home, benchmark table, 1487 challenge, sub-1300 invalid submissions, N_CORES example: all match",
+    "machine and kernel description vs problem.py: slot limits, VLEN 8, scratch 1536, end-of-cycle writes, cycle counting (non-debug bundles), ALU ops, load_offset/vload/const/select/vselect/add_imm semantics, value ranges [0, 2^30), memory length exactly 7 + n_nodes + 2*batch (checked numerically)",
+    "scoring claims vs tests/submission_tests.py: 8 unseeded correctness runs on values only, one timed run with 2*147734 on failure, the 8 strict thresholds and the CodeSignal docstring; 9 CYCLES lines per run",
+    "starter-code count: 36 non-debug slots per (item, round), 14 header + 262 consts + 2 pauses = 278 setup, 147734",
+    "own probe on a scratch copy (tools/out/scratch/audit-e/perf/probe.py) building every stage and running it on the frozen machine: cycles 97040/7690/2084/1548/1355/1329/1107/1064/1040 all correct; per-engine op counts give exactly the page's lower-bound table; stage 9 ops load 1949 (1888 gathers + 36 vloads + 25 consts), valu 6082, alu 7070, stage 8 valu 6318, alu 5182",
+    "scheduler passes table (0/1/3/6 passes for stages 2/5/7/9) reproduced exactly",
+    "ablations reproduced: stage 6 without each rewrite 1332/1329/1329; stage 9 without each rewrite 1107/1065/1130; level 3 by multiply_add 1193 (valu bound 1185); level 4 for all blocks 1687 (flow bound 1664); 32 blocks on second trip 1207 (flow bound 1184); stage 3 block order 2084; stage 9 round order out of scratch (66 words + 201 vectors); 20 blocks on first trip is 1091 in the stage-8 config (page says 1085, which is the stage-9 config)",
+    "gather timeline: stage 4 first gather at cycle 153 with 104 under-filled load cycles; stage 5 first at 39, vectors 121 -> 77; stage 3 first at 2 with 1 under-filled; stage 9 47 + 983 (39 under-filled) + 10 = 1040; scratch 56 words + 149 vectors = 1248",
+    "PERF_STORE_IDX=1 stage 9: 1055 cycles, values and indices correct on 3 seeds and 3 other sizes",
+    "all 9 stages correct on 8 other sizes (heights 1-10, rounds 1-23, batch 8-64) x 2 random inputs",
+    "did not re-run tests/submission_tests.py (the lead already did at stage 9); did not open the trace viewer"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Page block passes normally and with --hash-seeds. Own probes: tools/out/scratch/audit-e/perf/probe.py and v.py on a copy of the repo with the staged solution; nothing run inside materials/."
+  },
+  "env_evidence": [
+    "博客明确说这份 take-home **允许使用 AI**（Anthropic 的一般规定是 take-home 默认不用 AI，除非另有说明）。",
+    "第 1 版限时 4 小时，从完全串行的代码开始。",
+    "于是有了第 2 版：限时改为 2 小时；起点换成 Opus 4 开始吃力的地方（Readme 说起始代码是 18532 个周期）；代码更干净，加了新的机器功能，去掉了多核。"
+  ],
+  "confidence": "high"
+}

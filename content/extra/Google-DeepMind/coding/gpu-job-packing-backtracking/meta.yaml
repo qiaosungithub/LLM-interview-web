@@ -1,0 +1,14 @@
+title: "Packing Training Jobs onto GPUs: Search Order, Pruning and Branch and Bound"
+title_zh: "把训练作业分到 GPU 上：回溯的搜索顺序、剪枝与分支限界"
+summary_zh: "把 n 个作业放到 k 块显存相同的 GPU 上：先用回溯找一个合法方案；再靠“先放大的作业”和“占用相同的 GPU 只试一块”两种剪枝，把访问的节点数降几个数量级；最后用分支限界求最忙那块 GPU 的最小占用。"
+category: coding
+kind_zh: "编程 · 回溯与剪枝"
+roles: [SWE, MLE, RE]
+topics: [backtracking, pruning, symmetry-breaking, branch-and-bound, search-order, memoization]
+difficulty: medium
+frequency: low
+stage: [onsite]
+format_zh: "3 个部分 / 45 分钟"
+order: 61
+added: true
+origin: "Google DeepMind 面试流程汇总里，有一份反馈说软件工程和 Gemini 应用岗位的编程轮是 LeetCode 中等难度、考“dynamic programming and backtracking”，没有记录具体题目；这道 GPU 装箱回溯题是按这个题型补写的，真实面试不一定考过它。"

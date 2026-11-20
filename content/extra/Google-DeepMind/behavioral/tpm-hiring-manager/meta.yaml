@@ -1,0 +1,13 @@
+title: "TPM Hiring-Manager Round: Technical Depth and Stakeholder Management"
+title_zh: "技术项目经理（TPM）用人经理面：技术深度与干系人管理"
+summary_zh: "两组共 12 道题，练 TPM 用人经理面的两个考察方向：把一个机器学习系统讲清楚并指出真正的风险；在自己没有决定权的情况下处理算力冲突、发布分歧、延期上报和对上级说“不”。"
+category: behavioral
+kind_zh: "行为面 · TPM 用人经理面"
+roles: [TPM]
+topics: [tpm, technical-depth, stakeholder-management, evaluation-gate, compute-allocation, escalation]
+frequency: rare
+stage: [hm-screen]
+format_zh: "2 组共 12 题 / 时长无记录，按 45 分钟练"
+order: 60
+added: true
+origin: "Google DeepMind 面试流程汇总里，对技术项目经理（TPM）只有一句话：先是一个简短的招聘联系人初筛，然后是一场考察技术深度和干系人管理的用人经理面，并注明项目管理类岗位的证据还比较少。没有记录任何原题，这里的 12 道题全部是按这句描述补写的。"

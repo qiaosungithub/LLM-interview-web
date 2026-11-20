@@ -1,0 +1,32 @@
+{
+  "id": "OpenAI/coding/transformer-bug-hunt",
+  "verdict": "fixed",
+  "summary_zh": "写评测时在 Part 2 的代码框架里注明 ParityClassifier() 不带参数，其余不变。",
+  "issues": [
+    {
+      "where": "Part 2 代码框架",
+      "problem_zh": "题面没有说 ParityClassifier() 不带参数，但参考解答的检查代码和评测都直接调用 ParityClassifier()。把训练好的 TinyGPT 传进去是很自然的设计，那样会在评测时莫名失败。",
+      "action": "fixed",
+      "change_zh": "代码框架里加上 def __init__(self): ...（注释 takes no arguments），中英文题面同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages)",
+    "extracted the buggy tiny_gpt.py from the statement and ran it with the claimed fixes applied cumulatively: none -> shape error (768x64 and 16x64); fix 1 -> loss ~2.55, all grads None, test 1 fails; fixes 1-2 -> loss 0.97, test 1 fails; fixes 1-3 -> test 1 passes, loss 1.44, test 2 fails; all four -> loss 0.0004, all tests passed",
+    "ran each bug alone (other three fixed): bug 3 alone gives loss 0.152, test 1 fails, 0/500 completions; bug 4 alone gives loss 1.44",
+    "diffed buggy file + four fixes against the page's full fixed file: the only differences are the four fixes and the Part 3 cache additions",
+    "reproduced the quoted numbers: 0.92 attention weight on the 11 hidden positions in the untrained model; identical logits at the separator for the two permuted prompts; n_layer=2 with bug 4 -> loss 0.39; softmax(dim=-2) -> loss 0.0014, test 1 fails, 2% completions; float16 masked_fill(-1e9) raises the quoted overflow error; fully masked row -> NaN",
+    "fixed model retrained with 8 different seeds (and with N(0,1) positional init): all converge to loss <= 0.0005 and pass run_tests",
+    "parity classifier trained with 6 seeds: 1000/1000 new numbers correct each time; pool-then-head equals head-then-pool to 1e-6; statement examples 702258 -> even, 852207 -> odd",
+    "KV cache: 540 random chunkings over n_layer 1-3 and n_head 1/2/4 against a full forward pass, 0 mismatches; cached generate equals uncached generate on 500 prompts for 1 and 2 layers; cache size matches 2*n_layer*B*T*d_model",
+    "compared every code fence between README.zh.md and README.md (identical) and read the English prose against the Chinese",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "With torch 2.15 the shape error text carries an 'addmm: ' prefix before 'mat1 and mat2 shapes cannot be multiplied (768x64 and 16x64)'; the shapes are as the page says. The 2-layer fixed model ends at 0.0004 here against the page's 0.0005."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,14 @@
+title: "Online Assessment: Worker Mode Tracker"
+title_zh: "在线测评：多 worker 众数统计"
+summary_zh: "分四关实现一个汇总类：多个 worker 各自上报整数；随时查询全局出现次数最多的值和前 k 名；移除一个 worker 时把它上报过的数据全部抹掉；合并两个 worker。追问里用带懒删除的堆把众数查询做到平摊 O(log V)。"
+category: coding
+kind_zh: "在线测评 · 4 关"
+roles: [SWE, MLE, RE]
+topics: [oop-design, hash-map, counting, mode, lazy-deletion-heap]
+difficulty: medium
+frequency: low
+stage: [oa]
+format_zh: "4 关 / 90 分钟"
+order: 71
+added: true
+origin: "证据很薄：一份第三方备考清单（一个付费课程的宣传页）在“CodeSignal OA Questions”下列了“Worker Mode Tracker”，只有三条要点：Collect data from multiple worker shards；Track most frequent values globally；Support worker removal (erase historical contributions)。没有接口、例子和分关方式，也不是真实测评的原题。本页第 1 到 3 关各对应一条要点，接口、并列规则和例子都是这次定的；第 4 关（合并 worker）在来源里没有对应内容，是这次补的。"

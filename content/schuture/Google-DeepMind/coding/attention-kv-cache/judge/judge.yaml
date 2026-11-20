@@ -1,0 +1,3 @@
+timeout: 40
+case_cpu: 2
+note: Part 3 用 tracemalloc 量调用期间的内存峰值，超过完整得分矩阵的四分之一就算保留了整个矩阵；Part 3 的证明题和追问不评测。

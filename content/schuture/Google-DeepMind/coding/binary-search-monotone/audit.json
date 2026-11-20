@@ -1,0 +1,22 @@
+{
+  "id": "Google-DeepMind/coding/binary-search-monotone",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "Part 1: exhaustive check on all 4095 strictly bitonic arrangements of n distinct values for n = 1..12 (negatives included) against (min, max), with an index-checking wrapper; comparison count never exceeds ceil(log2 n); spot checks at n = 1e5 and 1e6",
+    "Part 1: hand trace of the worked example matches the page; the backward-comparison variant loops forever on [1, 5, 3] as claimed",
+    "Part 2: inverse_floor / inverse against a linear-scan brute force on 10 functions x 5200 values of y (52,000 cases, incl. y below f(1), negative offsets, 2^x); calls to f never exceed 2 * m.bit_length() (bound is tight), no argument evaluated twice, exactly 1 call when f(1) > y; all six statement examples; answers up to 2^200",
+    "Part 3(a): on every non-strictly bitonic array over {0,1,2} with n <= 8, max(a) is returned and min(a[0], a[-1]) is the minimum; adversary argument re-read",
+    "Part 3(b): 13,500 runs over five strictly increasing g (x^3, exp, linear, x/1e6, atan) with roots at the endpoints, the midpoint and random points, eps from 1.0 down to 1e-300 and 0: result within eps of the root (or within float resolution for eps = 0), always terminates, number of g evaluations equals ceil(log2((hi-lo)/eps)); statement example returns 3.10645 (within 0.001 of 3.10723)",
+    "English and Chinese text compared paragraph by paragraph; code blocks identical"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

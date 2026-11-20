@@ -1,0 +1,39 @@
+{
+  "id": "Google-DeepMind/coding/attention-kv-cache",
+  "verdict": "fixed",
+  "summary_zh": "三个部分的题目、例子和参考代码都没问题（带 cache 和不带 cache 的结果逐行一致）。只改了追问里关于 bf16 的一条：原文说“减去最大值”能同时解决溢出和舍入两个问题，实际上它只能解决溢出，舍入丢失要靠把累加量放在 float32 里。",
+  "issues": [
+    {
+      "where": "参考解答 追问（bf16 那一条）",
+      "problem_zh": "原文说减去运行最大值后“两种失效方式都被一次性绕开”，即 bf16 相加时小项被舍入掉的问题也解决了。实际不是：平移不改变两个指数值的比值。实测在 bf16 下得分差 6 时，不平移是 404+1=404，平移后是 1+0.0025=1，小项照样丢；64 个比最大值低 5.6 的项逐个加到 1 上，bf16 得到 1.0，正确值是 1.237。另外原文给的丢失门槛“相差约 2^7 倍（得分差约 4.85）”偏小一倍，实测得分差 5.0 时小项还在，要到约 2^8 倍（得分差约 5.5）才完全丢失。",
+      "action": "fixed",
+      "change_zh": "改为：减去最大值让 bf16 和 float16 都不再溢出；但它治不了舍入，所以生产环境的 kernel 除了平移，通常还把 ℓ 和 o 放在 float32 里累加。门槛数字改为 2^8（ln256≈5.5）。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查只验证了 float16 不平移会溢出、平移后不溢出，没有检查“平移后小项是否还会被舍入掉”。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：float16 下平移后的两项 1 和 exp(-9) 相加仍等于 1（小项丢失），换成 float32 累加则能保留。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "recomputed the Part 1 / Part 2 / Part 3 worked examples by hand-style code (weights, l, o, 30.8562) and against the reference",
+    "causal_mha vs an independent pure-Python brute force on 400 random (T, d, n_heads, scale) cases incl. T=1, d_h=1, n_heads in {1,2,3,4,6}",
+    "causality check: changing later rows leaves earlier outputs unchanged",
+    "cached decode_step vs uncached causal_mha (whole sequence and prefix-recompute) for T in {1..300}, d in {1,4,12,64}, heads in {1,2,4}: worst abs error 2e-15 (4e-12 with unnormalised N(0,1) weights and outputs up to ~300), within the stated 1e-10",
+    "wrote a separate batched (B, T, d) einsum attention and compared it with per-sequence cached and uncached paths for B in {1,2,5}: worst abs error 3e-15 (the page's decode_step has no batch axis by design)",
+    "cache does not alias the caller's x_t; KVCache.append shape errors",
+    "kv_cache_bytes: 2^32 and 2^35 figures",
+    "attention_blockwise vs pure-Python brute force on 300 random cases for every block from 1 to T_k+3; scores of magnitude 1e3, 1e5, 1e8 in ascending/descending/random order with overflow/invalid warnings turned into errors",
+    "bf16 follow-up measured with torch.bfloat16 (shifted vs unshifted sums, sequential accumulation), float16/bf16/float32 overflow thresholds (11.09 / 88.7 / 88.7)",
+    "code blocks identical in README.md and README.zh.md"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass before and after. The added check asserts the corrected claim; the old claim's opposite assertion (small term survives the shift in float16) fails."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

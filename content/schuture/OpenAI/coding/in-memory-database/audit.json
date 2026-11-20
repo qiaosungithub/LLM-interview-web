@@ -1,0 +1,31 @@
+{
+  "id": "OpenAI/coding/in-memory-database",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "插入出错规则之后那一段",
+      "problem_zh": "失败的 insert 不留下行、重名的 create_table 保留原表，这两点只是暗示，测试却检查。",
+      "action": "fixed",
+      "change_zh": "补一句：抛出异常的调用不改变数据库：失败的 insert 不留下任何行，重名的 create_table 不动原来那张表。英文版同样修改。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages), including its own cross-check of 4500 queries against sqlite3",
+    "wrote an independent model from the statement (explicit int-below-str comparison, None rules, comparator-based insertion sort with insertion-order tie-break, KeyError/ValueError order) and compared the final class against it on 4000 random sessions (about 200,000 calls, 97,000 selects): several tables, bad table and column names, rows with missing and unknown keys, None, empty strings, digit strings, very large ints, repeated ORDER BY columns, indexes of both kinds created and rebuilt at random points between inserts",
+    "same comparison for the Part 1-only class (1500 sessions) and the Part 2-3 class (2500 sessions)",
+    "replayed every statement example, and the KeyError rules on an empty table",
+    "'must not scan every row': counted the rows select touches on a 5000-row table over 3000 indexed queries (indexed condition first or after a non-indexed one, value None, int-vs-str values) - always exactly the rows the indexed condition matches",
+    "complexity claims: hash lookup and a 100-match range lookup take the same time at 20,000 and 200,000 rows; insert into a sorted index grows with table size",
+    "reproduced the measured claims: about 4000x, 225x, and 6x slower insert",
+    "compared Chinese and English text; code blocks identical",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; nothing was changed."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

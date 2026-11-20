@@ -1,0 +1,46 @@
+{
+  "id": "Google-DeepMind/system-design/llm-evaluation-system",
+  "verdict": "fixed",
+  "summary_zh": "样本量、算力、人工评分预算、kappa、多重比较、Bradley–Terry 排名等数字重算后都对得上。改了两处：一是发布关卡的说法和它自己的核对代码对不上——正文说关卡是按黄金集（每个领域 2,000 次比较）能分辨的程度定的，但核对代码用的是每个领域 4,904 次；真按 2,000 次去跑，一个处处打平的候选模型只有约 8% 能过关。现在正文写明关卡要跑在补足到 4,904 次的样本上，并给出 93% / 13% / 8% 三个通过率，代码里加了一条核对。二是位置偏差那段说“只用一种顺序”也能在整体上抵消偏差，这是错的，也和同一段里“固定顺序会测出约 63%”自相矛盾，已删掉这半句。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "需求与规模「黄金集与统计目标的对比」、参考解答 深入话题 (c) 非劣效关卡",
+      "problem_zh": "原文说 (c) 的关卡“按黄金集实际能够诚实分辨的程度来定标”，δ 取 3 个百分点就足以让真正打平的领域“有把握通过”全部 12 道 Holm 校正阈值；算力估算和流程走查也都只跑黄金集的 2,000 次比较。但页面自己的核对代码用的是每个领域 4,904 次比较。我用 20 万次模拟算过：一个在 12 个领域都与生产模型打平的候选模型，4,904 次、δ=3 个百分点时约 93% 通过；只有 2,000 次时同一道关卡只有约 8% 通过（单个领域在 α/12 下的检验效能只有约 0.52）。照原文去设计，这道关卡几乎会拦下所有打平的候选模型。",
+      "action": "fixed",
+      "change_zh": "保留 δ=3 个百分点和原有代码，把正文改成与代码一致：关卡跑在每个领域补足到 4,904 次比较的样本上；(c) 里写明 4,904 次时打平的候选模型约 93% 通过、换成 2 个百分点边界约 13%、只跑一遍黄金集的 2,000 次时约 8%。算力一段补了一句：补足之后各项数字乘以 4,904/2,000≈2.45，同样 3 小时内约需 50 个工作进程。流程走查里加了“包括补足样本量的那部分”。代码块加了一个 tied_pass_rate 核对这三个通过率。"
+    },
+    {
+      "where": "参考解答 深入话题 (a) 位置偏差",
+      "problem_zh": "原文说“只用一种顺序，或者每条比较随机挑一种顺序，只能在许多条提示词的整体层面上抵消 b……期望值和跑两种顺序的设计相同”。固定只用一种顺序在整体上也抵消不了偏差：同一段后面就写了固定把候选模型放第一位会测出约 63% 而不是 55%。我自己复算的结果是固定顺序 0.630，随机顺序 0.550，两种顺序取平均 0.550。",
+      "action": "fixed",
+      "change_zh": "删掉“只用一种顺序，或者”，只保留对“每条比较随机挑一种顺序”的说法，这句对随机顺序是成立的。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits; code blocks identical in README.md and README.zh.md",
+    "recomputed in my own script: z values, n = 4,903.2 -> 4,904 (exact binomial power 0.801), coverage 40.8%, MDE at n=2,000 = 3.13 pp",
+    "recomputed compute and budget figures: 24,000 / 48,000 / 28,800 call-equivalents, +20%, 216,000 s, 60 h, 20 workers, 45 h left, 5,000/4,904 = 1.02, 360 / 4,640 / 386.7 human ratings",
+    "Cohen's kappa example recomputed by hand and with sklearn (p_o 0.80, p_e 0.3415, kappa 0.696)",
+    "position bias: own replication of always-first (0.630), random order per item (0.550, sd 0.0091) and both orders averaged (0.550, sd 0.0064)",
+    "FWER 1 - 0.95^12 = 0.46; Holm vs Bonferroni example (3 rejections vs 1) with my own Holm implementation",
+    "Bradley-Terry MM update compared against a direct BFGS maximum-likelihood fit (same strengths), likelihood monotone from 20 random starts, ranking recovered 30/30, bootstrap CI covered the truth 28/30",
+    "release gate: own 200k-trial simulation of the pass rate for a candidate tied in all 12 domains at n = 2,000 / 3,000 / 4,000 / 4,904 / 6,000 and margins 2-5 pp; page's evaluate_release over 300-400 seeds (scenario A releases 94%, scenario B 0%, all-tied passes non-inferiority 93%)",
+    "top-up scaling: 4,904/2,000 = 2.452, 176,544 calls, 49.04 workers for 3 hours (about 50)",
+    "added check confirmed in both directions: the old claim (tied candidate clears a golden-set-sized gate comfortably) fails at 0.08; the new assertions pass",
+    "read the architecture diagram edge by edge against the walkthrough, API list and data model",
+    "compared Chinese and English paragraph by paragraph, including an automated comparison of every number in the two files"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass after the edits (about 2 s each). Added one check, tied_pass_rate with three assertions (0.93 / 0.13 / 0.08, tolerance 0.03, fixed seed); existing functions unchanged. The assertion encoding the old claim, tied_pass_rate(golden_set_size, 0.03) > 0.8, fails at 0.0795."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "Anthropic/coding/agentic-pr-review",
+  "verdict": "fixed",
+  "summary_zh": "题目和参考评审本身没有问题，只改了一处说法：原文说“在持锁状态下循环调用 submit 的初稿会在第一个多条目的批次上死锁”，实际上只有一个条目的批次也会死锁，已改成“第一个非空的批次”。",
+  "issues": [
+    {
+      "where": "参考解答 与助手协作",
+      "problem_zh": "原文说在 with self._lock: 里循环调用 self.submit(...) 的初稿“会在第一个多条目的批次上死锁”。实测只含一个条目的批次同样死锁：第一次调用 submit 就要再取同一把不可重入的锁，和批次里有几个条目无关；只有空批次才能正常返回。",
+      "action": "fixed",
+      "change_zh": "把“第一个多条目的批次”改为“第一个非空的批次”（英文版同步修改）。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查没有覆盖“持锁调用 submit 会死锁”这条说法。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：用只含一个条目的批次运行这种初稿写法，确认线程一直卡住、不会返回。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "compared the reference submit_many against a model (all-or-nothing, pop order equal to sequential submit) on 5000 random batches, lists and generators",
+    "stress-ran submit_many from 6 threads with overlapping batches, 200 trials: every id created once, no partial batch",
+    "ran the lock-then-self.submit draft on batches of size 0, 1 and 2: size 1 and 2 both deadlock, size 0 returns",
+    "applied PR #4's diff to jobqueue.py and ran the existing tests (5 pass), confirmed the shared metadata dict and the bare KeyError for an unknown policy name",
+    "confirmed PR #1's original leaves the first n-1 jobs in the queue on a duplicate",
+    "confirmed pickle.load on a JSON snapshot raises UnpicklingError, and json.dump of a dataclass payload raises TypeError",
+    "checked code blocks are identical in README.md and README.zh.md"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Both languages pass. The added check asserts the behaviour the corrected sentence describes (a one-item batch hangs); the code under test did not change, so the check contradicts the old sentence rather than failing against old code."
+  },
+  "env_evidence": [
+    "你正在一个带终端的浏览器内置编辑器中工作，打开着一个小型 Python 代码仓库。",
+    "终端里可以使用一个 AI 编程助手，整个任务的任何部分都可以借助它，但你提交的每一条评审意见、每一行代码都由你自己负责：如果说不清楚某条评论或某处改动为什么是对的，就等同于没有做出这个评论或改动。",
+    "代码评审 · AI 辅助，Python"
+  ],
+  "confidence": "high"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "Anthropic/coding/streaming-detokenizer-slowdown",
+  "verdict": "fixed",
+  "summary_zh": "参考解答是对的：修复版、标准库版和原版在截断字符、坏字节、代理区、超长编码、真正的 U+FFFD 等情况下每次返回值都一样，停止串部分也和按定义写的暴力版逐次一致。只做了两处小改：一组计时注明是一次测量；修正了代码里一条和实际不符的注释。",
+  "issues": [
+    {
+      "where": "参考解答 Part 1 第五步",
+      "problem_zh": "“push 自身的时间是 0.164 → 0.481 → 1.549 秒”“从每秒 38 万 token 掉到 8.3 万”写得像固定事实，其实是共享机器上的一次计时。",
+      "action": "fixed",
+      "change_zh": "加注“以下是我们机器上的一次测量”。复测结果趋势一致（每秒约 34 万掉到 8 万，push 自身时间每翻倍涨 3 到 4 倍）。"
+    },
+    {
+      "where": "参考解答 Part 2 代码注释",
+      "problem_zh": "注释说 held “只有在以 U+FFFD 结尾时才非空”。实际上等半个字符时它也可能非空，例如一个 token 是 b\"a\\xe4\"，held 是 [\"a\"]，并不以 U+FFFD 结尾。",
+      "action": "fixed",
+      "change_zh": "改为“只有在等待时才非空”。代码本身没变。"
+    }
+  ],
+  "checked": [
+    "ran page and ran it with --hash-seeds (PYTHONHASHSEED 0 and 1): pass before and after edits",
+    "found both hot spots from the given code before reading the solution (decode of all ids on every push; emitted += delta on an attribute)",
+    "exhaustive comparison of given / fixed / stdlib decoders on all 292,561 sequences of up to 4 tokens drawn from 23 one-byte-class pieces (ASCII, every continuation range, C0/C1, C2-DF, E0, E1, ED, EF, F0, F1, F4, F5, FF, empty, real U+FFFD): every push/finish return value, text() after each call, second finish, push after finish",
+    "all sequences of up to 3 tokens plus 30,000 random longer ones over 31 multi-byte pieces: truncated 2/3/4-byte characters, ED A0 / ED A0 80 / ED BF (surrogates), E0 80 / E0 9F BF (overlong), F0 80 80 80 / F0 8F (overlong), F4 90 / F4 90 80 80 (out of range), C0 AF, F8 sequences, EF BF BD and its truncations: all three versions identical",
+    "incomplete_tail vs CPython's incremental decoder buffer (getstate) on every 0-2 byte string and 3-byte palette strings: the only differences are a trailing ED A0..BF, which CPython buffers and incomplete_tail decodes at once, exactly as follow-up 1 says; checked bytes.decode('utf-8','replace') results for the cases the page cites",
+    "stop strings: 40,000 random cases (overlapping stops, a stop that is a prefix of another, U+FFFD inside stops, one byte per token so stops span many calls, with and without finish) against an independently written brute force from the definition; a 5-character stop split over 15 calls; empty stop raises; examples in the statement",
+    "recomputed Part 1 table (us per token and /position), the 42% / 1.26 core arithmetic, the generator ncalls formula, the counter table (matches page's asserts), follow-up 5's 1.6 us and <1% of a core",
+    "one measured run of the timing claims on this machine: ticket bench 7044 -> 791 tok/s (ticket 7084 -> 795); only-decode-fixed bench(200000, 40000) 337K -> 80K tok/s (page 380K -> 83K); its push self time 0.097 -> 0.345 -> 1.267 s; fixed ~590K tok/s flat",
+    "CPython 3.11.18: sys.getsizeof of 1000-char strings ASCII / CJK / containing one emoji = 1049 / 2074 / 4076 bytes (1, 2, 4 bytes per char); attribute += never in place (0/10000) vs local (9954/10000)",
+    "vLLM main, vllm/tokenizers/detokenizer_utils.py detokenize_incrementally: decodes tokens[prefix_offset:read_offset] and tokens[prefix_offset:], holds back when the new text ends in U+FFFD, then advances to (read_offset, len(tokens)); matches follow-up 2",
+    "py-spy README: a sampling profiler that attaches to a running process by --pid without restarting it",
+    "meta.yaml origin checked against the source excerpt; frequency rare; no paths"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "Page passes with and without --hash-seeds after the edits (only a comment and prose changed)."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

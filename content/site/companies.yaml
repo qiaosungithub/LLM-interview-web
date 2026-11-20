@@ -1,0 +1,49 @@
+# Text shown at the top of each company's page. `text` is Markdown.
+
+anthropic:
+  tagline: 默认不能用 AI，除非那一轮明说可以；写代码的轮次都能运行代码，但多半不给测试。
+  cards:
+    - title: 能用 AI 吗
+      text: >-
+        默认**不能**。官方原话：“This is all you–no AI assistance unless we indicate otherwise.”
+        两个明确的例外：“AI 辅助编程”轮可以用环境里的 Claude Code，性能工程的 take-home 可以用 AI。查文档、搜索是允许的。
+    - title: 在哪写代码
+      text: >-
+        Google Meet 共享屏幕，在 **CodeSignal 或 Colab** 里写，代码能运行，面试官看着你写和跑。
+        在线测评也在 CodeSignal，90 分钟四关。系统设计用共享的 Google Doc 或你自己的白板。
+    - title: 给不给测试
+      text: >-
+        在线测评**自带测试**，一关全过才解锁下一关。电话面和现场面**通常不给**：
+        编辑器里可能只有一个空的 `main()`，测试数据和用例都要自己写、自己跑。
+
+openai:
+  tagline: 面试中不能用 AI 编程助手；在 CoderPad 里写代码并运行，题目一问一问放出来。
+  cards:
+    - title: 能用 AI 吗
+      text: >-
+        候选人反馈一致：**不能**用 AI 编程助手，至少有一轮还要求关掉编辑器自带的自动补全。
+        可以查标准库文档（有协调人的说明明确写了）。官方面试指南这次没能打开核对，以协调人发给你的说明为准。
+    - title: 在哪写代码
+      text: >-
+        多数是 **CoderPad + Google Meet**，代码能运行，输出和日志在编辑器面板下方。
+        系统设计轮用 Excalidraw 之类的白板，只讨论、不写可运行的代码。
+    - title: 给不给测试
+      text: >-
+        **有时给、有时不给**。有的题带（可见或隐藏的）测试，必须跑过才放出下一问；
+        有的题什么都不给，要自己写测试或口头把代码走一遍。两种都要练。
+
+deepmind:
+  tagline: 除非另行告知，面试和面试任务中都不能用 AI；编程在能运行代码的共享编辑器里，知识问答是口头的。
+  cards:
+    - title: 能用 AI 吗
+      text: >-
+        默认**不能**。官方原话：“unless told otherwise – please don't use any AI tools during live interviews,
+        or during interview tasks.” 准备阶段可以随便用。
+    - title: 在哪写代码
+      text: >-
+        Google Meet 视频，候选人反馈编程轮用**能运行代码的共享编辑器**（如 CoderPad）。
+        机器学习与数学的知识问答是**口头**回答，不写代码；设计轮是口头讨论。
+    - title: 给不给测试
+      text: >-
+        **有时要通过面试官准备的测试用例**（有候选人四个用例过了三个）；
+        也有题目要求你自己写单元测试并处理边界情况。

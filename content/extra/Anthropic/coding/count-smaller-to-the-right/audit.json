@@ -1,0 +1,18 @@
+{
+  "id": "Anthropic/coding/count-smaller-to-the-right",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page, and with --hash-seeds (PYTHONHASHSEED 0 and 1): all pass",
+    "worked every statement example (including the OnlineSmallerCounter sequence) by hand and with my own brute force",
+    "exhaustive compare of merge, Fenwick and the online counter against my own brute force on all 21,845 arrays over values 0..3 with length 0..7",
+    "3,000 random arrays (lengths up to 60, value spans 1, 2 and 1e18, negatives) for merge and Fenwick; input not modified",
+    "counted < comparisons in the merge solution: always <= n*ceil(log2 n) (max 0.88 of the bound), confirming the Part 2 claim",
+    "checked n(n-1)/2 = 19,999,900,000 and ceil(log2 200000) = 18; measured the brute force at about 1.3e7 comparisons/s here (about 25 minutes for n = 2e5), consistent with the 'about half an hour' estimate",
+    "checked the origin line against the third-party prep guide: it lists 'Count Smaller to the Right' under phone-screen questions with exactly three bullet points, as stated"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "Page passes as written, also under PYTHONHASHSEED 0 and 1. No edits."},
+  "env_evidence": [],
+  "confidence": "high"
+}

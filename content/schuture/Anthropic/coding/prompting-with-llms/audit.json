@@ -1,0 +1,63 @@
+{
+  "id": "Anthropic/coding/prompting-with-llms",
+  "verdict": "fixed",
+  "summary_zh": "解析器、重试、指标和符号检验的代码都核对过，没有问题，代码没有改。改了两句话：解答说系统提示词“逐字”写明了平局裁定规则，实际代码里只写了规则的总原则，两个具体情形没有写进去；另外中文把符号检验那句话译错了，说成必须“全部倒向同一边”才可能低于 0.05。",
+  "issues": [
+    {
+      "where": "参考解答 Part 1 第一段",
+      "problem_zh": "原文说系统提示词“逐字写明了四个标签定义和平局裁定规则”。四个标签定义确实是逐字照抄的，但 SYSTEM_PROMPT 里的平局裁定规则只有总原则那一句（按客服此刻必须采取的行动来标，而不是顺带提到的次要原因）。题面规则里的两个具体情形（因账单问题无法登录标 access；以提问形式描述失灵的控件标 bug 而不是 how_to）并没有写进去，而这两个情形正好对应基线判错的 t08 和 t22。",
+      "action": "fixed",
+      "change_zh": "改为“逐字写明了四个标签定义，并写明了平局裁定规则的总原则（那两个具体情形没有写进去）”，并把“规则完全一致”改成“规则一致”。中英文都改了，代码没有动。"
+    },
+    {
+      "where": "参考解答 Part 3 最后一段（只有中文有问题）",
+      "problem_zh": "中文写的是“只有当意见不一致的工单足够多、且全部倒向同一边时，双侧符号检验才会降到 0.05 以下”，把“全部倒向同一边”说成了必要条件。这不对：9 条意见不一致的工单里 8 比 1，p 约为 0.039，同样低于 0.05。英文的原意是：就算全部倒向同一边，也至少要 6 条。",
+      "action": "fixed",
+      "change_zh": "中文改为“只有当意见不一致的工单足够多时，双侧符号检验才会降到 0.05 以下——即使它们全部倒向同一边，也至少需要 6 条意见不一致的工单，而不是 2 条”。英文本来就是对的，没有改。"
+    },
+    {
+      "where": "题目 Part 1 与参考解答 Part 1：示例放在哪里",
+      "problem_zh": "题面说“在系统提示词中写明……以及一到两个示例”，解答的文字也说系统提示词“给出两个示例”。但参考代码里示例并不在 SYSTEM_PROMPT 中，而是由 build_user_prompt 放进用户提示词，排在工单前面。",
+      "action": "fixed",
+      "change_zh": "已改：题面改成“示例写进系统提示词或放在用户消息里排在工单前面都可以”；解答的文字改成与参考代码一致——示例由 build_user_prompt 放在用户消息里，因为示例是 classify 的参数，Part 3 要换一组。代码没有动。"
+    },
+    {
+      "where": "参考解答 Part 2、Part 3 里的评测数字",
+      "problem_zh": "解答正文里的 26/28、t03 重试一次、t08 和 t22 判错、加了示例后全对，这些数字都不是真实模型跑出来的，而是可运行检查里一个按固定规则回复的替身 complete() 算出来的。这一点只在检查代码的注释里说明了，正文没有提。",
+      "action": "fixed",
+      "change_zh": "已改：在解答 Part 2 的数字前加了一段说明——这些数字来自验证代码里按固定规则回复的替身 complete()，不是真实模型的结果；换成真模型具体数字会不同，分析方法不变。"
+    },
+    {
+      "where": "classify 的 docstring",
+      "problem_zh": "没说调用 complete() 时要把 temperature 传进去，测试会检查这一点。",
+      "action": "fixed",
+      "change_zh": "改为 calls complete() at `temperature`（中英文题面的代码里同样修改）。"
+    }
+  ],
+  "checked": [
+    "confirmed README.md, README.zh.md and meta.yaml were byte-identical to the originals before editing; ran the page (both languages) before and after the edits",
+    "confirmed all python/py fences are identical in README.md and README.zh.md (16 fences each)",
+    "data facts the prose relies on: 28 tickets, 7 per label, ids t01..t28 in order; tickets[:20] drops t21 (how_to) and t22..t28 (all 7 access); exemplars A-D are not among the 28 tickets; no ticket text is contained in another",
+    "compared SYSTEM_PROMPT with the statement: four label definitions verbatim; only the general tie-break sentence, neither of the two specific cases; no worked example inside the system prompt",
+    "parse_reply against an independent str.find implementation written from the docstring: 300000 random token strings and 200000 structured replies (mixed case, padded whitespace, junk around the tags, several tags, invalid first tag followed by a valid one, unclosed tags, missing reason); no disagreement",
+    "classify with scripted fake models: one call when the first reply parses, exactly two when it does not and never a third, failed reply and the reason fed back in the retry prompt, system prompt and temperature passed on both calls, examples rendered before the ticket; replayed the statement's trace",
+    "score against an independent confusion-matrix implementation on 20000 random cases with None predictions, missing predictions and never-predicted labels; the statement's toy example",
+    "evaluate with a fake model: every ticket classified exactly once (plus one call per retry), a parse failure counted as wrong rather than excluded, retry_count correct; compare's changed list on the page's two example sets",
+    "paired_improvement against exact binomial arithmetic on 4000 random pairs of results (max abs difference 1.1e-16), unchanged p-value when the two results are swapped; statement example (0,2) -> 0.5, (1,1) -> 1.0",
+    "sign-test facts: all-one-sided p-values for n = 1..8 (0.0625 at 5, 0.03125 at 6); the smallest n with any split below 0.05 is 6; non-unanimous splits below 0.05 exist (8-1 -> 0.039, 10-2 -> 0.039)",
+    "executed the statement's flawed cell as printed against fake models: with bare gold-label replies it prints 50.00% (how_to rejected by the regex, 8 tickets never scored, divided by 28), with 'Label: x' replies 0.00%; ceiling 20/28; the first ticket's text appears twice in its own prompt",
+    "read the Chinese statement and solution prose against the English for meaning changes: one found (sign-test sentence), fixed in Chinese only",
+    "not checked: no real language model was called, so nothing about how a real model behaves with this prompt (which tickets it misses, whether worked examples fix them) was verified; the caching, self-consistency, model-grading and fine-tuning follow-ups were read for plausibility only",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "No code changed; two prose sentences corrected (one in both languages, one in Chinese only), so no runnable check was added. All numbers quoted in the solution (26/28, one retry on t03, misses on t08 and t22, 28/28 with the larger example set) come from the page's own scripted stand-in for complete(), not from a model."
+  },
+  "env_evidence": [
+    "| 编程 · 提示词与评测 | ★★☆☆☆ | 中等 | RE · RS · MLE | prompt-design, structured-output, parsing, evaluation, error-analysis | 3 个部分 / 55 分钟 | 技术电面 |",
+    "笔记本（notebook）中定义了 `complete`，这是一个把一轮对话发给语言模型、并返回其纯文本回复的函数。"
+  ],
+  "confidence": "high"
+}

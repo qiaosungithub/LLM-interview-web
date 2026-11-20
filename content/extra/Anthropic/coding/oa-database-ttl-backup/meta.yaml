@@ -1,0 +1,14 @@
+title: "Online Assessment: In-Memory Database with TTL, Conditional Writes, Backup and History"
+title_zh: "在线测评：内存数据库（TTL、条件写入、备份与历史读取）"
+summary_zh: "内存数据库题的另一套四关：字段级的增删查与条件写入；按字段名排序的扫描；时间戳放在最后一个参数的 TTL 操作；备份返回记录数、恢复时按剩余寿命重算 TTL，并能读取过去某一时刻的值。"
+category: coding
+kind_zh: "在线测评 · 4 关"
+roles: [SWE, MLE, RE]
+topics: [oop-design, hash-table, ttl, snapshotting, compare-and-set, versioning]
+difficulty: medium
+frequency: low
+stage: [oa]
+format_zh: "4 关 / 90 分钟"
+order: 73
+added: true
+origin: "内存数据库这类四关在线测评在收集到的面经里多次出现，本站已有另一套关卡。这一套的骨架（字段级记录、排序扫描、时间戳在最后一个参数的 TTL 方法、backup 返回记录数、restore 按剩余寿命重算 TTL）取自公开练习集 LibreSignal，Fellowship Trainer 里的内存数据库四关模拟题规则基本相同（只是返回值用 None、布尔值和整数，不是字符串）；两者都说明自己是练习用的模拟题；Fellowship Trainer 说这一套是按公开练习仓库和候选人的回忆改编的，并引用了一篇第三方整理的“Anthropic 在线测评：内存数据库”，但两者都不是经过确认的 Anthropic 原题。条件写入（compare-and-set、compare-and-delete）和读取过去某一时刻的值都没有找到题面：网上一份整理清单里各只有一行要点，一个题库目录里另有“内存数据库历史查询”这个题名；本页这几个方法的签名和规则是补写的。题面、例子和参考解答都是重写的。"

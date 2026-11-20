@@ -1,0 +1,14 @@
+title: "Reservation Service with Concurrency Constraints"
+title_zh: "带并发约束的预订服务"
+summary_zh: "先写一个单线程的内存预订服务（资源、左闭右开的时间区间、预订、取消、查询），再让它在多个线程同时调用时不重复预订、不丢取消，最后支持一次原子地预订多个资源并且不死锁。还要自己写出能稳定复现竞态的测试。"
+category: coding
+kind_zh: "编程 · 并发，Python"
+roles: [SWE, MLE, RE]
+topics: [concurrency, threading, locks, check-then-act, lock-ordering, intervals, testing-races]
+difficulty: medium
+frequency: low
+stage: [onsite]
+format_zh: "3 个部分 / 55 分钟"
+order: 69
+added: true
+origin: "一位自称拿到 Anthropic SWE L4 offer 的候选人在 Reddit 帖子里列出现场编程轮的题目，其中一行是“Design and implement a reservation service with concurrency constraints”（匿名帖，可信度偏低）。证据只有这一句，没有接口、分几步、怎么判分等任何细节；本页的接口、三个部分、例子和全部测试都是照这一句补写的，真实面试的题面未必如此。"

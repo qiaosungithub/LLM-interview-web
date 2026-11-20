@@ -1,0 +1,75 @@
+{
+  "id": "Anthropic/system-design/telemetry-data-infrastructure",
+  "verdict": "fixed",
+  "summary_zh": "容量估算全部重算过，数字都对。改了五处，都是小改动：(1) 去重一段说“先插入去重索引、再写存储”就安全，其实这样崩溃后事件会丢，已改为两步必须作为一个原子步骤提交，并加了一个小检查；(2) 深入话题 (c) 里“废弃规则也会触发回填、把历史数据打回隔离区”和页面其他几处“废弃不影响已有数据”矛盾，已删；(3) 告警聚合方式里的 p95 用汇总行里的 count/sum 算不出来，已去掉；(4) 架构图里回填任务和原始存储之间的箭头画反了；(5) 删掉“超出汇总保留期”这个不成立的条件。另有两处设计上的薄弱点只做了标记，没有改。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 深入话题 (a) 去重",
+      "problem_zh": "原文说去重索引的插入“必须发生在它所保护的那些写入之前”，只讲了“先写后插”中途崩溃会重复。但“先插后写”同样有问题：插入成功、还没写存储就崩溃，重新投递的消息会被当成重复丢弃，这个事件就丢了（模拟结果：先写后插留下 2 份，先插后写留下 0 份）。照原文回答，面试官问一句“插入之后崩溃怎么办”就答不上来。",
+      "action": "fixed",
+      "change_zh": "把最后一句改成：两种顺序单独都不安全，插入要和它所保护的写入作为一个原子步骤一起提交。同时在可运行检查里加了一个十来行的小模拟（两步之间崩溃、然后重新投递），验证两种顺序分别得到 2 份和 0 份。"
+    },
+    {
+      "where": "参考解答 深入话题 (c) 覆盖率、废弃与回填",
+      "problem_zh": "同一段里先说废弃一条规则“不影响它已经产出的任何一行数据”（API 第 3 条、方案开头的假设、代码里的检查也都这么说），紧接着又说“这两类改动都会排入回填……若规则已废弃，则将其打回隔离区”，等于废弃会改写历史数据。两种说法矛盾，而追问第 5 点正好要求讲清楚规则变更对历史数据的影响。",
+      "action": "fixed",
+      "change_zh": "改为只有新增或编辑规则才会排入回填，删掉“若规则已废弃，则将其打回隔离区”这半句。废弃只对新流量生效，和页面其余各处一致。"
+    },
+    {
+      "where": "参考解答 数据模型 AlertRule",
+      "problem_zh": "AlertRule 的 aggregation 里列了 p95，但 RollupRow 只存 count 和 sum，而告警“只读取汇总存储”——凭 count 和 sum 算不出 p95。",
+      "action": "removed",
+      "change_zh": "从枚举里去掉 p95，保留 count | sum | avg。（真要做分位数告警，汇总行里得另存直方图或 sketch，这一点本页没有展开。）"
+    },
+    {
+      "where": "参考解答 架构图（mermaid）",
+      "problem_zh": "图里画的是“回填任务 --> 原始不可变存储”。图中其他箭头都表示数据流向，这样画等于回填任务往原始存储里写；正文说的是回填任务只读原始存储，原始存储从不改写。",
+      "action": "fixed",
+      "change_zh": "箭头改成“原始不可变存储 --> 回填任务”，中英文两张图同步修改。"
+    },
+    {
+      "where": "参考解答 深入话题 (b) 查询引擎",
+      "problem_zh": "原文说查询的日期范围“超出了汇总的保留期”时改查整理表。但规模估算里汇总和整理表的保留期同为 400 天，不存在汇总已过期、整理表还在的日期范围。",
+      "action": "removed",
+      "change_zh": "删掉这半句，另外两个条件（需要完整维度、需要汇总没有预先算好的聚合方式）保留。"
+    },
+    {
+      "where": "参考解答 深入话题 (d) 聚合查询的隐私下限，以及对应的检查代码",
+      "problem_zh": "不足 25 个账号的分组被并入 \"__other__\"，但 \"__other__\" 这一行仍然带着行数返回。把查询过滤到单个账号时（页面自己的例子），结果是 {\"__other__\": 200}——这个账号有 200 条事件，照样看得出来。面试官可能会追问这一点；常见的补法是 \"__other__\" 自身不足 25 个账号时也不返回。这更像设计取舍，不确定算不算错。",
+      "action": "flag",
+      "change_zh": "未改动。"
+    },
+    {
+      "where": "参考解答 深入话题 (a) 乱序与延迟事件",
+      "problem_zh": "水位线取“见过的最大 event_time 减 10 分钟”，而 event_time 是题目明说不可信的客户端时钟，只有偏差超过 7 天才被排除。一个时钟快 1 小时的客户端就会把水位线往前推 1 小时，之后的正常事件都被算作迟到（模拟结果：3 小时内 27% 的正常事件被判迟到）。面试官可能会追问；常见做法是推进水位线时不让 event_time 超过 receive_time。属于设计上的薄弱点，不确定算不算错。",
+      "action": "flag",
+      "change_zh": "未改动。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "recomputed every capacity number from the statement's givens in tools/out/scratch/b10/telemetry_numbers.py: 4.32e9 events/day, 50,000/s average, 200,000/s peak, 100 MB/s (800 Mbps), 40 -> 60 cores, 25 -> 64 partitions (256 MB/s, 2.56x), dedup index 103.7 GB, 2.16 TB/day uncompressed, log 2.16 TB, raw 16.2 TB, curated 108 TB, rollup 200,000 rows/min = 20 MB/min = 28.8 GB/day = 11.52 TB, total 135.7 TB, 66.7 alert evaluations/s, 6,000,000 events per 30 s window - all match",
+    "cross-checked numbers reused in other sections (30/400-day retentions, 370-day remainder, top-50 cap, 30 s alert pass, 24 h dedup window); the only mismatch was the rollup-retention clause in the query-engine paragraph",
+    "simulated a crash between the dedup-index insert and the storage write, then a redelivery, for both orderings (tools/out/scratch/b10/telemetry_probes.py): write-first leaves 2 copies, insert-first leaves 0",
+    "ran the page's own mapping model: a backfill after deprecating a rule sends already-mapped records back to quarantine, i.e. the removed half-sentence and the page's 'deprecation leaves history alone' cannot both hold",
+    "ran the page's privacy-floor function on a query narrowed to one account: returns {'__other__': 200}",
+    "simulated the watermark rule with a single event from a clock 1 h fast: 27% of honest events over 3 h are classed late; 0% if the watermark input is capped at receive_time",
+    "checked the difflib ratios the fuzzy-matching check relies on (sync_completed_v2 vs sync_completed = 0.903)",
+    "checked technology claims from my own knowledge, not against external docs: one consumer per partition within a consumer group, redelivery of uncommitted offsets, backward-compatible schema changes, manifest-based table formats for late writes, small-file compaction",
+    "compared every mermaid edge with the architecture walk-through; the diagram was read, not rendered",
+    "compared README.zh.md with README.md paragraph by paragraph; python fences are byte-identical in both, mermaid edges identical once labels are stripped"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass before and after the edits. One check added (copies_after_crash); the page's old claim written as an assertion - insert-first leaves exactly one copy - fails with 0 copies."
+  },
+  "env_evidence": [],
+  "confidence": "medium"
+}

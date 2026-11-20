@@ -1,0 +1,5 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 68       # seconds for the whole run: the case limits add up to 63
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+special: concurrency
+note: "只评测 Part 2 和 Part 3 的代码；Part 1 的定位分析和 Part 2 要求的倍增计数实验是书面部分，不评测。Part 2 的两个大测试按 CPU 时间限时，复制量是平方级的写法（原版、只改查表、每次 read 都压缩一次）会超时；大测试用的是 16 条的小词表，只修复制、仍逐条扫词表的写法也符合题目要求，能通过。Part 3 的测试从两个线程同时调用你的代码，死锁会表现为超时或“还没结束”；但并发测试只能发现问题，不能证明没有问题：全部通过不代表没有竞态条件。"

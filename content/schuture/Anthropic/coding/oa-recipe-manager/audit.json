@@ -1,0 +1,39 @@
+{
+  "id": "Anthropic/coding/oa-recipe-manager",
+  "verdict": "fixed",
+  "summary_zh": "四关的规则、示例和参考实现都对得上，没有改动代码。只改了“追问”里一条讲并发的说法：原文说给每个菜谱各加一把锁就够了，其实不够，因为名称去重的索引是所有菜谱共用的；另外顺手改通了 Level 2 示例里一句不通的注释。",
+  "issues": [
+    {
+      "where": "参考解答 追问（并发调用）",
+      "problem_zh": "原文说“给每个 recipe_id 加一把锁”就能把所有碰到共享状态的调用串行化。实际上名称索引 _name_index 是所有菜谱共用的：两个线程分别把 r1 和 r2 改成同一个新名字 \"Soup\"，各自拿的是不同的锁，都能通过冲突检查，最后两份菜谱同名（手工按这个顺序执行检查和改名，确实得到两份都叫 \"Soup\" 的菜谱）。",
+      "action": "fixed",
+      "change_zh": "改写这一条：说明两个不同菜谱改成同名也会撞上，所以每个菜谱一把锁不够；最简单的做法是整个管理器共用一把锁，想更细就得连名称的查找键一起锁。"
+    },
+    {
+      "where": "题目 Level 2 示例",
+      "problem_zh": "list_recipes 结果后面的注释写的是“r1 比 r2 先创建，两者都比对方先出现”，后半句自相矛盾、读不通（英文原文同样不通）。输出本身 [\"r3\", \"r4\", \"r1\", \"r2\"] 是对的。",
+      "action": "fixed",
+      "change_zh": "注释改为“r1 比 r2 先创建，所以排在 r2 前面”，输出没有变。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edits",
+    "confirmed python/py fences are identical in README.md and README.zh.md",
+    "all four level examples are asserted by the page's own replay blocks",
+    "wrote an independent model from the statement (explicit creation-sequence tie-break) and compared it with the Level 1, Level 2, Level 3 and Level 4 classes separately: 3000 random operation sequences each, full state (list_recipes and every history) compared after every operation",
+    "random inputs included case variants, trailing-space names, empty names, 'Straße'/'STRASSE', empty and duplicate ingredient lists, id reuse after delete, out-of-range versions, unregistered users",
+    "aliasing: mutated every list passed in and every list/dict returned (get_recipe, list_recipes, history, get_version) and checked the store did not change",
+    "concurrency follow-up: executed by hand the interleaving check(r1)->check(r2)->rename(r1)->rename(r2) and got two recipes with the same name, which a per-recipe lock would not prevent",
+    "verified 'STRASSE'.casefold() == 'straße'.casefold() is True and the lower() comparison is False"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "No code changed; only one follow-up bullet and one example comment were edited. The lock claim is about a design the page does not implement, so no runnable check was added."
+  },
+  "env_evidence": [
+    "| 在线测评 · 4 关 | ★★★☆☆ | 中等 | SWE · MLE | oop-design, case-folding, sorting, permissions, versioning | 4 关 / 90 分钟 | 在线测评（OA） |",
+    "按顺序实现下面四关：只有当前一关自己的测试全部通过，下一关的测试才会开始运行，且每一关都在同一个类上继续扩展，而不是另起一个新类。"
+  ],
+  "confidence": "high"
+}

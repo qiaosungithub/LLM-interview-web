@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 75       # seconds for the whole run: 26 cases x 2 s + 3 cases x 3 s CPU, plus margin
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: 只评测 Part 2 和 Part 3 的代码；Part 1 的定位分析和 Part 2 要求的倍增计数实验是书面部分，不评测。

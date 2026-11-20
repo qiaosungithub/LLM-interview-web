@@ -1,0 +1,29 @@
+{
+  "id": "OpenAI/system-design/slack",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "read README.zh.md and README.md in full and compared them paragraph by paragraph (same numbers, code block identical, mermaid edges identical)",
+    "ran page (1 block, both languages pass)",
+    "recomputed every estimate in my own script (tools/out/scratch/b21/t2_slack.py): 210M messages/day, 2,431 and 12,153 messages/s, 900,000 online users, 1.17M connections, 78 -> 90 gateways, 2.7 online members and 3.51 deliveries per message, 11,181 messages/s in small channels, 39,244 deliveries/s, 40,000-member channel: 6,000 online, 7,800 frames per post, 39,000/s at 5 posts/s, 37.8 GB/day, 13.8 TB/year, 41.4 TB/year replicated",
+    "recomputed the deep-dive numbers: 5% budget = 1,962 frames/s, threshold N <= 2,012 from frames and from routing lookups alike, (1 - 1/90)^300 = 3.5%, 3,900 pointers/s, 200 posts/s per row lock, 25% utilization and 0.83 ms mean lock wait at 50 posts/s (M/D/1), 15 KB reconnect response, 30 messages/s for a 50,000-seat workspace",
+    "simulated the 'gateways hit by a small-channel post' figure (200,000 trials): 3.46 gateways, 26x fewer than broadcasting to all 90, as the page says",
+    "checked factual claims: UPDATE ... RETURNING holds the row lock until commit and rolls back with the transaction (so no holes, unlike a sequence); a signed download URL stays valid until it expires; best-effort pub/sub is enough when the store is the source of truth",
+    "checked the mermaid diagram against the message walk-through"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

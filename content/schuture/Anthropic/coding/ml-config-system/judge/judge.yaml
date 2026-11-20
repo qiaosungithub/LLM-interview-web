@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 92       # seconds for the whole run: 41 cases x 2 s CPU + one 4 s case, plus margin
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: 返回值按类型严格比较（7 和 7.0、True 和 1、0.0 和 -0.0 都算不同），dict 的键序不比较。FieldError 只比较 path 和错误种类，不比较列表顺序，也不比较类型不符时的 message 文字。有一个测试会在另一个 Python 进程里载入 answer.py 并调用 config_hash。Part 4 的书面问题（还需记录什么）不评测。

@@ -1,0 +1,3 @@
+timeout: 75
+case_cpu: 2
+note: 测试用题目给的 FileSystem，再加上模拟进程崩溃的 CrashFS（见 ref.py）：崩溃发生在某次 write / append / delete 之前，或让 append 只写进一部分（可能被清零）。只通过 get 检查内容，不检查文件格式；新建的实例在 load() 之前视为空。

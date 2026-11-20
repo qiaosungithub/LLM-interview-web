@@ -1,0 +1,22 @@
+{
+  "id": "Anthropic/safety/claude-constitution",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "meta.yaml frequency",
+      "problem_zh": "频率标的是 high。收集到的材料里，宪法只出现在两份“面试前该读什么”的阅读建议里，没有候选人报告说被直接问到宪法本身。",
+      "action": "flag",
+      "change_zh": "没有改。文化面每个流程都有，谈模型该怎么行为的问题也常见，high 说得过去，但依据偏间接，请负责人决定是否降到 medium。"
+    }
+  ],
+  "checked": [
+    "verified every English quote against the full constitution text and the announcement post (2026-01-22), including the CC0 dedication, the four core values and their order, 'holistic rather than strict', the definition of broad safety, the four-case argument, 'corrigibility does not mean blind obedience', the dial sentence, the seven hard constraints, 'boundaries or filters', the seven honesty properties, 'many hands', wellbeing and weight preservation, and the discomfort quote",
+    "checked the Chinese paraphrases of the hard constraints against the original meaning",
+    "confirmed the Q7 question appears verbatim in the collected third-party interview guide",
+    "ran build.py --check"
+  ],
+  "code_run": {"ran": false, "passed": null, "notes": "no runnable code on this page"},
+  "env_evidence": [],
+  "confidence": "high"
+}

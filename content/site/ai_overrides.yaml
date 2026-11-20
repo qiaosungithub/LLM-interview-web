@@ -1,0 +1,51 @@
+# Per-problem exceptions to the default AI rule picked in build.py (ai_rule).
+# Keys are site ids; any of level / label / env / basis may be overridden.
+# level: no | yes | ask | talk
+
+anthropic/coding/agentic-pr-review:
+  level: "yes"
+  label: 可以用 AI
+  env: 类似 VS Code + GitHub 的浏览器环境，终端里有 Claude Code；代码能运行
+  basis: 候选人反馈：这一轮的邀请里写明可以用环境里的 Claude Code。考察的是你怎么用它，每条评审意见、每行改动都要自己讲得清。
+
+anthropic/coding/llm-agent-tool-loop:
+  env: notebook（如 Colab），里面已经给好一个调用模型的 client；代码能运行，不给测试
+  basis: 题目本身要调用模型 API，但没有消息说这一轮可以让 AI 助手代写代码；按官方默认规则（现场面试全靠自己）准备。
+
+anthropic/coding/prompting-with-llms:
+  env: notebook（如 Colab），里面已经给好一个调用模型的函数；代码能运行，不给测试
+  basis: 题目本身要调用模型写提示词、做评测，但没有消息说这一轮可以让 AI 助手代写代码；按官方默认规则准备。
+
+anthropic/take-home/performance-kernel-optimization:
+  level: "yes"
+  label: 可以用 AI
+  env: 这一页是同类练习，模拟器就写在页面的代码里；真实作业是在自己的机器上限时完成（现在是 2 小时，最早是 4 小时）
+  basis: 官方工程博客：性能工程这份 take-home 明确允许使用 AI 工具（“For this take-home, we explicitly indicate otherwise”）。
+
+anthropic/take-home/original-performance-takehome:
+  level: "yes"
+  label: 可以用 AI
+  env: 在自己的机器上限时完成（最早是 4 小时，后来改成 2 小时；公开版不限时）；仓库自带模拟器、计分测试，以及一个在浏览器里看执行轨迹的工具
+  basis: 官方工程博客：性能工程这份 take-home 明确允许使用 AI 工具（“For this take-home, we explicitly indicate otherwise”）。公开版的说明提醒，用 AI 智能体时要叮嘱它别改 tests/ 目录，因为有模型靠改测试“作弊”。
+
+anthropic/take-home/constrained-machine-puzzles-a:
+  level: "yes"
+  label: 可以用 AI
+  env: 在自己的机器上限时完成；起始代码只检查答案是否合法，不提供可视化和调试工具，要自己决定造不造工具
+  basis: 官方工程博客介绍现行版本时写道，调试工具可以自己加打印语句，也可以“ask a coding model to generate an interactive debugger”，说明这份作业同样允许用 AI；题目本身是专门挑的 AI 不擅长的类型。
+
+anthropic/take-home/constrained-machine-puzzles-b:
+  level: "yes"
+  label: 可以用 AI
+  env: 在自己的机器上限时完成；起始代码只检查答案是否合法，不提供可视化和调试工具，要自己决定造不造工具
+  basis: 官方工程博客介绍现行版本时写道，调试工具可以自己加打印语句，也可以“ask a coding model to generate an interactive debugger”，说明这份作业同样允许用 AI；题目本身是专门挑的 AI 不擅长的类型。
+
+anthropic/take-home/ml-take-home:
+  label: 禁用 AI
+  env: 自己的机器或托管 notebook，4 小时；结束后做 10 分钟展示，再接 30 分钟技术讨论
+  basis: 题面写明不能用 AI 编程助手，可以查文档；与官方默认规则（take-home 默认不用 Claude）一致。
+
+anthropic/take-home/interp-double-descent:
+  label: 禁用 AI
+  env: 自己的机器，4 小时；交 notebook 和不超过八页的幻灯片，然后当面评审
+  basis: 题面写明不得使用 AI 编程助手；与官方默认规则（take-home 默认不用 Claude）一致。

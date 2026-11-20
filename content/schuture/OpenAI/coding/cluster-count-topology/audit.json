@@ -1,0 +1,38 @@
+{
+  "id": "OpenAI/coding/cluster-count-topology",
+  "verdict": "fixed",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "题目（receive_message 启动查询的说明）",
+      "problem_zh": "题面没说启动查询的那条消息长什么样，测试必须由外部发起查询，无从下手。",
+      "action": "fixed",
+      "change_zh": "补一句：启动消息固定为 Part 1 (\"request\",\"count\")、Part 2 (\"request\",\"topology\")、Part 3 带 request_id 的三元组；机器之间互发的消息仍自定。参考解答本来就用这个格式。英文版同样修改。"
+    },
+    {
+      "where": "Part 3（“只向那一个子节点重发”之后）",
+      "problem_zh": "没说各步在哪里完成；测试要求收到请求当场转发，原来“完成后保持安静”的检查还会误判用确认消息的正确设计。",
+      "action": "fixed",
+      "change_zh": "补一句：除超时重发外，各步都和 Part 1、2 一样在 receive_message 里当场完成（收到请求立即转发或应答，包括重发缓存的答案；收齐应答立即汇报）；on_tick 只用来重发。英文版同样修改；测试的安静检查也已放宽。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages, also under PYTHONHASHSEED=0 and 1)",
+    "confirmed the page is byte-identical to the original and that code blocks match across the two languages",
+    "Parts 1-2: 1,500 random trees (1-30 nodes, shuffled child order) for count and topology against a direct traversal, and round count == 2 * depth on every one",
+    "Part 3: 3,000 random trees with drop_prob in {0..0.7} and duplicate_prob in {0..1.0}, two queries in flight plus a duplicated start call; 0 wrong results, 0 missing with idle_rounds_to_stop=400",
+    "statement example re-run for seeds 0..999 at 0.2/0.2 for both count (8) and topology",
+    "replayed a finished request at the root: cached value, no new sends",
+    "explanation numbers: 0.2**10 = 1.0e-7, 0.5**10 = 9.8e-4; the '6 of 10,000 seeds' and '3,586 messages on a depth-100 chain' figures are asserted by the page's own checks",
+    "follow-up claim 'each lost message adds at most TIMEOUT rounds': dropped every single send and every pair of sends on chains of depth 1-8; worst extra delay 3 rounds per drop",
+    "judge tests written (see judge/)",
+    "judge tests written (see judge/)"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass; no edits made."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

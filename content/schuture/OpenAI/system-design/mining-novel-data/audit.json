@@ -1,0 +1,30 @@
+{
+  "id": "OpenAI/system-design/mining-novel-data",
+  "verdict": "fixed",
+  "summary_zh": "之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages)",
+    "recomputed every scale number in an independent script: S1 = 6.8e9 and S2 = 5.44e9, 472 + 1,889 = 2,361 GPU-hours, 18.4 h on 128 GPUs, under 16% of 15,360, 2,778 without the cascade (417 more), 7.6 / 3.8 / 0.82 / 4.6 TiB, 19 + 2 index nodes, 348 GiB, 67 min of hashing and 2.2 h to read 800 TB, 24 h and 3.2e4 core-hours for the neighbor passes",
+    "recomputed the target-scan and brute-force numbers: 8.4e15 operations and 42 s, 1,000 operations per byte and 200 GB/s, 7.6 TiB vs 80 GB of GPU memory, 5.6 min over a 25 GB/s PCIe link, 1.4 min at 100 GB/s, 2.3e22 operations and 31,600 GPU-hours (2x budget), detector 50,000 vs 37 GPU-hours, 1 GPU-hour and 54,400 images per cluster",
+    "checked the rule of three (1 - 0.05^(1/n) vs 3/n), the recall lower bound 0.04% and n = 5.4e6, the union-bound confidence per band, the stratified precision formula and the filter break-even rule r > T_embed / T (quality filter exactly breaks even, de-dup gives the whole 417)",
+    "checked the ViT-L/14 FLOPs vs A100 peak (about 40%), the HNSW memory model and the PCIe figure for plausibility",
+    "checked that the numbers quoted for the synthetic novelty experiment and the perceptual-hash behaviour are the ones the runnable block asserts",
+    "checked the mermaid diagram against the walk-through",
+    "compared README.zh.md with README.md paragraph by paragraph and by the set of numbers in the prose; python block identical in both"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": ""
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

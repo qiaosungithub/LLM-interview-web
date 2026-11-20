@@ -1,0 +1,24 @@
+{
+  "id": "Anthropic/coding/research-fundamentals-spectra",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page plain, with --hash-seeds (PYTHONHASHSEED=0/1) and with 1 thread instead of 2: PASS every time",
+    "solved all three parts cold in my own script from the statement alone (own pca_svd, power iteration, autograd GD on least squares) before reading the reference; every number matches: eigvals [3.8102 ... 0.0310], ||mean||^2 72.59, e_k 1 / 0.716 / 0.507 / 0.355 / 0.251 / 0.170 / 0.111 / 0.063, max sample/population deviation 6.1%",
+    "Part 1: re-derived C = V S^2/n V^T, e_k^2 = tail/total (Eckart-Young), the population formula e_k^2 = (2^-k - 2^-8)/(1 - 2^-8), the bound ||mean||^2 <= s_1^2/n <= ||mean||^2 + lambda_1 (Weyl) and the rank-one interlacing direction; measured s_1^2/n = 73.97 and cos(v_1, mean direction) = 0.99978",
+    "Part 2: re-derived the exact tan(theta_t) and delta_t formulas and the bounds; own run gives slopes -0.6438 (sin) and -1.289 (delta) vs ln(lambda2/lambda1) = -0.6438 and twice that; floors ~1.2e-15 and 2-3e-15; tan(theta_0) = 2.35, bound 30 steps, measured 28; (0.5253/0.5)^50 = 11.8",
+    "Part 3: own GD run: l_1 drops to ~5e-30 after one step, l_8 falls 8.53 decades in 1200 steps, |a_8| reaches 1/1000 at step 845 (formula 844.5 -> 845, kappa ln 1000 = 848), L(w_hat) = 0.00491; eta = 2.1/lambda_1 gives a_1 ratio 1.899e8 after 200 steps and excess ratio 1.58e15; other factors at 2.1/lambda_1 are all inside (-1, 1)",
+    "follow-ups: recomputed best constant step (424 steps), heavy ball with optimal parameters in numpy (49 steps; the asymptotic-rate estimate alone would say 38, the extra comes from the double root), deflation rate 0.512, float32 power-iteration floor (sin ~2.4e-7)",
+    "meta.yaml: origin matches the process page's research track sentence (ML research fundamentals = PyTorch coding with basic linear algebra and plotting, no concrete problem recorded) and says the problem was written for this site; no paths; frequency low; stage phone-screen"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "All arithmetic is float64; results identical with 1 and 2 threads. No edits."
+  },
+  "env_evidence": [
+    "这一轮在共享的 notebook 里做，考的是“ML 研究基本功”：用 PyTorch 写几个小函数，画图，并且**在画图之前先说出图会长什么样**。"
+  ],
+  "confidence": "high"
+}

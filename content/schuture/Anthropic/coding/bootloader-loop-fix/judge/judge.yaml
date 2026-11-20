@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 61       # seconds for the whole run: 28 cases at 2 s each, plus 5 (the reference needs under 1 s)
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "三个部分都评测。Part 2 的测试程序都满足题目的前提（原样运行会陷入死循环，恰好翻转一行能让它正常结束）；题目没有给出规模，所以不要求线性时间，逐行翻转后整段重跑的暴力做法也能通过。Part 3 有几行同时格式错误时，报告其中任意一行都算对；有一项测试用 \\r\\n 换行，行尾的 \\r 按空白处理。"

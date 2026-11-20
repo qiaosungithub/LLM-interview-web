@@ -1,0 +1,40 @@
+{
+  "id": "Google-DeepMind/take-home/timed-research-take-home",
+  "verdict": "fixed",
+  "summary_zh": "两处小改：一是题目说 Part 1 的数字应当和参考解答一致，但换一台机器或换 PyTorch 版本，第二位有效数字就可能变，现在写明了；二是参考报告说“裁剪后发散没有了”，可裁剪后第 30 步的总亮度仍是真实值的 1.75 倍，现在把这个数补上，并加了检查。",
+  "issues": [
+    {
+      "where": "题目 规则",
+      "problem_zh": "原文说 Part 1 的数字应当一致，因为“那里没有你自己引入的随机性”。实测把初始权重扰动 1e-7（相当于换一种浮点舍入），第 0 个 seed 的 MSE@20 从 0.22 变成 0.21，MSE@30 从 1.9 变成 1.8，最差 seed 的 MSE@30 从 10.3 变成 6.3 到 8.8。照原文对数字，会以为自己做错了。",
+      "action": "relaxed",
+      "change_zh": "括号里补一句：换了 CPU 或 PyTorch 版本，浮点舍入不同，单步 MSE 和第 20、30 步的数可能在第二位有效数字上略有出入。验证代码里逐位断言的地方加了注释，说明这些数字只对本页的环境成立。"
+    },
+    {
+      "where": "参考解答 Part 2 裁剪对照 / 报告",
+      "problem_zh": "原文说滚动时裁剪到 [0, 1] 后“发散没有了”“发散消失”。本页用质量比衡量发散，而裁剪后质量比@30 仍是 1.75（1.48–1.91），总亮度明显偏高，MSE 也还在从第 20 步的 0.101 涨到第 30 步的 0.262。",
+      "action": "fixed",
+      "change_zh": "两处都改成“MSE 不再爆炸，但质量比@30 仍是 1.75，总亮度偏高”；验证代码加一条断言，核对 1.75（1.48–1.91）这个数。"
+    },
+    {
+      "where": "题目 Part 2",
+      "problem_zh": "题目让你“只加一个”便宜的对照，参考解答却做了两项额外实验：裁剪对照，外加只换噪声随机流的重复实验。",
+      "action": "flag",
+      "change_zh": "后一项可以看作对已有结论的稳健性检查，不算新的对照，时间表里也给它留了时间。算灰色地带，没改。"
+    }
+  ],
+  "checked": [
+    "ran page normally and with --hash-seeds (PYTHONHASHSEED 0 and 1): all pass, about 80 s each",
+    "wrote an independent re-implementation (rollout, MSE, centre-of-mass position error, mass ratio, noisy training) reusing only the starter code; every number in the main table, the clipping table, the gains at steps 5/10/20, the one-step cost ratios, the sigma=0.1 loss ratios, the clip/sigma=0.01 ratio and the crossing steps [16,15,19,16,18] match the page",
+    "sensitivity run: initial weights times (1 + 1e-7 z), three trials, to see which printed digits survive a different floating-point rounding; medians and all conclusions are stable, some second significant figures move",
+    "checked by hand: linear-extrapolation example, index convention, copy-last vs mean frame about 2x, E|U - mid| = (HI-LO)/4, sign test p = 0.0625, 'stays worse after crossing' on all 5 seeds",
+    "checked the time plan: 5 models take about 12 s, the full grid about 1 minute, well inside 3 hours",
+    "checked that no assertion depends on wall-clock time",
+    "checked meta.yaml origin against the source process notes (one research-scientist loop mentioned a 3-hour timed take-home): accurate, no paths; frequency is rare"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "Exact-digit assertions hold on this machine's PyTorch build; another build may move the last printed digit."},
+  "env_evidence": [
+    "只用 CPU，只用 PyTorch 和 NumPy。全部实验从头跑一遍不超过 10 分钟。",
+    "不用 AI 工具。DeepMind 的官方面试指南写明：除非另有通知，面试任务中不要使用任何 AI 工具。能不能查文档以招聘方的通知为准；练习时建议只查 PyTorch 和 NumPy 的官方文档。"
+  ],
+  "confidence": "high"
+}

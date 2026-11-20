@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 47       # seconds for the whole run: 21 cases at 2 s each, plus 5
+case_cpu: 2       # CPU seconds per case
+note: 三个 Part 都用检查器逐个前缀核对覆盖、唯一、最短长度和（Part 2、3 的）按任务均衡，任何合法调度都算对。Part 3 不要求按标注员均衡，只在结果下面报告你的调度是否做到了；证明或反例的书面部分不评测。

@@ -1,0 +1,37 @@
+{
+  "id": "Anthropic/coding/oa-bank-system",
+  "verdict": "fixed",
+  "summary_zh": "题目、四关示例和参考代码都没问题。只有参考解答开头一句话说反了：它说“转账在发起的那一刻就计入转出总额”，但题目定义和代码都是只算成功的 withdraw，转账根本不计入。已把这句话改对，并加了一条检查。",
+  "issues": [
+    {
+      "where": "参考解答 开头说明段",
+      "problem_zh": "原文写“转出总额在转账发起的那一刻就计入，不论成败”。实际上题目 Level 2 把转出总额定义为成功的 withdraw 取走的金额之和，参考代码的 transfer 和 accept_transfer 也都不改 outgoing_total：A 存 100 后 transfer(A→B, 60) 再被接收，top_spenders 仍是 [\"A(0)\", \"B(0)\"]。照这句话去理解，榜单会算错。",
+      "action": "fixed",
+      "change_zh": "改成“转账不计入来源方的转出总额：题目把转出总额定义为成功的 withdraw 取走的金额之和，所以发起转账和转账被接收都不会改变它”。题目和代码没有动。"
+    },
+    {
+      "where": "验证代码",
+      "problem_zh": "原有检查和示例里，转账之后从没查过 top_spenders，所以上面这句说法的对错没有任何检查能看出来。",
+      "action": "fixed",
+      "change_zh": "新增一条检查：A 先取款 10，再发起并完成一笔 60 的转账，前后 top_spenders 都是 [\"A(10)\", \"B(0)\"]。如果按原来那句话在发起时计入，这条检查会失败。"
+    }
+  ],
+  "checked": [
+    "ran page (both languages) before and after the edit",
+    "all four level examples are asserted by the page's own checks; re-derived each by hand from the statement's rules (inclusive 1,000 window, hold vs balance, merge re-pointing, generations)",
+    "wrote my own literal model of the statement (generation objects, merge re-points only still-pending transfers) and compared with the reference on 6,000 + 8,000 random call sequences over 2-5 account ids, biased so that accepts succeed, expiry windows are crossed (gaps of 999/1000/1001) and merges hit accounts with pending transfers in both directions; no disagreement",
+    "asserted in the fuzz that no balance and no available balance ever goes negative",
+    "called the reference to see whether a transfer moves the outgoing total (it does not, at start or at accept)",
+    "new check fails when transfer is patched to count toward the outgoing total at start (the behaviour the old sentence described), passes on the page's code",
+    "code blocks are identical in README.md and README.zh.md; section/details structure unchanged"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "README.md and README.zh.md both pass. Only prose and one added check changed; the reference code is untouched."
+  },
+  "env_evidence": [
+    "按顺序实现下面四关：只有当前一关的测试全部通过，下一关的测试才会开始运行，且每一关都在同一个类上继续扩展，而不是另起炉灶。"
+  ],
+  "confidence": "high"
+}

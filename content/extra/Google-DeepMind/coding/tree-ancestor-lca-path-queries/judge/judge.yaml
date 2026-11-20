@@ -1,0 +1,4 @@
+# Limits for this problem's judge; see tools/JUDGE_BRIEF.md.
+timeout: 90      # seconds for the whole run: covers an answer that times out on every case (24 x 2 + 8 + 10 + 12, plus 12)
+case_cpu: 2       # CPU seconds per case unless the case says otherwise
+note: "追问（求和、加叶子、内存）不评测。复杂度只用 2×10⁵ 个节点的链和两条长臂上的用时检查，能区分的是每次查询沿父指针一步一步走的 O(n) 做法；每次查询 O(log² n) 的做法（比如二分查找 LCA）也能通过。"

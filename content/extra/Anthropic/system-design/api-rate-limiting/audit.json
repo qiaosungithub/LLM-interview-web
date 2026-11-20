@@ -1,0 +1,37 @@
+{
+  "id": "Anthropic/system-design/api-rate-limiting",
+  "verdict": "fixed",
+  "summary_zh": "输出 token 记账那张表的 (C) 行说“持续以 2 倍限额请求”，但按它自己给的参数（每秒 40 个、平均 400 token）是每分钟 96 万，相当于限额的 2.4 倍。已改成“约 2.4 倍”，结论不变。 之后又按正常面试题的写法重写了题干（中英文页都用英文题干），数字和条件不变。",
+  "issues": [
+    {
+      "where": "参考解答 (d) 表格 (C) 行 / 验证代码",
+      "problem_zh": "表格写“持续以 2 倍限额请求（每秒 40 个，输出 100 或 700）”。每秒 40 个、平均 400 token，每分钟就是 960,000，而限额是 400,000，倍数是 2.4，不是 2。代码注释和打印的标签也写的是 2 倍。",
+      "action": "fixed",
+      "change_zh": "表格、代码注释和打印标签都改成“约 2.4 倍”；验证代码加了一条断言，从模拟用的请求序列算出需求正好是限额的 2.4 倍。表里三个数字（400,219 / 400,024 / 400,000）和“都收敛到限额”的结论不变。"
+    },
+    {
+      "where": "题目",
+      "problem_zh": "原题干是一大段长句，把条件、规模、范围和要讨论的话题全挤在一起，读起来不像面试官会说的话；中文版又是逐句硬翻。",
+      "action": "fixed",
+      "change_zh": "按正常面试题的写法重写题干：先一句话说要设计什么，再分块列出已有条件、需求和规模、要交付什么、面试官会追问的话题和不考的范围。所有数字和条件不变，参考解答没有改。按用户要求，中文页的题干也直接用英文。"
+    }
+  ],
+  "checked": [
+    "ran the page with tools/run_page.py, before and after the edit, normally and with --hash-seeds (PYTHONHASHSEED 0 and 1): all PASS, about 2.4 s",
+    "re-ran the extracted python block and compared every printed number with the text: capacity line (200,000 calls/s, 8 shards x 25,000, hot shard 42,500 -> 24,500 with leases), worst-case table (fixed 120/120, log 60/60, counter 60/119, bucket60 60/119, bucket10 10/69), table (C) 400,219 / 400,024 / 400,000, lease table 12,019 vs 12,098 admitted and 2,885 vs 18,000 calls",
+    "recomputed by hand the capacity estimates and the (A)/(B) rows (100 admitted, 10% used, 280,000 / 346,000 lowest, -733,333 / -734,000, 1.2M = 1.5 x (400k + 400k), 110 s lock-out)",
+    "found the (C) demand multiple is 40 x 400 x 60 / 400,000 = 2.4, not 2; added one assertion in the page and confirmed it fails with the old value (2) and passes with 2.4",
+    "confirmed the page's Lua ADMIT and SETTLE scripts are identical to the copies in the writer's fakeredis harness, then re-ran that harness against the current page block (fakeredis 2.40 + lupa from the session scratchpad, nothing installed): 5,342 allowed / 3,054 refused, 27,467 stored values agree with the Python twin",
+    "checked every Claude API rate-limit statement against platform.claude.com/docs/en/api/rate-limits (2026-11-18): token bucket with continuous replenishment, the 60 RPM ~ 1 request per second example, ITPM estimated at start and adjusted, cache-read tokens not counted toward ITPM, OTPM counted in real time on actual output with max_tokens not a factor, ramp limits, workspace vs organisation limits, anthropic-ratelimit-* headers with reset meaning fully replenished, retry-after on 429",
+    "checked Redis statements against redis.io docs: INCR rate-limiter race and Lua fix, MULTI/EXEC isolation and no rollback on runtime errors, WATCH making EXEC return null, script atomicity, keys passed via KEYS, effects replication (default since 5.0, only mode since 7.0) allowing TIME, EVALSHA/NOSCRIPT, hash tags and same-slot rule, Redis Cluster losing acknowledged writes on failover",
+    "checked the origin line against the Landed guide (lists 'Design API rate-limiting' under system design, sources badge Glassdoor/Blind/Reddit/candidate blogs) and the process page; no paths, says it is not a real interview question, frequency low",
+    "checked that company-specific details are framed as practice assumptions or public docs only"
+  ],
+  "code_run": {
+    "ran": true,
+    "passed": true,
+    "notes": "1 python block; passes before and after the edit and with --hash-seeds. Redis itself was not run (not allowed here); Lua semantics were checked with fakeredis from the session scratchpad and the Redis docs."
+  },
+  "env_evidence": [],
+  "confidence": "high"
+}

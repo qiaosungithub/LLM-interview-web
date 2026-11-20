@@ -1,0 +1,28 @@
+{
+  "id": "Anthropic/take-home/constrained-machine-puzzles-a",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [
+    {
+      "where": "meta.yaml 的 roles",
+      "problem_zh": "来源文章只讲了性能工程团队的 take-home，这一页的岗位标签写的是 SWE、Infra Eng、RE，比来源说的范围宽。",
+      "action": "flag",
+      "change_zh": "没有改：题目和解答本身不受影响，另一页同来源的练习也用同样的标签。建议统一改成性能工程方向（Perf Eng）。"
+    }
+  ],
+  "checked": [
+    "wrote my own interpreter for the machine from the statement alone, before reading the page's checker; the statement example and both quoted traces match it step for step",
+    "ran every reference, pass-mark and intermediate program on ~400 random stated-range inputs per part plus edge cases: all valid; worst case is Part 5 reference at 11,148 steps on eight 99s, under the 20,000 limit",
+    "own C brute force over every guard x opcode x target program up to length 5: Part 1 has no solution at length <=2 and exactly 1 at 3; Parts 2 and 3 none at <=4 and 4 / 8 at length 5 (the same programs the page lists); Parts 4 and 5 none at <=5",
+    "own C lazy search reproduced every node count in the page's table and the offline claims: Part 4 length 6 has 234 solutions, Part 5 none at 6 and 28 at 7 in 242,496,994 nodes; same solution counts on my own stated-range tests",
+    "recomputed both follow-ups: Part 3 with negative inputs (none at <=6, 11 at 7 including the page's program) and the DEC variant (-IN; +OUT; +DEC; TP is valid; Part 5 still none at <=6)",
+    "checked the origin line against the Jan 21 2026 Anthropic engineering article and the process page: every statement matches, the time-limit wording is accurate, it says the puzzles are our own design, no file paths; frequency medium kept because the article says the typical process now uses this puzzle take-home",
+    "ran the page with run_page.py (PASS, ~11 s) and with --hash-seeds (PASS); embedded checks only print timings, no wall-clock assertions"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": "PASS normally and with PYTHONHASHSEED=0/1; about 11 s per run."},
+  "env_evidence": [
+    "检查器不会告诉你哪个测试错了、错在哪一步。没有调试器，也不能单步执行。需要工具就自己做：加 print，或者让 AI 编程助手几分钟写一个单步跟踪器。花多少时间做工具、做什么工具，本身就是考察的一部分。",
+    "时间 2 小时，可以使用 AI 助手。"
+  ],
+  "confidence": "high"
+}

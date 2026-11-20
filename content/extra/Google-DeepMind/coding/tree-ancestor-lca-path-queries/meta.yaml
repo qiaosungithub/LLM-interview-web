@@ -1,0 +1,14 @@
+title: "Ancestors, Lowest Common Ancestors and Path Maxima on a Rooted Tree"
+title_zh: "有根树上的祖先、最近公共祖先与路径最大值"
+summary_zh: "给一棵用父节点数组表示、可以深到一条链的有根树，回答大量查询：某个节点的第 k 个祖先、两个节点的最近公共祖先和距离、两个节点之间路径上的最大边权。要求构造 O(n log n)、每次查询 O(log n)，核心想法是倍增（binary lifting）。"
+category: coding
+kind_zh: "编程 · 树上倍增"
+roles: [SWE, MLE, RE, RS]
+topics: [tree, binary-lifting, lowest-common-ancestor, kth-ancestor, path-query, time-memory-trade-offs]
+difficulty: hard
+frequency: low
+stage: [onsite]
+format_zh: "3 个部分 / 45 分钟"
+order: 62
+added: true
+origin: "Google DeepMind 面试流程汇总的编程轮一段里，有一份反馈提到考过“比较冷门的数据结构和树相关问题”（obscure data structure and trees questions），没有记录任何具体题目；这道树上查询题是按这个题型补写的，真实面试不一定考过它。"

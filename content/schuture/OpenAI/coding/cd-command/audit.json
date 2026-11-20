@@ -1,0 +1,19 @@
+{
+  "id": "OpenAI/coding/cd-command",
+  "verdict": "ok",
+  "summary_zh": "",
+  "issues": [],
+  "checked": [
+    "ran page (both languages)",
+    "re-typed every statement example of Parts 1-3 (and the explanation's current/../snapshot and self/self/self/x examples) and called all three functions on them",
+    "edge inputs the statement allows: empty destination, '/', '//', '~/', '~/../..', '/..', './~', home = '/', a link as the last component, links below home, whole-component key matching",
+    "Part 3 against my own string-based resolver on 32000 random cases over three real directory trees with real symlinks (absolute, relative, climbing, self-pointing, chained and cyclic targets); about 4800 of them also compared with the kernel's own answer (chdir + getcwd) and 150 with bash 'cd -P ... && pwd'",
+    "hop cap boundary: chains and repeats of exactly 20 pass, 21 raise; five kinds of true cycle raise",
+    "Linux claims tested on this machine (kernel 5.19, glibc 2.35): with 'ln -s . loop', 40 components resolve and the 41st gives ELOOP in both the kernel and glibc realpath(); a 40-link chain resolves, 41 fails; link() on a directory gives EPERM",
+    "bash 5.1 behaviour: plain cd is logical and 'cd ..' returns to the link's directory while 'cd -P ..' goes to the target's parent; 'cd -' prints the directory and swaps PWD/OLDPWD; CDPATH is tried first, the hit is printed, the current directory is the fallback; cd is a builtin and a subshell cd does not move the parent",
+    "compared Chinese and English prose; code fences are identical in both files apart from two translated labels inside text fences"
+  ],
+  "code_run": {"ran": true, "passed": true, "notes": ""},
+  "env_evidence": [],
+  "confidence": "high"
+}
